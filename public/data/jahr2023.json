@@ -1,0 +1,93 @@
+{
+  "jahr": 2023,
+  "kindergeld": 250,
+  "selbstbehalt": {
+    "Notwendig": 1370,
+    "Notwendig (nicht erwerbstätig)": 1120,
+    "Angemessen": 1650
+  },
+  "duesseldorferTabelle": {
+    "eintraege": [
+      {
+        "altersgruppe": "0-5",
+        "einkommensgruppen": [
+          { "einkommenVon": 0, "einkommenBis": 1900, "regelbedarf": 437 },
+          { "einkommenVon": 1901, "einkommenBis": 2300, "regelbedarf": 459 },
+          { "einkommenVon": 2301, "einkommenBis": 2700, "regelbedarf": 481 },
+          { "einkommenVon": 2701, "einkommenBis": 3100, "regelbedarf": 503 },
+          { "einkommenVon": 3101, "einkommenBis": 3500, "regelbedarf": 525 },
+          { "einkommenVon": 3501, "einkommenBis": 3900, "regelbedarf": 560 },
+          { "einkommenVon": 3901, "einkommenBis": 4300, "regelbedarf": 595 },
+          { "einkommenVon": 4301, "einkommenBis": 4700, "regelbedarf": 630 },
+          { "einkommenVon": 4701, "einkommenBis": 5100, "regelbedarf": 665 },
+          { "einkommenVon": 5101, "einkommenBis": 5500, "regelbedarf": 700 },
+          { "einkommenVon": 5501, "einkommenBis": 6200, "regelbedarf": 735 },
+          { "einkommenVon": 6201, "einkommenBis": 7000, "regelbedarf": 770 },
+          { "einkommenVon": 7001, "einkommenBis": 8000, "regelbedarf": 805 },
+          { "einkommenVon": 8001, "einkommenBis": 9500, "regelbedarf": 840 },
+          { "einkommenVon": 9501, "einkommenBis": 11000, "regelbedarf": 874 }
+        ]
+      },
+      {
+        "altersgruppe": "6-11",
+        "einkommensgruppen": [
+          { "einkommenVon": 0, "einkommenBis": 1900, "regelbedarf": 502 },
+          { "einkommenVon": 1901, "einkommenBis": 2300, "regelbedarf": 528 },
+          { "einkommenVon": 2301, "einkommenBis": 2700, "regelbedarf": 553 },
+          { "einkommenVon": 2701, "einkommenBis": 3100, "regelbedarf": 578 },
+          { "einkommenVon": 3101, "einkommenBis": 3500, "regelbedarf": 603 },
+          { "einkommenVon": 3501, "einkommenBis": 3900, "regelbedarf": 643 },
+          { "einkommenVon": 3901, "einkommenBis": 4300, "regelbedarf": 683 },
+          { "einkommenVon": 4301, "einkommenBis": 4700, "regelbedarf": 723 },
+          { "einkommenVon": 4701, "einkommenBis": 5100, "regelbedarf": 764 },
+          { "einkommenVon": 5101, "einkommenBis": 5500, "regelbedarf": 804 },
+          { "einkommenVon": 5501, "einkommenBis": 6200, "regelbedarf": 844 },
+          { "einkommenVon": 6201, "einkommenBis": 7000, "regelbedarf": 884 },
+          { "einkommenVon": 7001, "einkommenBis": 8000, "regelbedarf": 924 },
+          { "einkommenVon": 8001, "einkommenBis": 9500, "regelbedarf": 964 },
+          { "einkommenVon": 9501, "einkommenBis": 11000, "regelbedarf": 1004 }
+        ]
+      },
+      {
+        "altersgruppe": "12-17",
+        "einkommensgruppen": [
+          { "einkommenVon": 0, "einkommenBis": 1900, "regelbedarf": 588 },
+          { "einkommenVon": 1901, "einkommenBis": 2300, "regelbedarf": 618 },
+          { "einkommenVon": 2301, "einkommenBis": 2700, "regelbedarf": 647 },
+          { "einkommenVon": 2701, "einkommenBis": 3100, "regelbedarf": 677 },
+          { "einkommenVon": 3101, "einkommenBis": 3500, "regelbedarf": 706 },
+          { "einkommenVon": 3501, "einkommenBis": 3900, "regelbedarf": 753 },
+          { "einkommenVon": 3901, "einkommenBis": 4300, "regelbedarf": 800 },
+          { "einkommenVon": 4301, "einkommenBis": 4700, "regelbedarf": 847 },
+          { "einkommenVon": 4701, "einkommenBis": 5100, "regelbedarf": 894 },
+          { "einkommenVon": 5101, "einkommenBis": 5500, "regelbedarf": 941 },
+          { "einkommenVon": 5501, "einkommenBis": 6200, "regelbedarf": 988 },
+          { "einkommenVon": 6201, "einkommenBis": 7000, "regelbedarf": 1035 },
+          { "einkommenVon": 7001, "einkommenBis": 8000, "regelbedarf": 1082 },
+          { "einkommenVon": 8001, "einkommenBis": 9500, "regelbedarf": 1129 },
+          { "einkommenVon": 9501, "einkommenBis": 11000, "regelbedarf": 1176 }
+        ]
+      },
+      {
+        "altersgruppe": "18+",
+        "einkommensgruppen": [
+          { "einkommenVon": 0, "einkommenBis": 1900, "regelbedarf": 628 },
+          { "einkommenVon": 1901, "einkommenBis": 2300, "regelbedarf": 660 },
+          { "einkommenVon": 2301, "einkommenBis": 2700, "regelbedarf": 691 },
+          { "einkommenVon": 2701, "einkommenBis": 3100, "regelbedarf": 723 },
+          { "einkommenVon": 3101, "einkommenBis": 3500, "regelbedarf": 754 },
+          { "einkommenVon": 3501, "einkommenBis": 3900, "regelbedarf": 804 },
+          { "einkommenVon": 3901, "einkommenBis": 4300, "regelbedarf": 855 },
+          { "einkommenVon": 4301, "einkommenBis": 4700, "regelbedarf": 905 },
+          { "einkommenVon": 4701, "einkommenBis": 5100, "regelbedarf": 955 },
+          { "einkommenVon": 5101, "einkommenBis": 5500, "regelbedarf": 1005 },
+          { "einkommenVon": 5501, "einkommenBis": 6200, "regelbedarf": 1056 },
+          { "einkommenVon": 6201, "einkommenBis": 7000, "regelbedarf": 1106 },
+          { "einkommenVon": 7001, "einkommenBis": 8000, "regelbedarf": 1156 },
+          { "einkommenVon": 8001, "einkommenBis": 9500, "regelbedarf": 1206 },
+          { "einkommenVon": 9501, "einkommenBis": 11000, "regelbedarf": 1256 }
+        ]
+      }
+    ]
+  }
+}
