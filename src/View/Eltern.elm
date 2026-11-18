@@ -374,9 +374,17 @@ viewSelbstbehalt model person =
                 Benutzerdefiniert _ ->
                     "ein benutzerdefinierter Selbstbehalt"
     in
+    let
+        personClass =
+            case person of
+                Vater ->
+                    "is-vater"
+
+                Mutter ->
+                    "is-mutter"
+    in
     div
-        [ class "box mt-5"
-        , style "background-color" "rgba(105, 166, 180, 0.3)"
+        [ class ("box mt-5 selbstbehalt-box " ++ personClass)
         ]
         [ div [ class "content" ]
             [ p
@@ -401,7 +409,7 @@ viewSelbstbehalt model person =
             [ div [ class "control" ]
                 [ Html.button
                     [ Html.Attributes.type_ "button"
-                    , class "button is-primary is-small"
+                    , class "button is-primary is-small selbstbehalt-button"
                     , onClick (ToggleView (ToggleSelbstbehaltOptions person))
                     ]
                     [ text "Ändern" ]

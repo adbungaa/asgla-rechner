@@ -303,3 +303,42 @@ html .button.entry-action {
     padding-bottom: 0;
     box-sizing: border-box;
 }
+
+/* #2: Selbstbehalt-Box passt sich farblich an den Abschnitt (Vater/Mutter) an und hebt sich stärker ab */
+.selbstbehalt-box {
+    background-color: #ffffff;
+    border: 2px solid #69a6b4;
+    border-left-width: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.selbstbehalt-box.is-vater {
+    border-color: #2f7f92;
+}
+
+.selbstbehalt-box.is-mutter {
+    border-color: #e0702e;
+}
+
+html .selbstbehalt-box.is-vater .button.selbstbehalt-button {
+    background-color: #2f7f92;
+    border-color: #2f7f92;
+    color: #ffffff;
+}
+
+html .selbstbehalt-box.is-vater .button.selbstbehalt-button:hover {
+    background-color: #236272;
+    border-color: #236272;
+}
+
+html .selbstbehalt-box.is-mutter .button.selbstbehalt-button {
+    background-color: #f9a374;
+    border-color: #f9a374;
+    color: #1a1a1a;
+}
+
+html .selbstbehalt-box.is-mutter .button.selbstbehalt-button:hover {
+    background-color: #f08161;
+    border-color: #f08161;
+    color: #1a1a1a;
+}
