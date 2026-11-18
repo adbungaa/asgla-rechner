@@ -34,7 +34,7 @@ viewKind model =
                     [ text "Alter / Geburtsdatum des Kindes* "
                     , showTooltip "Geben Sie hier entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ ein."
                     ]
-                , div [ class "control", style "width" "50%" ]
+                , div [ class "control half-width-control" ]
                     [ input
                         [ classList
                             [ ( "input", True )
@@ -61,7 +61,7 @@ viewKind model =
                 [ text "Kindergeld Empfänger "
                 , showTooltip "Elternteil, der das Kindergeld für das Kind erhält"
                 ]
-            , div [ class "control", style "width" "50%" ]
+            , div [ class "control half-width-control" ]
                 [ div [ class "select is-fullwidth" ]
                     [ select
                         [ onInput (\val -> Update (UpdateKindergeldEmpfaenger (stringToPerson val))) ]
@@ -199,11 +199,11 @@ viewBedarf bedarfsTyp model index eingabe =
                 ]
                 []
             ]
-        , div [ class "control entry-label", style "width" "23%" ]
+        , div [ class "control entry-label", style "width" "38%" ]
             [ input
                 [ class "input entry-input"
                 , type_ "text"
-                , placeholder "Bezeichnung z.B. Musikschule"
+                , placeholder "z.B. Musikschule"
                 , value eingabe.bezeichnung
                 , onInput (\newBezeichnung -> UpdateKindDaten (ChangeBedarf (UpdateBedarf bedarfsTyp index { eingabe | bezeichnung = newBezeichnung })))
                 ]
@@ -341,7 +341,7 @@ viewKindEinkuenfte model index eingabe =
                 ]
                 []
             ]
-        , div [ class "control entry-label", style "width" "23%" ]
+        , div [ class "control entry-label", style "width" "38%" ]
             [ input
                 [ class "input entry-input"
                 , type_ "text"
@@ -370,7 +370,7 @@ viewIndividuelleRegelbedarf model =
         [ label [ class "label" ]
             [ text "Individueller Regelbedarf für das Kind (€) "
             ]
-        , div [ class "control", style "width" "50%" ]
+        , div [ class "control half-width-control" ]
             [ input
                 [ classList
                     [ ( "input", True )

@@ -238,7 +238,7 @@ html .button.is-primary:active {
 }
 
 .entry-controls .entry-cost {
-    flex: 0 0 40%;
+    flex: 0 0 8rem;
 }
 
 .entry-controls .entry-label {
@@ -247,7 +247,7 @@ html .button.is-primary:active {
 }
 
 .entry-action {
-    min-width: 4.1rem;
+    min-width: 3.2rem;
 }
 
 .entry-row.field.has-addons .control .button.entry-add {
@@ -281,12 +281,15 @@ html .button.is-primary:active {
         gap: 0;
     }
 
-    .entry-controls .entry-cost {
-        flex: 0 0 38%;
+    .entry-row .entry-cost {
+        width: auto !important;
+        flex: 0 0 34%;
     }
 
-    .entry-controls .entry-label {
-        flex: 1 1 auto;
+    .entry-row .entry-label {
+        width: auto !important;
+        flex: 1 1 0;
+        min-width: 0;
     }
 
     .entry-controls .entry-action {
@@ -294,6 +297,29 @@ html .button.is-primary:active {
         min-width: 0;
     }
 
+    .half-width-control {
+        width: 100%;
+    }
+
+}
+
+/* #5: Platzhalter/Hints in Formularfeldern gut lesbar (Kontrast >= 4.5:1) */
+.input::placeholder,
+.textarea::placeholder {
+    color: #6b6b6b;
+    opacity: 1;
+}
+
+/* #5: Eingabefelder in Zeilen mit Aktionsbuttons: weniger Innenabstand, damit Beispieltexte nicht abgeschnitten werden */
+.input.entry-input {
+    padding-left: 1rem;
+    padding-right: .75rem;
+    text-overflow: ellipsis;
+}
+
+/* Breite der Einzelfelder im Kind-Tab: Desktop 50 %, mobil volle Breite (Hints bleiben lesbar) */
+.half-width-control {
+    width: 50%;
 }
 
 /* #1: Plus/Minus-Buttons haben exakt die Höhe der Eingabefelder (2,5em) und schließen bündig mit deren Kontur ab */
