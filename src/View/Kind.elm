@@ -27,6 +27,16 @@ import View.Components exposing (showTooltip, viewEntryActionButtons)
 
 viewKind : Model -> Html Msg
 viewKind model =
+    let
+        -- Ein leeres Feld wird erst nach einem fehlgeschlagenen Berechnen als Fehler markiert;
+        -- vorher zeigt nur der Platzhalter den Hinweis.
+        altersFehler =
+            if String.trim model.kind.alterInput == "" && model.error == Nothing then
+                Nothing
+
+            else
+                validateAgeOrBirthday model.kind.alterInput
+    in
     div [ class "content" ]
         [ div []
             [ div [ class "field", style "margin-top" "1.5rem" ]
@@ -39,7 +49,7 @@ viewKind model =
                         [ classList
                             [ ( "input", True )
                             , ( "entry-input", True )
-                            , ( "is-danger", validateAgeOrBirthday model.kind.alterInput /= Nothing )
+                            , ( "is-danger", altersFehler /= Nothing )
                             ]
                         , type_ "text"
                         , placeholder "z.B. 5 oder 12.12.2000"
@@ -47,7 +57,7 @@ viewKind model =
                         , onInput (\val -> UpdateKindDaten (UpdateAlter val))
                         ]
                         []
-                    , case validateAgeOrBirthday model.kind.alterInput of
+                    , case altersFehler of
                         Just error ->
                             p [ class "help is-danger" ] [ text error ]
 

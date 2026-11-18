@@ -48,7 +48,7 @@ init _ =
       , jahr = "2023" -- FALLBACK
       , kind =
             { alter = 0
-            , alterInput = "0"
+            , alterInput = ""
             , mehrbedarf = [ { kosten = "", bezeichnung = "", bezahltVon = Nothing } ]
             , sonderbedarf = [ { kosten = "", bezeichnung = "", bezahltVon = Nothing } ]
             , einkuenfte = [ { kosten = "", bezeichnung = "" } ]
