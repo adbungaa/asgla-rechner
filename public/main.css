@@ -295,3 +295,11 @@ html .button.is-primary:active {
     }
 
 }
+
+/* #1: Plus/Minus-Buttons haben exakt die Höhe der Eingabefelder (2,5em) und schließen bündig mit deren Kontur ab */
+html .button.entry-action {
+    height: 2.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+    box-sizing: border-box;
+}
