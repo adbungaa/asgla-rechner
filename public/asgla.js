@@ -7288,7 +7288,7 @@ var $author$project$ImportExport$decodeElternteil = A7(
 				$elm$json$Json$Decode$succeed(
 				_List_fromArray(
 					[
-						{bezeichnung: ' ', kosten: ''}
+						{bezeichnung: '', kosten: ''}
 					]))
 			])));
 var $author$project$Types$Kind = F7(
