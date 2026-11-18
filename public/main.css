@@ -322,6 +322,21 @@ html .button.is-primary:active {
     width: 50%;
 }
 
+/* #6: Aktiver Tab: dunkle Schrift auf allen Tabs (WCAG), Hervorhebung über Fettschrift und Unterstreichung */
+.tabs li a {
+    border-bottom-width: 4px;
+    border-bottom-color: transparent;
+}
+
+.tabs li.tab-active a {
+    font-weight: 700;
+    border-bottom-color: #1a1a1a;
+}
+
+.tabs li:not(.tab-active) a:hover {
+    border-bottom-color: rgba(26, 26, 26, 0.45);
+}
+
 /* #1: Plus/Minus-Buttons haben exakt die Höhe der Eingabefelder (2,5em) und schließen bündig mit deren Kontur ab */
 html .button.entry-action {
     height: 2.5em;
