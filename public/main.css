@@ -54,13 +54,55 @@ html .button.is-primary:active {
     box-shadow: 0 0 0 3px rgba(105, 166, 180, 0.5);
 }
 
-.calculate-button:hover {
-    color: #000000 !important;
-    padding: .3em 1em;
-    /* border-width: 2px !important; */
-    border-color: #F08161 !important;
-    font-weight: 700 !important;
-    background-color: #F08161 !important;
+/* Primärer Aktionsbutton "Berechnen": deutlich präsenter als der Zwischenspeichern-Button */
+html .button.calculate-button {
+    background-color: #1f5f6e;
+    border-color: #1f5f6e;
+    color: #ffffff;
+    font-size: 1.15rem;
+    padding: .5em 1.6em;
+    box-shadow: 0 3px 8px rgba(31, 95, 110, 0.35);
+}
+
+html .button.calculate-button:hover,
+html .button.calculate-button:focus-visible {
+    background-color: #164a57;
+    border-color: #164a57;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(22, 74, 87, 0.45) !important;
+}
+
+html .button.calculate-button:active {
+    background-color: #0f3943;
+    border-color: #0f3943;
+    box-shadow: none !important;
+}
+
+/* Sekundärer Button "Eingabe Zwischenspeichern": heller Hintergrund mit Kontur */
+html .button.save-button {
+    background-color: #ffffff;
+    border-color: #1f5f6e;
+    color: #1f5f6e;
+}
+
+html .button.save-button:hover,
+html .button.save-button:focus-visible {
+    background-color: #e3f0f3;
+    border-color: #1f5f6e;
+    color: #164a57;
+}
+
+html .button.save-button:active {
+    background-color: #cfe4e9;
+}
+
+.action-buttons {
+    align-items: center;
+    gap: .5rem;
+}
+
+.action-buttons .control {
+    margin-bottom: 0;
 }
 
 .footer-link {

@@ -62,22 +62,26 @@ viewForm model =
                 , style "margin-bottom" "1rem"
                 ]
                 [ -- LEFT SIDE
-                  div [ class "buttons" ]
+                  div [ class "buttons action-buttons" ]
                     [ div [ class "control" ]
                         [ Html.button
-                            [ class "button is-primary calculate-button"
+                            [ class "button is-medium calculate-button"
                             , type_ "button"
                             , onClick (ToggleView ViewErgebnis)
                             ]
-                            [ text "Berechnen" ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-calculator", Html.Attributes.attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "Berechnen" ]
+                            ]
                         ]
                     , div [ class "control" ]
                         [ Html.button
-                            [ class "button is-primary"
+                            [ class "button save-button"
                             , type_ "button"
                             , onClick (ToggleView ToggleSaveModal)
                             ]
-                            [ text "Eingabe Zwischenspeichern" ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-floppy-disk", Html.Attributes.attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "Eingabe Zwischenspeichern" ]
+                            ]
                         ]
                     ]
                 ]
