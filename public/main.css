@@ -304,6 +304,12 @@ html .button.entry-action {
     box-sizing: border-box;
 }
 
+html .button.entry-add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* #2: Selbstbehalt-Box passt sich farblich an den Abschnitt (Vater/Mutter) an und hebt sich stärker ab */
 .selbstbehalt-box {
     background-color: #ffffff;

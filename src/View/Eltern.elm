@@ -18,7 +18,7 @@ import Types
         )
 import Utils.Format exposing (formatEuroRounded, formatInputToFloat, renderSelbstbehaltBetrag, selbstbehaltToString)
 import Utils.Validation exposing (validateMoney)
-import View.Components exposing (showTooltip)
+import View.Components exposing (showTooltip, viewEntryActionButtons)
 
 
 
@@ -233,7 +233,7 @@ viewElternPosten postenType model p index eingabe =
     in
     div [ class "entry-row" ]
         [ div [ class "field has-addons entry-controls" ]
-            [ div [ class "control entry-cost" ]
+            ([ div [ class "control entry-cost" ]
                 [ input
                     [ classList
                         [ ( "input", True )
@@ -301,31 +301,14 @@ viewElternPosten postenType model p index eingabe =
                             ]
                             []
                 ]
-            , div [ class "control" ]
-                [ button
-                    (if List.length typeList == 1 then
-                        [ class "button is-light  entry-action entry-remove", type_ "button" ]
-
-                     else
-                        [ class "button is-primary  entry-action entry-remove", onClick (UpdateElternDaten p (ChangePosten (RemovePosten postenType index))), type_ "button" ]
-                    )
-                    [ text "-" ]
-                ]
-            , div [ class "control" ]
-                [ button
-                    [ class
-                        (if List.length typeList >= maxPosten then
-                            "button is-light entry-action entry-add"
-
-                         else
-                            "button is-primary entry-action entry-add"
-                        )
-                    , type_ "button"
-                    , onClick (UpdateElternDaten p (ChangePosten (AddPosten postenType)))
-                    ]
-                    [ text "+" ]
-                ]
             ]
+                ++ viewEntryActionButtons
+                    { isRemovable = List.length typeList > 1
+                    , isAtLimit = List.length typeList >= maxPosten
+                    , onRemove = UpdateElternDaten p (ChangePosten (RemovePosten postenType index))
+                    , onAdd = UpdateElternDaten p (ChangePosten (AddPosten postenType))
+                    }
+            )
         , div []
             [ moneyHelp eingabe.kosten ]
         ]

@@ -6,6 +6,7 @@ module View.Components exposing
     , showTooltip
     , ueberUnsSection
     , viewCheckboxDurchschnittseinkommen
+    , viewEntryActionButtons
     , viewMonth
     , viewYear
     )
@@ -1129,3 +1130,30 @@ viewVorschlagHaftungsanteil model ergebnis elterenteil vorschlag =
             [ text "Werte Übernehmen" ]
         , p [] [ text "Bitte nutzen Sie diese Funktion nur, wenn Sie einem ausnahmsweisen Sonderfall haben." ]
         ]
+
+
+viewEntryActionButtons : { isRemovable : Bool, isAtLimit : Bool, onRemove : msg, onAdd : msg } -> List (Html msg)
+viewEntryActionButtons { isRemovable, isAtLimit, onRemove, onAdd } =
+    [ if isRemovable then
+        div [ class "control" ]
+            [ button
+                [ class "button is-light entry-action entry-remove"
+                , onClick onRemove
+                , type_ "button"
+                , attribute "aria-label" "Eintrag entfernen"
+                ]
+                [ text "-" ]
+            ]
+
+      else
+        text ""
+    , div [ class "control" ]
+        [ button
+            [ class "button is-primary entry-action entry-add"
+            , type_ "button"
+            , disabled isAtLimit
+            , onClick onAdd
+            ]
+            [ text "+" ]
+        ]
+    ]
