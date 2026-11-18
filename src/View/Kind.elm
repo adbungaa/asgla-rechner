@@ -216,7 +216,7 @@ viewBedarf bedarfsTyp model index eingabe =
                 , onRemove = UpdateKindDaten (ChangeBedarf (RemoveBedarf bedarfsTyp index))
                 , onAdd = UpdateKindDaten (ChangeBedarf (AddBedarf bedarfsTyp))
                 }
-            ++ [ div [ class "control", style "margin-left" "1.5rem", style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
+            ++ [ div [ class "control", style "flex-basis" "100%", style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
             [ div [ style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
                 [ span [ class "has-text-weight-light", style "white-space" "nowrap" ]
                     [ text "Bereits bezahlt von:" ]

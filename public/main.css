@@ -310,6 +310,11 @@ html .button.entry-add:disabled {
     pointer-events: none;
 }
 
+/* #4: "Bereits bezahlt von"-Zeile umbricht unter die Eingabezeile und berührt sie nicht mehr */
+.entry-row.field.has-addons {
+    row-gap: .6rem;
+}
+
 /* #2: Selbstbehalt-Box passt sich farblich an den Abschnitt (Vater/Mutter) an und hebt sich stärker ab */
 .selbstbehalt-box {
     background-color: #ffffff;
