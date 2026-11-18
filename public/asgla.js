@@ -5682,7 +5682,7 @@ var $author$project$Main$init = function (_v0) {
 			jahr: '2023',
 			kind: {
 				alter: 0,
-				alterInput: '0',
+				alterInput: '',
 				einkuenfte: _List_fromArray(
 					[
 						{bezeichnung: '', kosten: ''}
@@ -20183,6 +20183,59 @@ var $author$project$View$Eltern$moneyHelp = function (value) {
 	}
 };
 var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
+var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
+	var isRemovable = _v0.isRemovable;
+	var isAtLimit = _v0.isAtLimit;
+	var onRemove = _v0.onRemove;
+	var onAdd = _v0.onAdd;
+	return _List_fromArray(
+		[
+			isRemovable ? A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('control')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('button is-light entry-action entry-remove'),
+							$elm$html$Html$Events$onClick(onRemove),
+							$elm$html$Html$Attributes$type_('button'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Eintrag entfernen')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('-')
+						]))
+				])) : $elm$html$Html$text(''),
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('control')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('button is-primary entry-action entry-add'),
+							$elm$html$Html$Attributes$type_('button'),
+							$elm$html$Html$Attributes$disabled(isAtLimit),
+							$elm$html$Html$Events$onClick(onAdd)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('+')
+						]))
+				]))
+		]);
+};
 var $author$project$View$Eltern$viewElternPosten = F5(
 	function (postenType, model, p, index, eingabe) {
 		var modelPerson = function () {
@@ -20223,302 +20276,261 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 						[
 							$elm$html$Html$Attributes$class('field has-addons entry-controls')
 						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('control entry-cost')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$input,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$classList(
-											_List_fromArray(
-												[
-													_Utils_Tuple2('input', true),
-													_Utils_Tuple2('entry-input', true),
-													_Utils_Tuple2(
-													'is-danger',
-													!_Utils_eq(
-														$author$project$Utils$Validation$validateMoney(eingabe.kosten),
-														$elm$core$Maybe$Nothing))
-												])),
-											$elm$html$Html$Attributes$type_('text'),
-											$elm$html$Html$Attributes$placeholder('Kosten (€)'),
-											$elm$html$Html$Attributes$value(eingabe.kosten),
-											$elm$html$Html$Events$onInput(
-											function (newKosten) {
+					_Utils_ap(
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('control entry-cost')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$classList(
+												_List_fromArray(
+													[
+														_Utils_Tuple2('input', true),
+														_Utils_Tuple2('entry-input', true),
+														_Utils_Tuple2(
+														'is-danger',
+														!_Utils_eq(
+															$author$project$Utils$Validation$validateMoney(eingabe.kosten),
+															$elm$core$Maybe$Nothing))
+													])),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Kosten (€)'),
+												$elm$html$Html$Attributes$value(eingabe.kosten),
+												$elm$html$Html$Events$onInput(
+												function (newKosten) {
+													return A2(
+														$author$project$Types$UpdateElternDaten,
+														p,
+														$author$project$Types$ChangePosten(
+															A3(
+																$author$project$Types$UpdatePosten,
+																postenType,
+																index,
+																_Utils_update(
+																	eingabe,
+																	{kosten: newKosten}))));
+												})
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('control is-expanded entry-label')
+									]),
+								_List_fromArray(
+									[
+										function () {
+										switch (postenType.$) {
+											case 'WeitereEinkuenfte':
+												var selectId = function () {
+													if (p.$ === 'Vater') {
+														return 'weitereEinkuenfteVater' + $elm$core$String$fromInt(index);
+													} else {
+														return 'weitereEinkuenfteMutter' + $elm$core$String$fromInt(index);
+													}
+												}();
+												var currentBezeichnung = eingabe.bezeichnung;
 												return A2(
-													$author$project$Types$UpdateElternDaten,
-													p,
-													$author$project$Types$ChangePosten(
-														A3(
-															$author$project$Types$UpdatePosten,
-															postenType,
-															index,
-															_Utils_update(
-																eingabe,
-																{kosten: newKosten}))));
-											})
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('control is-expanded entry-label')
-								]),
-							_List_fromArray(
-								[
-									function () {
-									switch (postenType.$) {
-										case 'WeitereEinkuenfte':
-											var selectId = function () {
-												if (p.$ === 'Vater') {
-													return 'weitereEinkuenfteVater' + $elm$core$String$fromInt(index);
-												} else {
-													return 'weitereEinkuenfteMutter' + $elm$core$String$fromInt(index);
-												}
-											}();
-											var currentBezeichnung = eingabe.bezeichnung;
-											return A2(
-												$elm$html$Html$div,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('select is-fullwidth')
-													]),
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$select,
-														_List_fromArray(
-															[
-																A2($elm$html$Html$Attributes$attribute, 'key', selectId),
-																$elm$html$Html$Attributes$id(selectId),
-																$elm$html$Html$Attributes$class('input entry-input'),
-																$elm$html$Html$Attributes$value(currentBezeichnung),
-																$elm$html$Html$Events$onInput(
-																function (newBezeichnung) {
-																	return A2(
-																		$author$project$Types$UpdateElternDaten,
-																		p,
-																		$author$project$Types$ChangePosten(
-																			A3(
-																				$author$project$Types$UpdatePosten,
-																				postenType,
-																				index,
-																				_Utils_update(
-																					eingabe,
-																					{bezeichnung: newBezeichnung}))));
-																})
-															]),
-														_List_fromArray(
-															[
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value(' '),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === ' ')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Bitte wählen')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('Nebentätigkeit'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === 'Nebentätigkeit')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Nebentätigkeit')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('Überstundenvergütungen'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === 'Überstundenvergütungen')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Überstundenvergütungen')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('Sozialleistungen'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === 'Sozialleistungen')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Sozialleistungen')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('Selbstständige Tätigkeit'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === 'Selbstständige Tätigkeit')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Selbstständige Tätigkeit')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('1/12 Steuererstattung'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === '1/12 Steuererstattung')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('1/12 Steuererstattung')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('Fiktives Einkommen'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === 'Fiktives Einkommen')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Fiktives Einkommen')
-																	])),
-																A2(
-																$elm$html$Html$option,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$value('Sonstige Einkünfte'),
-																		$elm$html$Html$Attributes$selected(currentBezeichnung === 'Sonstige Einkünfte')
-																	]),
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text('Sonstige Einkünfte')
-																	]))
-															]))
-													]));
-										case 'Abzugsposten':
-											return A2(
-												$elm$html$Html$input,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('input  entry-input'),
-														$elm$html$Html$Attributes$type_('text'),
-														$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Fahrtkosten'),
-														$elm$html$Html$Attributes$value(eingabe.bezeichnung),
-														$elm$html$Html$Events$onInput(
-														function (newBezeichnung) {
-															return A2(
-																$author$project$Types$UpdateElternDaten,
-																p,
-																$author$project$Types$ChangePosten(
-																	A3(
-																		$author$project$Types$UpdatePosten,
-																		postenType,
-																		index,
-																		{bezeichnung: newBezeichnung, kosten: eingabe.kosten})));
-														})
-													]),
-												_List_Nil);
-										default:
-											return A2(
-												$elm$html$Html$input,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('input  entry-input'),
-														$elm$html$Html$Attributes$type_('text'),
-														$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Monat 1'),
-														$elm$html$Html$Attributes$value(eingabe.bezeichnung),
-														$elm$html$Html$Events$onInput(
-														function (newBezeichnung) {
-															return A2(
-																$author$project$Types$UpdateElternDaten,
-																p,
-																$author$project$Types$ChangePosten(
-																	A3(
-																		$author$project$Types$UpdatePosten,
-																		postenType,
-																		index,
-																		{bezeichnung: newBezeichnung, kosten: eingabe.kosten})));
-														})
-													]),
-												_List_Nil);
-									}
-								}()
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('control')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									($elm$core$List$length(typeList) === 1) ? _List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('button is-light  entry-action entry-remove'),
-											$elm$html$Html$Attributes$type_('button')
-										]) : _List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('button is-primary  entry-action entry-remove'),
-											$elm$html$Html$Events$onClick(
-											A2(
-												$author$project$Types$UpdateElternDaten,
-												p,
-												$author$project$Types$ChangePosten(
-													A2($author$project$Types$RemovePosten, postenType, index)))),
-											$elm$html$Html$Attributes$type_('button')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('-')
-										]))
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('control')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class(
-											(_Utils_cmp(
-												$elm$core$List$length(typeList),
-												maxPosten) > -1) ? 'button is-light entry-action entry-add' : 'button is-primary entry-action entry-add'),
-											$elm$html$Html$Attributes$type_('button'),
-											$elm$html$Html$Events$onClick(
-											A2(
-												$author$project$Types$UpdateElternDaten,
-												p,
-												$author$project$Types$ChangePosten(
-													$author$project$Types$AddPosten(postenType))))
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('+')
-										]))
-								]))
-						])),
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('select is-fullwidth')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$select,
+															_List_fromArray(
+																[
+																	A2($elm$html$Html$Attributes$attribute, 'key', selectId),
+																	$elm$html$Html$Attributes$id(selectId),
+																	$elm$html$Html$Attributes$class('input entry-input'),
+																	$elm$html$Html$Attributes$value(currentBezeichnung),
+																	$elm$html$Html$Events$onInput(
+																	function (newBezeichnung) {
+																		return A2(
+																			$author$project$Types$UpdateElternDaten,
+																			p,
+																			$author$project$Types$ChangePosten(
+																				A3(
+																					$author$project$Types$UpdatePosten,
+																					postenType,
+																					index,
+																					_Utils_update(
+																						eingabe,
+																						{bezeichnung: newBezeichnung}))));
+																	})
+																]),
+															_List_fromArray(
+																[
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value(' '),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === ' ')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Bitte wählen')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('Nebentätigkeit'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === 'Nebentätigkeit')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Nebentätigkeit')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('Überstundenvergütungen'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === 'Überstundenvergütungen')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Überstundenvergütungen')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('Sozialleistungen'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === 'Sozialleistungen')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Sozialleistungen')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('Selbstständige Tätigkeit'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === 'Selbstständige Tätigkeit')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Selbstständige Tätigkeit')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('1/12 Steuererstattung'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === '1/12 Steuererstattung')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('1/12 Steuererstattung')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('Fiktives Einkommen'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === 'Fiktives Einkommen')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Fiktives Einkommen')
+																		])),
+																	A2(
+																	$elm$html$Html$option,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$value('Sonstige Einkünfte'),
+																			$elm$html$Html$Attributes$selected(currentBezeichnung === 'Sonstige Einkünfte')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text('Sonstige Einkünfte')
+																		]))
+																]))
+														]));
+											case 'Abzugsposten':
+												return A2(
+													$elm$html$Html$input,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('input  entry-input'),
+															$elm$html$Html$Attributes$type_('text'),
+															$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Fahrtkosten'),
+															$elm$html$Html$Attributes$value(eingabe.bezeichnung),
+															$elm$html$Html$Events$onInput(
+															function (newBezeichnung) {
+																return A2(
+																	$author$project$Types$UpdateElternDaten,
+																	p,
+																	$author$project$Types$ChangePosten(
+																		A3(
+																			$author$project$Types$UpdatePosten,
+																			postenType,
+																			index,
+																			{bezeichnung: newBezeichnung, kosten: eingabe.kosten})));
+															})
+														]),
+													_List_Nil);
+											default:
+												return A2(
+													$elm$html$Html$input,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('input  entry-input'),
+															$elm$html$Html$Attributes$type_('text'),
+															$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Monat 1'),
+															$elm$html$Html$Attributes$value(eingabe.bezeichnung),
+															$elm$html$Html$Events$onInput(
+															function (newBezeichnung) {
+																return A2(
+																	$author$project$Types$UpdateElternDaten,
+																	p,
+																	$author$project$Types$ChangePosten(
+																		A3(
+																			$author$project$Types$UpdatePosten,
+																			postenType,
+																			index,
+																			{bezeichnung: newBezeichnung, kosten: eingabe.kosten})));
+															})
+														]),
+													_List_Nil);
+										}
+									}()
+									]))
+							]),
+						$author$project$View$Components$viewEntryActionButtons(
+							{
+								isAtLimit: _Utils_cmp(
+									$elm$core$List$length(typeList),
+									maxPosten) > -1,
+								isRemovable: $elm$core$List$length(typeList) > 1,
+								onAdd: A2(
+									$author$project$Types$UpdateElternDaten,
+									p,
+									$author$project$Types$ChangePosten(
+										$author$project$Types$AddPosten(postenType))),
+								onRemove: A2(
+									$author$project$Types$UpdateElternDaten,
+									p,
+									$author$project$Types$ChangePosten(
+										A2($author$project$Types$RemovePosten, postenType, index)))
+							}))),
 					A2(
 					$elm$html$Html$div,
 					_List_Nil,
@@ -20783,12 +20795,18 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 				return 'Kindsmutter';
 			}
 		}();
+		var personClass = function () {
+			if (person.$ === 'Vater') {
+				return 'is-vater';
+			} else {
+				return 'is-mutter';
+			}
+		}();
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('box mt-5'),
-					A2($elm$html$Html$Attributes$style, 'background-color', 'rgba(105, 166, 180, 0.3)')
+					$elm$html$Html$Attributes$class('box mt-5 selbstbehalt-box ' + personClass)
 				]),
 			_List_fromArray(
 				[
@@ -20835,7 +20853,7 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$type_('button'),
-											$elm$html$Html$Attributes$class('button is-primary is-small'),
+											$elm$html$Html$Attributes$class('button is-primary is-small selbstbehalt-button'),
 											$elm$html$Html$Events$onClick(
 											$author$project$Types$ToggleView(
 												$author$project$Types$ToggleSelbstbehaltOptions(person)))
@@ -21301,152 +21319,104 @@ var $author$project$View$Kind$viewBedarf = F4(
 					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
 				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control entry-cost'),
-							A2($elm$html$Html$Attributes$style, 'width', '20%')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$classList(
-									_List_fromArray(
-										[
-											_Utils_Tuple2('input', true),
-											_Utils_Tuple2('entry-input', true),
-											_Utils_Tuple2(
-											'is-danger',
-											!_Utils_eq(
-												$author$project$Utils$Validation$validateMoney(eingabe.kosten),
-												$elm$core$Maybe$Nothing))
-										])),
-									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('Kosten (€)'),
-									$elm$html$Html$Attributes$value(eingabe.kosten),
-									$elm$html$Html$Events$onInput(
-									function (newKosten) {
-										return $author$project$Types$UpdateKindDaten(
-											$author$project$Types$ChangeBedarf(
-												A3(
-													$author$project$Types$UpdateBedarf,
-													bedarfsTyp,
-													index,
-													_Utils_update(
-														eingabe,
-														{kosten: newKosten}))));
-									})
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control entry-label'),
-							A2($elm$html$Html$Attributes$style, 'width', '23%')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('input entry-input'),
-									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Musikschule'),
-									$elm$html$Html$Attributes$value(eingabe.bezeichnung),
-									$elm$html$Html$Events$onInput(
-									function (newBezeichnung) {
-										return $author$project$Types$UpdateKindDaten(
-											$author$project$Types$ChangeBedarf(
-												A3(
-													$author$project$Types$UpdateBedarf,
-													bedarfsTyp,
-													index,
-													_Utils_update(
-														eingabe,
-														{bezeichnung: newBezeichnung}))));
-									})
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							($elm$core$List$length(typeList) === 1) ? _List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('button is-light entry-action entry-remove'),
-									$elm$html$Html$Attributes$type_('button')
-								]) : _List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('button is-primary entry-action entry-remove'),
-									$elm$html$Html$Events$onClick(
-									$author$project$Types$UpdateKindDaten(
-										$author$project$Types$ChangeBedarf(
-											A2($author$project$Types$RemoveBedarf, bedarfsTyp, index)))),
-									$elm$html$Html$Attributes$type_('button')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('-')
-								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class(
-									($elm$core$List$length(typeList) >= 5) ? 'button is-light entry-action entry-add' : 'button is-primary entry-action entry-add'),
-									$elm$html$Html$Attributes$type_('button'),
-									$elm$html$Html$Events$onClick(
-									$author$project$Types$UpdateKindDaten(
-										$author$project$Types$ChangeBedarf(
-											$author$project$Types$AddBedarf(bedarfsTyp))))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('+')
-								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control'),
-							A2($elm$html$Html$Attributes$style, 'margin-left', '1.5rem'),
-							A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-							A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-							A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-							A2($elm$html$Html$Attributes$style, 'gap', '1rem')
-						]),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control entry-cost'),
+								A2($elm$html$Html$Attributes$style, 'width', '20%')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('input', true),
+												_Utils_Tuple2('entry-input', true),
+												_Utils_Tuple2(
+												'is-danger',
+												!_Utils_eq(
+													$author$project$Utils$Validation$validateMoney(eingabe.kosten),
+													$elm$core$Maybe$Nothing))
+											])),
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$placeholder('Kosten (€)'),
+										$elm$html$Html$Attributes$value(eingabe.kosten),
+										$elm$html$Html$Events$onInput(
+										function (newKosten) {
+											return $author$project$Types$UpdateKindDaten(
+												$author$project$Types$ChangeBedarf(
+													A3(
+														$author$project$Types$UpdateBedarf,
+														bedarfsTyp,
+														index,
+														_Utils_update(
+															eingabe,
+															{kosten: newKosten}))));
+										})
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control entry-label'),
+								A2($elm$html$Html$Attributes$style, 'width', '38%')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('input entry-input'),
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$placeholder('z.B. Musikschule'),
+										$elm$html$Html$Attributes$value(eingabe.bezeichnung),
+										$elm$html$Html$Events$onInput(
+										function (newBezeichnung) {
+											return $author$project$Types$UpdateKindDaten(
+												$author$project$Types$ChangeBedarf(
+													A3(
+														$author$project$Types$UpdateBedarf,
+														bedarfsTyp,
+														index,
+														_Utils_update(
+															eingabe,
+															{bezeichnung: newBezeichnung}))));
+										})
+									]),
+								_List_Nil)
+							]))
+					]),
+				_Utils_ap(
+					$author$project$View$Components$viewEntryActionButtons(
+						{
+							isAtLimit: $elm$core$List$length(typeList) >= 5,
+							isRemovable: $elm$core$List$length(typeList) > 1,
+							onAdd: $author$project$Types$UpdateKindDaten(
+								$author$project$Types$ChangeBedarf(
+									$author$project$Types$AddBedarf(bedarfsTyp))),
+							onRemove: $author$project$Types$UpdateKindDaten(
+								$author$project$Types$ChangeBedarf(
+									A2($author$project$Types$RemoveBedarf, bedarfsTyp, index)))
+						}),
 					_List_fromArray(
 						[
 							A2(
 							$elm$html$Html$div,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$class('control'),
+									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%'),
 									A2($elm$html$Html$Attributes$style, 'display', 'flex'),
 									A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
 									A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
@@ -21455,29 +21425,32 @@ var $author$project$View$Kind$viewBedarf = F4(
 							_List_fromArray(
 								[
 									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('has-text-weight-light'),
-											A2($elm$html$Html$Attributes$style, 'white-space', 'nowrap')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Bereits bezahlt von:')
-										])),
-									A2(
 									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('field is-grouped')
+											A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+											A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
+											A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+											A2($elm$html$Html$Attributes$style, 'gap', '1rem')
 										]),
 									_List_fromArray(
 										[
 											A2(
+											$elm$html$Html$span,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('has-text-weight-light'),
+													A2($elm$html$Html$Attributes$style, 'white-space', 'nowrap')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Bereits bezahlt von:')
+												])),
+											A2(
 											$elm$html$Html$div,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('field is-narrow')
+													$elm$html$Html$Attributes$class('field is-grouped')
 												]),
 											_List_fromArray(
 												[
@@ -21485,7 +21458,7 @@ var $author$project$View$Kind$viewBedarf = F4(
 													$elm$html$Html$div,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$class('control')
+															$elm$html$Html$Attributes$class('field is-narrow')
 														]),
 													_List_fromArray(
 														[
@@ -21493,191 +21466,199 @@ var $author$project$View$Kind$viewBedarf = F4(
 															$elm$html$Html$div,
 															_List_fromArray(
 																[
-																	$elm$html$Html$Attributes$class('buttons has-addons is-flex-wrap-wrap')
+																	$elm$html$Html$Attributes$class('control')
 																]),
 															_List_fromArray(
 																[
 																	A2(
-																	$elm$html$Html$label,
+																	$elm$html$Html$div,
 																	_List_fromArray(
 																		[
-																			$elm$html$Html$Attributes$class('button'),
-																			$elm$html$Html$Attributes$classList(
-																			_List_fromArray(
-																				[
-																					_Utils_Tuple2(
-																					'is-primary is-selected',
-																					_Utils_eq(
-																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Vater))),
-																					_Utils_Tuple2(
-																					'is-light',
-																					!_Utils_eq(
-																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Vater)))
-																				])),
-																			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-																			A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
-																			A2(
-																			$elm$html$Html$Attributes$style,
-																			'border-bottom',
-																			_Utils_eq(
-																				eingabe.bezahltVon,
-																				$elm$core$Maybe$Just($author$project$Types$Vater)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
-																			$elm$html$Html$Events$onClick(
-																			$author$project$Types$UpdateKindDaten(
-																				$author$project$Types$ChangeBedarf(
-																					A3(
-																						$author$project$Types$UpdateBedarf,
-																						bedarfsTyp,
-																						index,
-																						_Utils_update(
-																							eingabe,
-																							{
-																								bezahltVon: $elm$core$Maybe$Just($author$project$Types$Vater)
-																							})))))
+																			$elm$html$Html$Attributes$class('buttons has-addons is-flex-wrap-wrap')
 																		]),
 																	_List_fromArray(
 																		[
 																			A2(
-																			$elm$html$Html$input,
+																			$elm$html$Html$label,
 																			_List_fromArray(
 																				[
-																					$elm$html$Html$Attributes$type_('radio'),
-																					$elm$html$Html$Attributes$name(radioName),
-																					$elm$html$Html$Attributes$value('Vater'),
-																					$elm$html$Html$Attributes$checked(
+																					$elm$html$Html$Attributes$class('button'),
+																					$elm$html$Html$Attributes$classList(
+																					_List_fromArray(
+																						[
+																							_Utils_Tuple2(
+																							'is-primary is-selected',
+																							_Utils_eq(
+																								eingabe.bezahltVon,
+																								$elm$core$Maybe$Just($author$project$Types$Vater))),
+																							_Utils_Tuple2(
+																							'is-light',
+																							!_Utils_eq(
+																								eingabe.bezahltVon,
+																								$elm$core$Maybe$Just($author$project$Types$Vater)))
+																						])),
+																					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+																					A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
+																					A2(
+																					$elm$html$Html$Attributes$style,
+																					'border-bottom',
 																					_Utils_eq(
 																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Vater))),
-																					A2($elm$html$Html$Attributes$style, 'display', 'none')
+																						$elm$core$Maybe$Just($author$project$Types$Vater)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
+																					$elm$html$Html$Events$onClick(
+																					$author$project$Types$UpdateKindDaten(
+																						$author$project$Types$ChangeBedarf(
+																							A3(
+																								$author$project$Types$UpdateBedarf,
+																								bedarfsTyp,
+																								index,
+																								_Utils_update(
+																									eingabe,
+																									{
+																										bezahltVon: $elm$core$Maybe$Just($author$project$Types$Vater)
+																									})))))
 																				]),
-																			_List_Nil),
-																			$elm$html$Html$text('Vater')
-																		])),
-																	A2(
-																	$elm$html$Html$label,
-																	_List_fromArray(
-																		[
-																			$elm$html$Html$Attributes$class('button'),
-																			$elm$html$Html$Attributes$classList(
 																			_List_fromArray(
 																				[
-																					_Utils_Tuple2(
-																					'is-primary is-selected',
-																					_Utils_eq(
-																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Mutter))),
-																					_Utils_Tuple2(
-																					'is-light',
-																					!_Utils_eq(
-																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Mutter)))
+																					A2(
+																					$elm$html$Html$input,
+																					_List_fromArray(
+																						[
+																							$elm$html$Html$Attributes$type_('radio'),
+																							$elm$html$Html$Attributes$name(radioName),
+																							$elm$html$Html$Attributes$value('Vater'),
+																							$elm$html$Html$Attributes$checked(
+																							_Utils_eq(
+																								eingabe.bezahltVon,
+																								$elm$core$Maybe$Just($author$project$Types$Vater))),
+																							A2($elm$html$Html$Attributes$style, 'display', 'none')
+																						]),
+																					_List_Nil),
+																					$elm$html$Html$text('Vater')
 																				])),
-																			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-																			A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
 																			A2(
-																			$elm$html$Html$Attributes$style,
-																			'border-bottom',
-																			_Utils_eq(
-																				eingabe.bezahltVon,
-																				$elm$core$Maybe$Just($author$project$Types$Mutter)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
-																			$elm$html$Html$Events$onClick(
-																			$author$project$Types$UpdateKindDaten(
-																				$author$project$Types$ChangeBedarf(
-																					A3(
-																						$author$project$Types$UpdateBedarf,
-																						bedarfsTyp,
-																						index,
-																						_Utils_update(
-																							eingabe,
-																							{
-																								bezahltVon: $elm$core$Maybe$Just($author$project$Types$Mutter)
-																							})))))
-																		]),
-																	_List_fromArray(
-																		[
-																			A2(
-																			$elm$html$Html$input,
+																			$elm$html$Html$label,
 																			_List_fromArray(
 																				[
-																					$elm$html$Html$Attributes$type_('radio'),
-																					$elm$html$Html$Attributes$name(radioName),
-																					$elm$html$Html$Attributes$value('Mutter'),
-																					$elm$html$Html$Attributes$checked(
+																					$elm$html$Html$Attributes$class('button'),
+																					$elm$html$Html$Attributes$classList(
+																					_List_fromArray(
+																						[
+																							_Utils_Tuple2(
+																							'is-primary is-selected',
+																							_Utils_eq(
+																								eingabe.bezahltVon,
+																								$elm$core$Maybe$Just($author$project$Types$Mutter))),
+																							_Utils_Tuple2(
+																							'is-light',
+																							!_Utils_eq(
+																								eingabe.bezahltVon,
+																								$elm$core$Maybe$Just($author$project$Types$Mutter)))
+																						])),
+																					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+																					A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
+																					A2(
+																					$elm$html$Html$Attributes$style,
+																					'border-bottom',
 																					_Utils_eq(
 																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Mutter))),
-																					A2($elm$html$Html$Attributes$style, 'display', 'none')
+																						$elm$core$Maybe$Just($author$project$Types$Mutter)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
+																					$elm$html$Html$Events$onClick(
+																					$author$project$Types$UpdateKindDaten(
+																						$author$project$Types$ChangeBedarf(
+																							A3(
+																								$author$project$Types$UpdateBedarf,
+																								bedarfsTyp,
+																								index,
+																								_Utils_update(
+																									eingabe,
+																									{
+																										bezahltVon: $elm$core$Maybe$Just($author$project$Types$Mutter)
+																									})))))
 																				]),
-																			_List_Nil),
-																			$elm$html$Html$text('Mutter')
-																		])),
-																	A2(
-																	$elm$html$Html$label,
-																	_List_fromArray(
-																		[
-																			$elm$html$Html$Attributes$class('button'),
-																			$elm$html$Html$Attributes$classList(
 																			_List_fromArray(
 																				[
-																					_Utils_Tuple2(
-																					'is-primary is-selected',
-																					_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
-																					_Utils_Tuple2(
-																					'is-light',
-																					!_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing))
+																					A2(
+																					$elm$html$Html$input,
+																					_List_fromArray(
+																						[
+																							$elm$html$Html$Attributes$type_('radio'),
+																							$elm$html$Html$Attributes$name(radioName),
+																							$elm$html$Html$Attributes$value('Mutter'),
+																							$elm$html$Html$Attributes$checked(
+																							_Utils_eq(
+																								eingabe.bezahltVon,
+																								$elm$core$Maybe$Just($author$project$Types$Mutter))),
+																							A2($elm$html$Html$Attributes$style, 'display', 'none')
+																						]),
+																					_List_Nil),
+																					$elm$html$Html$text('Mutter')
 																				])),
-																			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-																			A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
 																			A2(
-																			$elm$html$Html$Attributes$style,
-																			'border-bottom',
-																			_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
-																			$elm$html$Html$Events$onClick(
-																			$author$project$Types$UpdateKindDaten(
-																				$author$project$Types$ChangeBedarf(
-																					A3(
-																						$author$project$Types$UpdateBedarf,
-																						bedarfsTyp,
-																						index,
-																						_Utils_update(
-																							eingabe,
-																							{bezahltVon: $elm$core$Maybe$Nothing})))))
-																		]),
-																	_List_fromArray(
-																		[
-																			A2(
-																			$elm$html$Html$input,
+																			$elm$html$Html$label,
 																			_List_fromArray(
 																				[
-																					$elm$html$Html$Attributes$type_('radio'),
-																					$elm$html$Html$Attributes$name(radioName),
-																					$elm$html$Html$Attributes$value('Nicht angegeben'),
-																					$elm$html$Html$Attributes$checked(
-																					_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
-																					A2($elm$html$Html$Attributes$style, 'display', 'none')
+																					$elm$html$Html$Attributes$class('button'),
+																					$elm$html$Html$Attributes$classList(
+																					_List_fromArray(
+																						[
+																							_Utils_Tuple2(
+																							'is-primary is-selected',
+																							_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
+																							_Utils_Tuple2(
+																							'is-light',
+																							!_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing))
+																						])),
+																					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+																					A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
+																					A2(
+																					$elm$html$Html$Attributes$style,
+																					'border-bottom',
+																					_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
+																					$elm$html$Html$Events$onClick(
+																					$author$project$Types$UpdateKindDaten(
+																						$author$project$Types$ChangeBedarf(
+																							A3(
+																								$author$project$Types$UpdateBedarf,
+																								bedarfsTyp,
+																								index,
+																								_Utils_update(
+																									eingabe,
+																									{bezahltVon: $elm$core$Maybe$Nothing})))))
 																				]),
-																			_List_Nil),
-																			$elm$html$Html$text('Wurde noch nicht bezahlt')
+																			_List_fromArray(
+																				[
+																					A2(
+																					$elm$html$Html$input,
+																					_List_fromArray(
+																						[
+																							$elm$html$Html$Attributes$type_('radio'),
+																							$elm$html$Html$Attributes$name(radioName),
+																							$elm$html$Html$Attributes$value('Nicht angegeben'),
+																							$elm$html$Html$Attributes$checked(
+																							_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
+																							A2($elm$html$Html$Attributes$style, 'display', 'none')
+																						]),
+																					_List_Nil),
+																					$elm$html$Html$text('Wurde noch nicht bezahlt')
+																				]))
 																		]))
 																]))
 														]))
 												]))
 										]))
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
+								]),
+							_List_fromArray(
+								[
+									$author$project$View$Kind$moneyHelp(eingabe.kosten)
 								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
-						]),
-					_List_fromArray(
-						[
-							$author$project$View$Kind$moneyHelp(eingabe.kosten)
-						]))
-				]));
+						]))));
 	});
 var $author$project$Types$UpdateRegelbedarf = function (a) {
 	return {$: 'UpdateRegelbedarf', a: a};
@@ -21724,8 +21705,7 @@ var $author$project$View$Kind$viewIndividuelleRegelbedarf = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('control'),
-						A2($elm$html$Html$Attributes$style, 'width', '50%')
+						$elm$html$Html$Attributes$class('control half-width-control')
 					]),
 				_List_fromArray(
 					[
@@ -21789,139 +21769,103 @@ var $author$project$View$Kind$viewKindEinkuenfte = F3(
 					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
 				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control entry-cost'),
-							A2($elm$html$Html$Attributes$style, 'width', '20%')
-						]),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control entry-cost'),
+								A2($elm$html$Html$Attributes$style, 'width', '20%')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('input', true),
+												_Utils_Tuple2('entry-input', true),
+												_Utils_Tuple2(
+												'is-danger',
+												!_Utils_eq(
+													$author$project$Utils$Validation$validateMoney(eingabe.kosten),
+													$elm$core$Maybe$Nothing))
+											])),
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$placeholder('Kosten (€)'),
+										$elm$html$Html$Attributes$value(eingabe.kosten),
+										$elm$html$Html$Events$onInput(
+										function (newKosten) {
+											return $author$project$Types$UpdateKindDaten(
+												A2(
+													$author$project$Types$UpdateEinkuenfte,
+													index,
+													_Utils_update(
+														eingabe,
+														{kosten: newKosten})));
+										})
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control entry-label'),
+								A2($elm$html$Html$Attributes$style, 'width', '38%')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('input entry-input'),
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$placeholder('Bezeichnung'),
+										$elm$html$Html$Attributes$value(eingabe.bezeichnung),
+										$elm$html$Html$Events$onInput(
+										function (newBezeichnung) {
+											return $author$project$Types$UpdateKindDaten(
+												A2(
+													$author$project$Types$UpdateEinkuenfte,
+													index,
+													{bezeichnung: newBezeichnung, kosten: eingabe.kosten}));
+										})
+									]),
+								_List_Nil)
+							]))
+					]),
+				_Utils_ap(
+					$author$project$View$Components$viewEntryActionButtons(
+						{
+							isAtLimit: $elm$core$List$length(typeList) >= 5,
+							isRemovable: $elm$core$List$length(typeList) > 1,
+							onAdd: $author$project$Types$UpdateKindDaten($author$project$Types$AddEinkuenfte),
+							onRemove: $author$project$Types$UpdateKindDaten(
+								$author$project$Types$RemoveEinkuenfte(index))
+						}),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$input,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$classList(
-									_List_fromArray(
-										[
-											_Utils_Tuple2('input', true),
-											_Utils_Tuple2('entry-input', true),
-											_Utils_Tuple2(
-											'is-danger',
-											!_Utils_eq(
-												$author$project$Utils$Validation$validateMoney(eingabe.kosten),
-												$elm$core$Maybe$Nothing))
-										])),
-									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('Kosten (€)'),
-									$elm$html$Html$Attributes$value(eingabe.kosten),
-									$elm$html$Html$Events$onInput(
-									function (newKosten) {
-										return $author$project$Types$UpdateKindDaten(
-											A2(
-												$author$project$Types$UpdateEinkuenfte,
-												index,
-												_Utils_update(
-													eingabe,
-													{kosten: newKosten})));
-									})
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control entry-label'),
-							A2($elm$html$Html$Attributes$style, 'width', '23%')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('input entry-input'),
-									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('Bezeichnung'),
-									$elm$html$Html$Attributes$value(eingabe.bezeichnung),
-									$elm$html$Html$Events$onInput(
-									function (newBezeichnung) {
-										return $author$project$Types$UpdateKindDaten(
-											A2(
-												$author$project$Types$UpdateEinkuenfte,
-												index,
-												{bezeichnung: newBezeichnung, kosten: eingabe.kosten}));
-									})
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							($elm$core$List$length(typeList) === 1) ? _List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('button is-light entry-action entry-remove'),
-									$elm$html$Html$Attributes$type_('button')
-								]) : _List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('button is-primary entry-action entry-remove'),
-									$elm$html$Html$Events$onClick(
-									$author$project$Types$UpdateKindDaten(
-										$author$project$Types$RemoveEinkuenfte(index))),
-									$elm$html$Html$Attributes$type_('button')
+									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('-')
+									$author$project$View$Kind$moneyHelp(eingabe.kosten)
 								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class(
-									($elm$core$List$length(typeList) >= 5) ? 'button is-light entry-action entry-add' : 'button is-primary entry-action entry-add'),
-									$elm$html$Html$Attributes$type_('button'),
-									$elm$html$Html$Events$onClick(
-									$author$project$Types$UpdateKindDaten($author$project$Types$AddEinkuenfte))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('+')
-								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
-						]),
-					_List_fromArray(
-						[
-							$author$project$View$Kind$moneyHelp(eingabe.kosten)
-						]))
-				]));
+						]))));
 	});
 var $author$project$View$Kind$viewKind = function (model) {
+	var altersFehler = (($elm$core$String$trim(model.kind.alterInput) === '') && _Utils_eq(model.error, $elm$core$Maybe$Nothing)) ? $elm$core$Maybe$Nothing : $author$project$Utils$Validation$validateAgeOrBirthday(model.kind.alterInput);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -21959,8 +21903,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('control'),
-										A2($elm$html$Html$Attributes$style, 'width', '50%')
+										$elm$html$Html$Attributes$class('control half-width-control')
 									]),
 								_List_fromArray(
 									[
@@ -21975,9 +21918,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 														_Utils_Tuple2('entry-input', true),
 														_Utils_Tuple2(
 														'is-danger',
-														!_Utils_eq(
-															$author$project$Utils$Validation$validateAgeOrBirthday(model.kind.alterInput),
-															$elm$core$Maybe$Nothing))
+														!_Utils_eq(altersFehler, $elm$core$Maybe$Nothing))
 													])),
 												$elm$html$Html$Attributes$type_('text'),
 												$elm$html$Html$Attributes$placeholder('z.B. 5 oder 12.12.2000'),
@@ -21990,9 +21931,8 @@ var $author$project$View$Kind$viewKind = function (model) {
 											]),
 										_List_Nil),
 										function () {
-										var _v0 = $author$project$Utils$Validation$validateAgeOrBirthday(model.kind.alterInput);
-										if (_v0.$ === 'Just') {
-											var error = _v0.a;
+										if (altersFehler.$ === 'Just') {
+											var error = altersFehler.a;
 											return A2(
 												$elm$html$Html$p,
 												_List_fromArray(
@@ -22034,8 +21974,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('control'),
-								A2($elm$html$Html$Attributes$style, 'width', '50%')
+								$elm$html$Html$Attributes$class('control half-width-control')
 							]),
 						_List_fromArray(
 							[
@@ -22336,7 +22275,7 @@ var $author$project$Types$Select = function (a) {
 };
 var $author$project$View$Layout$tabItem = F4(
 	function (tab, label, icon, active) {
-		var textColor = _Utils_eq(tab, active) ? 'white' : 'black';
+		var textColor = '#1a1a1a';
 		var tabColor = function () {
 			switch (tab.$) {
 				case 'Left':
@@ -22353,12 +22292,18 @@ var $author$project$View$Layout$tabItem = F4(
 				A2($elm$html$Html$Attributes$style, 'border-radius', '8px 8px 0 0'),
 				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
 			]);
+		var isActive = _Utils_eq(tab, active);
 		return A2(
 			$elm$html$Html$li,
 			_Utils_ap(
 				liStyles,
 				_List_fromArray(
 					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('tab-active', isActive)
+							])),
 						$elm$html$Html$Events$onClick(
 						$author$project$Types$ToggleView(
 							$author$project$Types$Select(tab)))
@@ -22367,10 +22312,15 @@ var $author$project$View$Layout$tabItem = F4(
 				[
 					A2(
 					$elm$html$Html$a,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'color', textColor)
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'color', textColor)
+							]),
+						isActive ? _List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page')
+							]) : _List_Nil),
 					_List_fromArray(
 						[
 							A2(
@@ -22648,7 +22598,7 @@ var $author$project$View$Layout$viewForm = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('buttons')
+										$elm$html$Html$Attributes$class('buttons action-buttons')
 									]),
 								_List_fromArray(
 									[
@@ -22664,14 +22614,37 @@ var $author$project$View$Layout$viewForm = function (model) {
 												$elm$html$Html$button,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$class('button is-primary calculate-button'),
+														$elm$html$Html$Attributes$class('button is-medium calculate-button'),
 														$elm$html$Html$Attributes$type_('button'),
 														$elm$html$Html$Events$onClick(
 														$author$project$Types$ToggleView($author$project$Types$ViewErgebnis))
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Berechnen')
+														A2(
+														$elm$html$Html$span,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('icon')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$i,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('fas fa-calculator'),
+																		A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+																	]),
+																_List_Nil)
+															])),
+														A2(
+														$elm$html$Html$span,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Berechnen')
+															]))
 													]))
 											])),
 										A2(
@@ -22686,14 +22659,37 @@ var $author$project$View$Layout$viewForm = function (model) {
 												$elm$html$Html$button,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$class('button is-primary'),
+														$elm$html$Html$Attributes$class('button save-button'),
 														$elm$html$Html$Attributes$type_('button'),
 														$elm$html$Html$Events$onClick(
 														$author$project$Types$ToggleView($author$project$Types$ToggleSaveModal))
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Eingabe Zwischenspeichern')
+														A2(
+														$elm$html$Html$span,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('icon')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$i,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('fas fa-floppy-disk'),
+																		A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+																	]),
+																_List_Nil)
+															])),
+														A2(
+														$elm$html$Html$span,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Eingabe Zwischenspeichern')
+															]))
 													]))
 											]))
 									]))
