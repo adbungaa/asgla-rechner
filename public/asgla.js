@@ -5711,7 +5711,7 @@ var $author$project$Main$init = function (_v0) {
 					]),
 				einkommenZumDurchschnittsberechnung: _List_fromArray(
 					[
-						{bezeichnung: ' ', kosten: ''}
+						{bezeichnung: '', kosten: ''}
 					]),
 				haupttaetigkeit: '',
 				selbstbehalt: $author$project$Types$Angemessen('1750'),
@@ -5733,7 +5733,7 @@ var $author$project$Main$init = function (_v0) {
 					]),
 				einkommenZumDurchschnittsberechnung: _List_fromArray(
 					[
-						{bezeichnung: ' ', kosten: ''}
+						{bezeichnung: '', kosten: ''}
 					]),
 				haupttaetigkeit: '',
 				selbstbehalt: $author$project$Types$Angemessen('1750'),
@@ -5922,7 +5922,7 @@ var $author$project$Elternteil$addPosten = F3(
 					default:
 						return _List_fromArray(
 							[
-								{bezeichnung: ' ', kosten: ''}
+								{bezeichnung: '', kosten: ''}
 							]);
 				}
 			}();
@@ -20628,7 +20628,7 @@ var $author$project$View$Eltern$viewDurchschnittseinkommen = F2(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('button is-primary'),
+									$elm$html$Html$Attributes$class('button is-primary durchschnitt-fertig-button mt-3'),
 									$elm$html$Html$Attributes$type_('button'),
 									$elm$html$Html$Attributes$disabled(
 									_Utils_eq(durchschnitt, $elm$core$Maybe$Nothing) || hasInvalidEinkommen),

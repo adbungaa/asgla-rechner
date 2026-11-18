@@ -365,6 +365,27 @@ html .button.save-button:active {
     width: 50%;
 }
 
+/* #15: Kontrastreicher Fertig-Button bei Durchschnittsberechnung (aktiv und deaktiviert) */
+html .button.durchschnitt-fertig-button {
+    background-color: #1f5f6e;
+    border-color: #1f5f6e;
+    color: #ffffff;
+}
+
+html .button.durchschnitt-fertig-button:hover {
+    background-color: #164a57;
+    border-color: #164a57;
+    color: #ffffff;
+}
+
+html .button.durchschnitt-fertig-button:disabled {
+    background-color: #e4e4e4;
+    border-color: #c8c8c8;
+    color: #555555;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
 /* #6: Aktiver Tab: dunkle Schrift auf allen Tabs (WCAG), Hervorhebung über Fettschrift und Unterstreichung */
 .tabs li a {
     border-bottom-width: 4px;

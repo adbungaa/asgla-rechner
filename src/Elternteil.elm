@@ -120,7 +120,7 @@ addPosten person postenType model =
                         [ { kosten = "", bezeichnung = " " } ]
 
                     EinkommenzumDurchschnittsberechnung ->
-                        [ { kosten = "", bezeichnung = " " } ]
+                        [ { kosten = "", bezeichnung = "" } ]
 
             updatedData =
                 case postenType of

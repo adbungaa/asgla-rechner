@@ -63,7 +63,7 @@ init _ =
             , abzugsposten = [ { kosten = "", bezeichnung = "" } ]
             , selbstbehalt = Angemessen "1750"
             , showSelbstbehaltOptions = False
-            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = " " } ]
+            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = "" } ]
             }
       , mutter =
             { haupttaetigkeit = ""
@@ -71,7 +71,7 @@ init _ =
             , abzugsposten = [ { kosten = "", bezeichnung = "" } ]
             , selbstbehalt = Angemessen "1750"
             , showSelbstbehaltOptions = False
-            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = " " } ]
+            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = "" } ]
             }
       , kindergeldEmpfaenger = Mutter
       , freitext = ""

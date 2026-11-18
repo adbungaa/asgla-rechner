@@ -174,7 +174,7 @@ viewDurchschnittseinkommen model p =
                         )
                     ]
                 , button
-                    [ class "button is-primary"
+                    [ class "button is-primary durchschnitt-fertig-button mt-3"
                     , type_ "button"
                     , disabled (durchschnitt == Nothing || hasInvalidEinkommen)
                     , onClick (UpdateElternDaten p ApplyDurchschnittseinkommen)
