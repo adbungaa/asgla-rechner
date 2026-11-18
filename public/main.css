@@ -337,6 +337,32 @@ html .button.is-primary:active {
     border-bottom-color: rgba(26, 26, 26, 0.45);
 }
 
+/* #7: Einheitlicher Hover-Effekt für alle Buttons: nur Hintergrund wird dunkler, kein innerer Schatten */
+html .button:hover,
+html .button:active,
+html .button.is-light:hover,
+html .button.is-light:active {
+    box-shadow: none !important;
+}
+
+html .button.is-light {
+    background-color: #e4e4e4;
+    border-color: #e4e4e4;
+    color: #1a1a1a;
+}
+
+html .button.is-light:hover {
+    background-color: #cfcfcf;
+    border-color: #cfcfcf;
+    color: #1a1a1a;
+}
+
+html .button:focus-visible {
+    outline: 3px solid #1b3a57;
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
 /* #1: Plus/Minus-Buttons haben exakt die Höhe der Eingabefelder (2,5em) und schließen bündig mit deren Kontur ab */
 html .button.entry-action {
     height: 2.5em;
