@@ -22702,6 +22702,42 @@ var $author$project$View$Layout$viewForm = function (model) {
 			]));
 };
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $author$project$View$Layout$temporaryWarning = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('notification is-danger is-light mb-4')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('is-flex is-align-items-center is-justify-content-space-between'),
+					A2($elm$html$Html$Attributes$style, 'gap', '0.75rem'),
+					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('WICHTIGER HINWEIS: ')
+						])),
+					$elm$html$Html$text('Bei dem ASGLA-Rechner handelt es sich um ein Projekt des JTC an der Uni Halle. Aufgrund von technischen Problemen ist der Rechner auf dem Uni-Server zurzeit nicht abrufbar. Aus diesem Grund wird der Rechner übergangsweise hier gehostet.'),
+					$elm$html$Html$text('Der eigentliche Link des Rechners lautet: https://asgla-rechner.jtc.uni-halle.de/'),
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('!!WICHTIG: Bei der Kanzlei Wöhlert handelt es sich NICHT um eine existente Kanzlei, sondern lediglich um eine reservierte Domain für eine geplante Kanzleigründung in der Zukunft. Bei Viselle Wöhlert handelt es sich derzeit NICHT um einen zugelassenen Anwalt!!')
+						]))
+				]))
+		]));
 var $author$project$View$Layout$viewHeader = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -22710,6 +22746,7 @@ var $author$project$View$Layout$viewHeader = A2(
 		]),
 	_List_fromArray(
 		[
+			$author$project$View$Layout$temporaryWarning,
 			A2(
 			$elm$html$Html$div,
 			_List_fromArray(

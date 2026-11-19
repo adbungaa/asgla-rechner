@@ -101,8 +101,8 @@ viewHeader =
     div [ class "box mb-5" ]
         [ -- DEVELOPMENT WARNING
           -- Comment the following line to remove the development warning before deploying to production (https://asgla-rechner.jtc.uni-halle.de)
-          --developmentWarning
-          -- MOBILE VERSION
+          temporaryWarning
+        , -- MOBILE VERSION
           --,
           div [ class "is-hidden-tablet" ]
             [ div [ class "columns is-mobile is-vcentered" ]
@@ -183,6 +183,23 @@ viewHeader =
                 , div [ class "column is-narrow" ]
                     [ img [ src "assets/vignette.png", alt "Illustration", style "max-height" "200px" ] [] ]
                 ]
+            ]
+        ]
+
+
+temporaryWarning : Html Msg
+temporaryWarning =
+    div [ class "notification is-danger is-light mb-4" ]
+        [ div
+            [ class "is-flex is-align-items-center is-justify-content-space-between"
+            , style "gap" "0.75rem"
+            , style "flex-wrap" "wrap"
+            ]
+            [ span []
+                [ text "WICHTIGER HINWEIS: " ]
+            , text "Bei dem ASGLA-Rechner handelt es sich um ein Projekt des JTC an der Uni Halle. Aufgrund von technischen Problemen ist der Rechner auf dem Uni-Server zurzeit nicht abrufbar. Aus diesem Grund wird der Rechner übergangsweise hier gehostet."
+            , text "Der eigentliche Link des Rechners lautet: https://asgla-rechner.jtc.uni-halle.de/"
+            , span [] [ text "!!WICHTIG: Bei der Kanzlei Wöhlert handelt es sich NICHT um eine existente Kanzlei, sondern lediglich um eine reservierte Domain für eine geplante Kanzleigründung in der Zukunft. Bei Viselle Wöhlert handelt es sich derzeit NICHT um einen zugelassenen Anwalt!!" ]
             ]
         ]
 
