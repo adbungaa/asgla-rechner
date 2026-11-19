@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install --global elm@0.19.1-6
-      - run: elm make src/Main.elm --optimize --output=public/asgla.js
+      - run: elm make src/Main.elm --output=public/asgla.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
