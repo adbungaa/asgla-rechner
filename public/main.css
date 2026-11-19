@@ -54,13 +54,55 @@ html .button.is-primary:active {
     box-shadow: 0 0 0 3px rgba(105, 166, 180, 0.5);
 }
 
-.calculate-button:hover {
-    color: #000000 !important;
-    padding: .3em 1em;
-    /* border-width: 2px !important; */
-    border-color: #F08161 !important;
-    font-weight: 700 !important;
-    background-color: #F08161 !important;
+/* Primärer Aktionsbutton "Berechnen": deutlich präsenter als der Zwischenspeichern-Button */
+html .button.calculate-button {
+    background-color: #1f5f6e;
+    border-color: #1f5f6e;
+    color: #ffffff;
+    font-size: 1.15rem;
+    padding: .5em 1.6em;
+    box-shadow: 0 3px 8px rgba(31, 95, 110, 0.35);
+}
+
+html .button.calculate-button:hover,
+html .button.calculate-button:focus-visible {
+    background-color: #164a57;
+    border-color: #164a57;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(22, 74, 87, 0.45) !important;
+}
+
+html .button.calculate-button:active {
+    background-color: #0f3943;
+    border-color: #0f3943;
+    box-shadow: none !important;
+}
+
+/* Sekundärer Button "Eingabe Zwischenspeichern": heller Hintergrund mit Kontur */
+html .button.save-button {
+    background-color: #ffffff;
+    border-color: #1f5f6e;
+    color: #1f5f6e;
+}
+
+html .button.save-button:hover,
+html .button.save-button:focus-visible {
+    background-color: #e3f0f3;
+    border-color: #1f5f6e;
+    color: #164a57;
+}
+
+html .button.save-button:active {
+    background-color: #cfe4e9;
+}
+
+.action-buttons {
+    align-items: center;
+    gap: .5rem;
+}
+
+.action-buttons .control {
+    margin-bottom: 0;
 }
 
 .footer-link {
@@ -202,7 +244,8 @@ html .button.is-primary:active {
 .select select {
     color: #4e4e4e;
     background-color: #fff;
-    padding: 10px 20px;
+    padding: 0 2.5em 0 20px;
+    line-height: 2.5em;
     border-radius: 24px;
     /* border: 2px solid #2e2e2d;  */
     box-shadow: none;
@@ -238,7 +281,7 @@ html .button.is-primary:active {
 }
 
 .entry-controls .entry-cost {
-    flex: 0 0 40%;
+    flex: 0 0 8rem;
 }
 
 .entry-controls .entry-label {
@@ -247,7 +290,7 @@ html .button.is-primary:active {
 }
 
 .entry-action {
-    min-width: 4.1rem;
+    min-width: 3.2rem;
 }
 
 .entry-row.field.has-addons .control .button.entry-add {
@@ -281,12 +324,15 @@ html .button.is-primary:active {
         gap: 0;
     }
 
-    .entry-controls .entry-cost {
-        flex: 0 0 38%;
+    .entry-row .entry-cost {
+        width: auto !important;
+        flex: 0 0 34%;
     }
 
-    .entry-controls .entry-label {
-        flex: 1 1 auto;
+    .entry-row .entry-label {
+        width: auto !important;
+        flex: 1 1 0;
+        min-width: 0;
     }
 
     .entry-controls .entry-action {
@@ -294,4 +340,147 @@ html .button.is-primary:active {
         min-width: 0;
     }
 
+    .half-width-control {
+        width: 100%;
+    }
+
+}
+
+/* #5: Platzhalter/Hints in Formularfeldern gut lesbar (Kontrast >= 4.5:1) */
+.input::placeholder,
+.textarea::placeholder {
+    color: #6b6b6b;
+    opacity: 1;
+}
+
+/* #5: Eingabefelder in Zeilen mit Aktionsbuttons: weniger Innenabstand, damit Beispieltexte nicht abgeschnitten werden */
+.input.entry-input {
+    padding-left: 1rem;
+    padding-right: .75rem;
+    text-overflow: ellipsis;
+}
+
+/* Breite der Einzelfelder im Kind-Tab: Desktop 50 %, mobil volle Breite (Hints bleiben lesbar) */
+.half-width-control {
+    width: 50%;
+}
+
+/* #15: Kontrastreicher Fertig-Button bei Durchschnittsberechnung (aktiv und deaktiviert) */
+html .button.durchschnitt-fertig-button {
+    background-color: #1f5f6e;
+    border-color: #1f5f6e;
+    color: #ffffff;
+}
+
+html .button.durchschnitt-fertig-button:hover {
+    background-color: #164a57;
+    border-color: #164a57;
+    color: #ffffff;
+}
+
+html .button.durchschnitt-fertig-button:disabled {
+    background-color: #e4e4e4;
+    border-color: #c8c8c8;
+    color: #555555;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* #6: Aktiver Tab: dunkle Schrift auf allen Tabs (WCAG), Hervorhebung über Fettschrift und Unterstreichung */
+.tabs li a {
+    border-bottom-width: 4px;
+    border-bottom-color: transparent;
+}
+
+.tabs li.tab-active a {
+    font-weight: 700;
+    border-bottom-color: #1a1a1a;
+}
+
+.tabs li:not(.tab-active) a:hover {
+    border-bottom-color: rgba(26, 26, 26, 0.45);
+}
+
+/* #7: Einheitlicher Hover-Effekt für alle Buttons: nur Hintergrund wird dunkler, kein innerer Schatten */
+html .button:hover,
+html .button:active,
+html .button.is-light:hover,
+html .button.is-light:active {
+    box-shadow: none !important;
+}
+
+html .button.is-light {
+    background-color: #e4e4e4;
+    border-color: #e4e4e4;
+    color: #1a1a1a;
+}
+
+html .button.is-light:hover {
+    background-color: #cfcfcf;
+    border-color: #cfcfcf;
+    color: #1a1a1a;
+}
+
+html .button:focus-visible {
+    outline: 3px solid #1b3a57;
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* #1: Plus/Minus-Buttons haben exakt die Höhe der Eingabefelder (2,5em) und schließen bündig mit deren Kontur ab */
+html .button.entry-action {
+    height: 2.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+    box-sizing: border-box;
+}
+
+html .button.entry-add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* #4: "Bereits bezahlt von"-Zeile umbricht unter die Eingabezeile und berührt sie nicht mehr */
+.entry-row.field.has-addons {
+    row-gap: .6rem;
+}
+
+/* #2: Selbstbehalt-Box passt sich farblich an den Abschnitt (Vater/Mutter) an und hebt sich stärker ab */
+.selbstbehalt-box {
+    background-color: #ffffff;
+    border: 2px solid #69a6b4;
+    border-left-width: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.selbstbehalt-box.is-vater {
+    border-color: #2f7f92;
+}
+
+.selbstbehalt-box.is-mutter {
+    border-color: #e0702e;
+}
+
+html .selbstbehalt-box.is-vater .button.selbstbehalt-button {
+    background-color: #2f7f92;
+    border-color: #2f7f92;
+    color: #ffffff;
+}
+
+html .selbstbehalt-box.is-vater .button.selbstbehalt-button:hover {
+    background-color: #236272;
+    border-color: #236272;
+}
+
+html .selbstbehalt-box.is-mutter .button.selbstbehalt-button {
+    background-color: #f9a374;
+    border-color: #f9a374;
+    color: #1a1a1a;
+}
+
+html .selbstbehalt-box.is-mutter .button.selbstbehalt-button:hover {
+    background-color: #f08161;
+    border-color: #f08161;
+    color: #1a1a1a;
 }

@@ -492,7 +492,7 @@ decodeElternteil =
         (Decode.succeed False)
         (Decode.oneOf
             [ Decode.field "avg" (Decode.list decodeStringFieldType)
-            , Decode.succeed [ { kosten = "", bezeichnung = " " } ]
+            , Decode.succeed [ { kosten = "", bezeichnung = "" } ]
             ]
         )
 

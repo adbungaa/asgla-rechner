@@ -18,7 +18,7 @@ import Types
         )
 import Utils.Format exposing (formatEuroRounded, formatInputToFloat, renderSelbstbehaltBetrag, selbstbehaltToString)
 import Utils.Validation exposing (validateMoney)
-import View.Components exposing (showTooltip)
+import View.Components exposing (showTooltip, viewEntryActionButtons)
 
 
 
@@ -174,7 +174,7 @@ viewDurchschnittseinkommen model p =
                         )
                     ]
                 , button
-                    [ class "button is-primary"
+                    [ class "button is-primary durchschnitt-fertig-button mt-3"
                     , type_ "button"
                     , disabled (durchschnitt == Nothing || hasInvalidEinkommen)
                     , onClick (UpdateElternDaten p ApplyDurchschnittseinkommen)
@@ -233,7 +233,7 @@ viewElternPosten postenType model p index eingabe =
     in
     div [ class "entry-row" ]
         [ div [ class "field has-addons entry-controls" ]
-            [ div [ class "control entry-cost" ]
+            ([ div [ class "control entry-cost" ]
                 [ input
                     [ classList
                         [ ( "input", True )
@@ -301,31 +301,14 @@ viewElternPosten postenType model p index eingabe =
                             ]
                             []
                 ]
-            , div [ class "control" ]
-                [ button
-                    (if List.length typeList == 1 then
-                        [ class "button is-light  entry-action entry-remove", type_ "button" ]
-
-                     else
-                        [ class "button is-primary  entry-action entry-remove", onClick (UpdateElternDaten p (ChangePosten (RemovePosten postenType index))), type_ "button" ]
-                    )
-                    [ text "-" ]
-                ]
-            , div [ class "control" ]
-                [ button
-                    [ class
-                        (if List.length typeList >= maxPosten then
-                            "button is-light entry-action entry-add"
-
-                         else
-                            "button is-primary entry-action entry-add"
-                        )
-                    , type_ "button"
-                    , onClick (UpdateElternDaten p (ChangePosten (AddPosten postenType)))
-                    ]
-                    [ text "+" ]
-                ]
             ]
+                ++ viewEntryActionButtons
+                    { isRemovable = List.length typeList > 1
+                    , isAtLimit = List.length typeList >= maxPosten
+                    , onRemove = UpdateElternDaten p (ChangePosten (RemovePosten postenType index))
+                    , onAdd = UpdateElternDaten p (ChangePosten (AddPosten postenType))
+                    }
+            )
         , div []
             [ moneyHelp eingabe.kosten ]
         ]
@@ -374,9 +357,17 @@ viewSelbstbehalt model person =
                 Benutzerdefiniert _ ->
                     "ein benutzerdefinierter Selbstbehalt"
     in
+    let
+        personClass =
+            case person of
+                Vater ->
+                    "is-vater"
+
+                Mutter ->
+                    "is-mutter"
+    in
     div
-        [ class "box mt-5"
-        , style "background-color" "rgba(105, 166, 180, 0.3)"
+        [ class ("box mt-5 selbstbehalt-box " ++ personClass)
         ]
         [ div [ class "content" ]
             [ p
@@ -401,7 +392,7 @@ viewSelbstbehalt model person =
             [ div [ class "control" ]
                 [ Html.button
                     [ Html.Attributes.type_ "button"
-                    , class "button is-primary is-small"
+                    , class "button is-primary is-small selbstbehalt-button"
                     , onClick (ToggleView (ToggleSelbstbehaltOptions person))
                     ]
                     [ text "Ändern" ]

@@ -1,7 +1,7 @@
 module View.Layout exposing (tabContent, viewFooter, viewForm, viewHeader)
 
 import Html exposing (Html, a, div, form, h1, h2, i, img, label, li, span, text, textarea, ul)
-import Html.Attributes exposing (alt, class, href, placeholder, rel, src, style, target, type_, value)
+import Html.Attributes exposing (alt, class, classList, href, placeholder, rel, src, style, target, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types exposing (AktionToggleViewComponent(..), AktionUpdate(..), Model, Msg(..), Person(..), Tab(..))
 import Utils.Validation exposing (inputAgeOrBirthdayToAge)
@@ -62,22 +62,26 @@ viewForm model =
                 , style "margin-bottom" "1rem"
                 ]
                 [ -- LEFT SIDE
-                  div [ class "buttons" ]
+                  div [ class "buttons action-buttons" ]
                     [ div [ class "control" ]
                         [ Html.button
-                            [ class "button is-primary calculate-button"
+                            [ class "button is-medium calculate-button"
                             , type_ "button"
                             , onClick (ToggleView ViewErgebnis)
                             ]
-                            [ text "Berechnen" ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-calculator", Html.Attributes.attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "Berechnen" ]
+                            ]
                         ]
                     , div [ class "control" ]
                         [ Html.button
-                            [ class "button is-primary"
+                            [ class "button save-button"
                             , type_ "button"
                             , onClick (ToggleView ToggleSaveModal)
                             ]
-                            [ text "Eingabe Zwischenspeichern" ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-floppy-disk", Html.Attributes.attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "Eingabe Zwischenspeichern" ]
+                            ]
                         ]
                     ]
                 ]
@@ -322,11 +326,10 @@ tabItem tab label icon active =
                     "#bbddc1"
 
         textColor =
-            if tab == active then
-                "white"
+            "#1a1a1a"
 
-            else
-                "black"
+        isActive =
+            tab == active
 
         liStyles =
             [ style "background-color" tabColor
@@ -334,8 +337,16 @@ tabItem tab label icon active =
             , style "cursor" "pointer"
             ]
     in
-    li (liStyles ++ [ onClick (ToggleView (Select tab)) ])
-        [ a [ style "color" textColor ]
+    li (liStyles ++ [ classList [ ( "tab-active", isActive ) ], onClick (ToggleView (Select tab)) ])
+        [ a
+            ([ style "color" textColor ]
+                ++ (if isActive then
+                        [ Html.Attributes.attribute "aria-current" "page" ]
+
+                    else
+                        []
+                   )
+            )
             [ span [ class "icon" ] [ i [ class icon, Html.Attributes.attribute "aria-hidden" "true" ] [] ]
             , span [] [ text label ]
             ]

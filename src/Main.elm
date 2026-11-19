@@ -48,7 +48,7 @@ init _ =
       , jahr = "2023" -- FALLBACK
       , kind =
             { alter = 0
-            , alterInput = "0"
+            , alterInput = ""
             , mehrbedarf = [ { kosten = "", bezeichnung = "", bezahltVon = Nothing } ]
             , sonderbedarf = [ { kosten = "", bezeichnung = "", bezahltVon = Nothing } ]
             , einkuenfte = [ { kosten = "", bezeichnung = "" } ]
@@ -63,7 +63,7 @@ init _ =
             , abzugsposten = [ { kosten = "", bezeichnung = "" } ]
             , selbstbehalt = Angemessen "1750"
             , showSelbstbehaltOptions = False
-            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = " " } ]
+            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = "" } ]
             }
       , mutter =
             { haupttaetigkeit = ""
@@ -71,7 +71,7 @@ init _ =
             , abzugsposten = [ { kosten = "", bezeichnung = "" } ]
             , selbstbehalt = Angemessen "1750"
             , showSelbstbehaltOptions = False
-            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = " " } ]
+            , einkommenZumDurchschnittsberechnung = [ { kosten = "", bezeichnung = "" } ]
             }
       , kindergeldEmpfaenger = Mutter
       , freitext = ""

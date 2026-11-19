@@ -18,7 +18,7 @@ import Types
         )
 import Utils.Format exposing (personToString, stringToPerson)
 import Utils.Validation exposing (validateAgeOrBirthday, validateMoney, validateRequiredMoney)
-import View.Components exposing (showTooltip)
+import View.Components exposing (showTooltip, viewEntryActionButtons)
 
 
 
@@ -27,6 +27,16 @@ import View.Components exposing (showTooltip)
 
 viewKind : Model -> Html Msg
 viewKind model =
+    let
+        -- Ein leeres Feld wird erst nach einem fehlgeschlagenen Berechnen als Fehler markiert;
+        -- vorher zeigt nur der Platzhalter den Hinweis.
+        altersFehler =
+            if String.trim model.kind.alterInput == "" && model.error == Nothing then
+                Nothing
+
+            else
+                validateAgeOrBirthday model.kind.alterInput
+    in
     div [ class "content" ]
         [ div []
             [ div [ class "field", style "margin-top" "1.5rem" ]
@@ -34,12 +44,12 @@ viewKind model =
                     [ text "Alter / Geburtsdatum des Kindes* "
                     , showTooltip "Geben Sie hier entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ ein."
                     ]
-                , div [ class "control", style "width" "50%" ]
+                , div [ class "control half-width-control" ]
                     [ input
                         [ classList
                             [ ( "input", True )
                             , ( "entry-input", True )
-                            , ( "is-danger", validateAgeOrBirthday model.kind.alterInput /= Nothing )
+                            , ( "is-danger", altersFehler /= Nothing )
                             ]
                         , type_ "text"
                         , placeholder "z.B. 5 oder 12.12.2000"
@@ -47,7 +57,7 @@ viewKind model =
                         , onInput (\val -> UpdateKindDaten (UpdateAlter val))
                         ]
                         []
-                    , case validateAgeOrBirthday model.kind.alterInput of
+                    , case altersFehler of
                         Just error ->
                             p [ class "help is-danger" ] [ text error ]
 
@@ -61,7 +71,7 @@ viewKind model =
                 [ text "Kindergeld Empfänger "
                 , showTooltip "Elternteil, der das Kindergeld für das Kind erhält"
                 ]
-            , div [ class "control", style "width" "50%" ]
+            , div [ class "control half-width-control" ]
                 [ div [ class "select is-fullwidth" ]
                     [ select
                         [ onInput (\val -> Update (UpdateKindergeldEmpfaenger (stringToPerson val))) ]
@@ -185,7 +195,7 @@ viewBedarf bedarfsTyp model index eingabe =
                     "erbrachteLeistungenBezahltVon" ++ String.fromInt index
     in
     div [ class "field has-addons entry-row", style "flex-wrap" "wrap", style "align-items" "flex-start" ]
-        [ div [ class "control entry-cost", style "width" "20%" ]
+        ([ div [ class "control entry-cost", style "width" "20%" ]
             [ input
                 [ classList
                     [ ( "input", True )
@@ -199,41 +209,24 @@ viewBedarf bedarfsTyp model index eingabe =
                 ]
                 []
             ]
-        , div [ class "control entry-label", style "width" "23%" ]
+        , div [ class "control entry-label", style "width" "38%" ]
             [ input
                 [ class "input entry-input"
                 , type_ "text"
-                , placeholder "Bezeichnung z.B. Musikschule"
+                , placeholder "z.B. Musikschule"
                 , value eingabe.bezeichnung
                 , onInput (\newBezeichnung -> UpdateKindDaten (ChangeBedarf (UpdateBedarf bedarfsTyp index { eingabe | bezeichnung = newBezeichnung })))
                 ]
                 []
             ]
-        , div [ class "control" ]
-            [ button
-                (if List.length typeList == 1 then
-                    [ class "button is-light entry-action entry-remove", type_ "button" ]
-
-                 else
-                    [ class "button is-primary entry-action entry-remove", onClick (UpdateKindDaten (ChangeBedarf (RemoveBedarf bedarfsTyp index))), type_ "button" ]
-                )
-                [ text "-" ]
-            ]
-        , div [ class "control" ]
-            [ button
-                [ class
-                    (if List.length typeList >= 5 then
-                        "button is-light entry-action entry-add"
-
-                     else
-                        "button is-primary entry-action entry-add"
-                    )
-                , type_ "button"
-                , onClick (UpdateKindDaten (ChangeBedarf (AddBedarf bedarfsTyp)))
-                ]
-                [ text "+" ]
-            ]
-        , div [ class "control", style "margin-left" "1.5rem", style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
+        ]
+            ++ viewEntryActionButtons
+                { isRemovable = List.length typeList > 1
+                , isAtLimit = List.length typeList >= 5
+                , onRemove = UpdateKindDaten (ChangeBedarf (RemoveBedarf bedarfsTyp index))
+                , onAdd = UpdateKindDaten (ChangeBedarf (AddBedarf bedarfsTyp))
+                }
+            ++ [ div [ class "control", style "flex-basis" "100%", style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
             [ div [ style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
                 [ span [ class "has-text-weight-light", style "white-space" "nowrap" ]
                     [ text "Bereits bezahlt von:" ]
@@ -331,10 +324,7 @@ viewBedarf bedarfsTyp model index eingabe =
         , div [ style "flex-basis" "100%" ]
             [ moneyHelp eingabe.kosten ]
         ]
-
-
-
--- Einkünfte des Kindes Eingabefelder mit Typ StringFieldType (Kosten, Bezeichnung)
+        )
 
 
 viewKindEinkuenfte : Model -> Int -> StringFieldType -> Html Msg
@@ -347,7 +337,7 @@ viewKindEinkuenfte model index eingabe =
             modelPerson.einkuenfte
     in
     div [ class "field has-addons entry-row", style "flex-wrap" "wrap", style "align-items" "flex-start" ]
-        [ div [ class "control entry-cost", style "width" "20%" ]
+        ([ div [ class "control entry-cost", style "width" "20%" ]
             [ input
                 [ classList
                     [ ( "input", True )
@@ -361,7 +351,7 @@ viewKindEinkuenfte model index eingabe =
                 ]
                 []
             ]
-        , div [ class "control entry-label", style "width" "23%" ]
+        , div [ class "control entry-label", style "width" "38%" ]
             [ input
                 [ class "input entry-input"
                 , type_ "text"
@@ -371,33 +361,17 @@ viewKindEinkuenfte model index eingabe =
                 ]
                 []
             ]
-        , div [ class "control" ]
-            [ button
-                (if List.length typeList == 1 then
-                    [ class "button is-light entry-action entry-remove", type_ "button" ]
-
-                 else
-                    [ class "button is-primary entry-action entry-remove", onClick (UpdateKindDaten (RemoveEinkuenfte index)), type_ "button" ]
-                )
-                [ text "-" ]
-            ]
-        , div [ class "control" ]
-            [ button
-                [ class
-                    (if List.length typeList >= 5 then
-                        "button is-light entry-action entry-add"
-
-                     else
-                        "button is-primary entry-action entry-add"
-                    )
-                , type_ "button"
-                , onClick (UpdateKindDaten AddEinkuenfte)
-                ]
-                [ text "+" ]
-            ]
-        , div [ style "flex-basis" "100%" ]
-            [ moneyHelp eingabe.kosten ]
         ]
+            ++ viewEntryActionButtons
+                { isRemovable = List.length typeList > 1
+                , isAtLimit = List.length typeList >= 5
+                , onRemove = UpdateKindDaten (RemoveEinkuenfte index)
+                , onAdd = UpdateKindDaten AddEinkuenfte
+                }
+            ++ [ div [ style "flex-basis" "100%" ]
+                    [ moneyHelp eingabe.kosten ]
+               ]
+        )
 
 
 viewIndividuelleRegelbedarf : Model -> Html Msg
@@ -406,7 +380,7 @@ viewIndividuelleRegelbedarf model =
         [ label [ class "label" ]
             [ text "Individueller Regelbedarf für das Kind (€) "
             ]
-        , div [ class "control", style "width" "50%" ]
+        , div [ class "control half-width-control" ]
             [ input
                 [ classList
                     [ ( "input", True )
