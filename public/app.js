@@ -1306,15 +1306,24 @@ app.ports.generatePdf.subscribe(async (data) => {
 
         });
     }
-    y -= 16;
-    page.drawText(data.freitext || "", {
-        x: 50,
-        y,
-        size: fontSize,
-        font,
-        color: rgb(0, 0, 0),
-        maxWidth: A4_WIDTH - 100,
-        lineHeight: 14,
+    // Freitext: Zeilen selbst umbrechen (auch überlange Wörter) und bei Bedarf auf neuer Seite fortsetzen
+    const freitextLineHeight = 14;
+    const freitextLines = String(data.freitext || "")
+        .split(/\r?\n/)
+        .flatMap(paragraph => wrapText(paragraph, font, fontSize, A4_WIDTH - 100));
+    freitextLines.forEach((line) => {
+        y -= freitextLineHeight;
+        if (y < 80) {
+            newPage();
+            y -= freitextLineHeight;
+        }
+        page.drawText(line, {
+            x: 50,
+            y,
+            size: fontSize,
+            font,
+            color: rgb(0, 0, 0),
+        });
     });
 
     if (data.qrCodeBase64) {
