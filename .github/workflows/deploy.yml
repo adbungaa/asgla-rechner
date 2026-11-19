@@ -1,1 +1,34 @@
 
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v4
+
+      - name: Install Elm
+        run: npm install -g elm@0.19.1-6
+
+      - name: Build Elm application
+        run: elm make src/Main.elm --output=public/asgla.js
+
+      - name: Deploy to Hetzner
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: www719.your-server.de
+          username: ff8h2y
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./public/
+          server-dir: /public_html/asgla-rechner/
+
