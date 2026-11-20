@@ -5827,6 +5827,107 @@ var $author$project$Types$OnFileSelected = F2(
 		return {$: 'OnFileSelected', a: a, b: b};
 	});
 var $author$project$Types$Vater = {$: 'Vater'};
+var $author$project$Types$Abzugsposten = {$: 'Abzugsposten'};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $author$project$Elternteil$maxPostenCount = function (postenType) {
+	if (postenType.$ === 'EinkommenzumDurchschnittsberechnung') {
+		return 12;
+	} else {
+		return 5;
+	}
+};
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$String$trim = _String_trim;
+var $author$project$Elternteil$addAbzugsVorlage = F4(
+	function (person, bezeichnung, kosten, model) {
+		var vorlage = {bezeichnung: bezeichnung, kosten: kosten};
+		var modelPerson = function () {
+			if (person.$ === 'Vater') {
+				return model.vater;
+			} else {
+				return model.mutter;
+			}
+		}();
+		var isEmpty = function (field) {
+			return $elm$core$String$isEmpty(
+				$elm$core$String$trim(field.kosten)) && $elm$core$String$isEmpty(
+				$elm$core$String$trim(field.bezeichnung));
+		};
+		var maybeNewList = A2($elm$core$List$any, isEmpty, modelPerson.abzugsposten) ? $elm$core$Maybe$Just(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (f, _v2) {
+						var done = _v2.a;
+						var acc = _v2.b;
+						return ((!done) && isEmpty(f)) ? _Utils_Tuple2(
+							true,
+							_Utils_ap(
+								acc,
+								_List_fromArray(
+									[vorlage]))) : _Utils_Tuple2(
+							done,
+							_Utils_ap(
+								acc,
+								_List_fromArray(
+									[f])));
+					}),
+				_Utils_Tuple2(false, _List_Nil),
+				modelPerson.abzugsposten).b) : ((_Utils_cmp(
+			$elm$core$List$length(modelPerson.abzugsposten),
+			$author$project$Elternteil$maxPostenCount($author$project$Types$Abzugsposten)) < 0) ? $elm$core$Maybe$Just(
+			_Utils_ap(
+				modelPerson.abzugsposten,
+				_List_fromArray(
+					[vorlage]))) : $elm$core$Maybe$Nothing);
+		if (maybeNewList.$ === 'Just') {
+			var newList = maybeNewList.a;
+			var updated = _Utils_update(
+				modelPerson,
+				{abzugsposten: newList});
+			if (person.$ === 'Vater') {
+				return _Utils_update(
+					model,
+					{error: $elm$core$Maybe$Nothing, showErgebnis: false, vater: updated});
+			} else {
+				return _Utils_update(
+					model,
+					{error: $elm$core$Maybe$Nothing, mutter: updated, showErgebnis: false});
+			}
+		} else {
+			return _Utils_update(
+				model,
+				{
+					error: $elm$core$Maybe$Just(
+						'Zu viele Posten (Max. ' + ($elm$core$String$fromInt(
+							$author$project$Elternteil$maxPostenCount($author$project$Types$Abzugsposten)) + ')'))
+				});
+		}
+	});
 var $author$project$Kind$addBedarf = F2(
 	function (bedarfsTyp, model) {
 		var currentList = function () {
@@ -5878,13 +5979,6 @@ var $author$project$Kind$addBedarf = F2(
 				});
 		}
 	});
-var $author$project$Elternteil$maxPostenCount = function (postenType) {
-	if (postenType.$ === 'EinkommenzumDurchschnittsberechnung') {
-		return 12;
-	} else {
-		return 5;
-	}
-};
 var $author$project$Elternteil$addPosten = F3(
 	function (person, postenType, model) {
 		var modelPerson = function () {
@@ -5967,28 +6061,6 @@ var $author$project$Elternteil$addPosten = F3(
 				});
 		}
 	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$Basics$not = _Basics_not;
 var $elm$core$List$all = F2(
 	function (isOkay, list) {
 		return !A2(
@@ -6056,7 +6128,6 @@ var $elm$core$String$replace = F3(
 	});
 var $elm$core$Basics$round = _Basics_round;
 var $elm$core$String$toFloat = _String_toFloat;
-var $elm$core$String$trim = _String_trim;
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -8520,10 +8591,6 @@ var $pablohirafuji$elm_qrcode$QRCode$Matrix$breakList = F3(
 			}
 		}
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $pablohirafuji$elm_qrcode$QRCode$Matrix$isDarkModule = A2(
 	$elm$core$Basics$composeR,
 	$elm$core$Maybe$map($elm$core$Tuple$second),
@@ -16541,12 +16608,18 @@ var $author$project$Main$update = F2(
 									return _Utils_Tuple2(
 										A4($author$project$Elternteil$removePosten, $author$project$Types$Vater, postenType, index, model),
 										$elm$core$Platform$Cmd$none);
-								default:
+								case 'UpdatePosten':
 									var postenType = a.a;
 									var index = a.b;
 									var field = a.c;
 									return _Utils_Tuple2(
 										A5($author$project$Elternteil$updatePosten, $author$project$Types$Vater, postenType, index, field, model),
+										$elm$core$Platform$Cmd$none);
+								default:
+									var bezeichnung = a.a;
+									var kosten = a.b;
+									return _Utils_Tuple2(
+										A4($author$project$Elternteil$addAbzugsVorlage, $author$project$Types$Vater, bezeichnung, kosten, model),
 										$elm$core$Platform$Cmd$none);
 							}
 					}
@@ -16612,6 +16685,12 @@ var $author$project$Main$update = F2(
 									var field = a.c;
 									return _Utils_Tuple2(
 										A5($author$project$Elternteil$updatePosten, $author$project$Types$Mutter, postenType, index, field, model),
+										$elm$core$Platform$Cmd$none);
+								case 'AddAbzugsVorlage':
+									var bezeichnung = a.a;
+									var kosten = a.b;
+									return _Utils_Tuple2(
+										A4($author$project$Elternteil$addAbzugsVorlage, $author$project$Types$Mutter, bezeichnung, kosten, model),
 										$elm$core$Platform$Cmd$none);
 								default:
 									var postenType = a.a;
@@ -16760,7 +16839,7 @@ var $author$project$Main$update = F2(
 								_Utils_update(
 									neuesBerechnungsModel,
 									{
-										error: $elm$core$Maybe$Just('Bitte geben Sie mindestens ein Einkommen ein oder korrigieren Sie rot markierte Felder.'),
+										error: $elm$core$Maybe$Just('Bitte tragen Sie im Reiter „Vater“ oder „Mutter“ mindestens ein Einkommen ein und füllen Sie im Reiter „Kind“ das Alter aus. Falls Felder rot markiert sind, korrigieren Sie bitte diese.'),
 										showErgebnis: false
 									}),
 								$elm$core$Platform$Cmd$none);
@@ -16788,7 +16867,7 @@ var $author$project$Main$update = F2(
 										_Utils_update(
 											neuesBerechnungsModel,
 											{
-												error: $elm$core$Maybe$Just('Das Einkommen der Eltern übersteigt die Beträge für die Regelbedarfssätze aus der Düsseldorfer Tabelle. Bitte tragen Sie unter dem Reiter Kind einen individuellen Regelbedarf ein!'),
+												error: $elm$core$Maybe$Just('Das Einkommen ist höher als die Werte, die der Rechner kennt. Bitte öffnen Sie den Reiter „Kind“ und tragen Sie dort unter „Stattdessen einen individuellen Regelbedarf festsetzen“ einen Betrag ein.'),
 												showErgebnis: false
 											}),
 										$elm$core$Platform$Cmd$none);
@@ -17069,6 +17148,7 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
+var $elm$html$Html$details = _VirtualDom_node('details');
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
 		return A2(
@@ -17077,8 +17157,10 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $elm$html$Html$h4 = _VirtualDom_node('h4');
 var $elm$html$Html$i = _VirtualDom_node('i');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -17118,6 +17200,7 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$summary = _VirtualDom_node('summary');
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$View$Components$importFileSection = function (model) {
@@ -17125,7 +17208,7 @@ var $author$project$View$Components$importFileSection = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mx-5')
+				$elm$html$Html$Attributes$class('asgla-import')
 			]),
 		_List_fromArray(
 			[
@@ -17133,10 +17216,7 @@ var $author$project$View$Components$importFileSection = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-flex-start'),
-						A2($elm$html$Html$Attributes$style, 'gap', '2rem'),
-						A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '1.5rem')
+						$elm$html$Html$Attributes$class('asgla-import-top')
 					]),
 				_List_fromArray(
 					[
@@ -17144,31 +17224,60 @@ var $author$project$View$Components$importFileSection = function (model) {
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('button is-text'),
-								A2($elm$html$Html$Attributes$style, 'background-color', '#bbddc1'),
+								$elm$html$Html$Attributes$class('button asgla-link-button'),
 								$elm$html$Html$Attributes$type_('button'),
 								$elm$html$Html$Events$onClick($author$project$Types$OpenSkriptPdf)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Skript/Anleitung')
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('icon')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$i,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('fas fa-book-open'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Skript/Anleitung'),
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('is-sr-only')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(' (öffnet Seitenleiste)')
+											]))
+									]))
 							])),
 						A2(
-						$elm$html$Html$div,
+						$elm$html$Html$details,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('buttons is-flex is-justify-content-flex-end')
+								$elm$html$Html$Attributes$class('asgla-import-details')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$button,
+								$elm$html$Html$summary,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('button is-primary tooltip-container'),
-										$elm$html$Html$Events$onClick(
-										$author$project$Types$ImportFile(
-											$author$project$Types$OpenFile($author$project$Types$JsonFile)))
+										$elm$html$Html$Attributes$class('asgla-import-summary')
 									]),
 								_List_fromArray(
 									[
@@ -17184,129 +17293,17 @@ var $author$project$View$Components$importFileSection = function (model) {
 												$elm$html$Html$i,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$class('fas fa-file-upload')
-													]),
-												_List_Nil)
-											])),
-										$elm$html$Html$text('Import JSON File'),
-										A2(
-										$elm$html$Html$span,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('tooltip-text')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Importiert Eingabedaten aus einer zuvor gespeicherten JSON-Datei (lokal, ohne Datenweitergabe).')
-											]))
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('button is-primary tooltip-container'),
-										$elm$html$Html$Attributes$classList(
-										_List_fromArray(
-											[
-												_Utils_Tuple2('is-loading', model.qrIsProcessing)
-											])),
-										$elm$html$Html$Events$onClick(
-										$author$project$Types$ImportFile(
-											$author$project$Types$OpenFile($author$project$Types$ImageFile))),
-										$elm$html$Html$Attributes$disabled(model.qrIsProcessing)
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$span,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('icon')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$i,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('fas fa-qrcode')
+														$elm$html$Html$Attributes$class('fas fa-file-import'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
 													]),
 												_List_Nil)
 											])),
 										A2(
 										$elm$html$Html$span,
+										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('ml-2')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text(
-												model.qrIsProcessing ? 'Processing... ' : 'QR-Code importieren '),
-												A2(
-												$elm$html$Html$span,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('tooltip-text')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Importiert Eingabedaten aus einem zuvor gespeicherten QR-Code (lokal, ohne Datenweitergabe).')
-													]))
-											]))
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('button is-primary tooltip-container'),
-										$elm$html$Html$Attributes$classList(
-										_List_fromArray(
-											[
-												_Utils_Tuple2('is-loading', model.qrIsProcessing)
-											])),
-										$elm$html$Html$Events$onClick(
-										$author$project$Types$CameraScanner($author$project$Types$OpenCameraContainer)),
-										$elm$html$Html$Attributes$disabled(model.qrIsProcessing)
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$span,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('icon')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$i,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('fas fa-camera')
-													]),
-												_List_Nil)
-											])),
-										A2(
-										$elm$html$Html$span,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('ml-2')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text(
-												model.qrIsProcessing ? 'Processing...' : 'QR-Code Scannen'),
-												A2(
-												$elm$html$Html$span,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('tooltip-text')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Öffnet die Kamera, um einen QR-Code mit Eingabedaten zu scannen (lokal, ohne Datenweitergabe).')
-													]))
+												$elm$html$Html$text('Gespeicherte Berechnung importieren')
 											]))
 									]))
 							]))
@@ -17315,7 +17312,7 @@ var $author$project$View$Components$importFileSection = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('card')
+						$elm$html$Html$Attributes$class('asgla-import-collapse')
 					]),
 				_List_fromArray(
 					[
@@ -17323,17 +17320,180 @@ var $author$project$View$Components$importFileSection = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('field')
+								$elm$html$Html$Attributes$class('asgla-import-body')
 							]),
 						_List_fromArray(
 							[
 								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-import-intro')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Haben Sie eine Berechnung früher gespeichert (als Datei, QR-Code oder Text)? Dann können Sie sie hier wieder laden, ohne alles neu einzutippen.')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-import-buttons')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('button is-primary'),
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Events$onClick(
+												$author$project$Types$ImportFile(
+													$author$project$Types$OpenFile($author$project$Types$JsonFile)))
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('icon')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$i,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('fas fa-file-upload'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+															]),
+														_List_Nil)
+													])),
+												A2(
+												$elm$html$Html$span,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Gespeicherte Datei öffnen')
+													]))
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('button is-primary'),
+												$elm$html$Html$Attributes$classList(
+												_List_fromArray(
+													[
+														_Utils_Tuple2('is-loading', model.qrIsProcessing)
+													])),
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Events$onClick(
+												$author$project$Types$ImportFile(
+													$author$project$Types$OpenFile($author$project$Types$ImageFile))),
+												$elm$html$Html$Attributes$disabled(model.qrIsProcessing)
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('icon')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$i,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('fas fa-qrcode'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+															]),
+														_List_Nil)
+													])),
+												A2(
+												$elm$html$Html$span,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Foto/Bild vom QR-Code öffnen')
+													]))
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('button is-primary'),
+												$elm$html$Html$Attributes$classList(
+												_List_fromArray(
+													[
+														_Utils_Tuple2('is-loading', model.qrIsProcessing)
+													])),
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Events$onClick(
+												$author$project$Types$CameraScanner($author$project$Types$OpenCameraContainer)),
+												$elm$html$Html$Attributes$disabled(model.qrIsProcessing)
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('icon')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$i,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('fas fa-camera'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+															]),
+														_List_Nil)
+													])),
+												A2(
+												$elm$html$Html$span,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('QR-Code mit Kamera lesen')
+													]))
+											]))
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-help')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Die Datei oder den QR-Code erhalten Sie über „Eingabe zwischenspeichern“.')
+									])),
+								A2(
+								$elm$html$Html$label,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('label'),
+										$elm$html$Html$Attributes$for('json-import')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Gespeicherten Text hier einfügen')
+									])),
+								A2(
 								$elm$html$Html$textarea,
 								_List_fromArray(
 									[
+										$elm$html$Html$Attributes$id('json-import'),
 										$elm$html$Html$Attributes$class('textarea'),
-										$elm$html$Html$Attributes$placeholder('JSON-String hier einfügen'),
-										$elm$html$Html$Attributes$rows(1),
+										$elm$html$Html$Attributes$placeholder('Gespeicherten Text hier einfügen'),
+										$elm$html$Html$Attributes$rows(3),
 										$elm$html$Html$Events$onInput(
 										function (input) {
 											return $author$project$Types$ImportFile(
@@ -17346,76 +17506,23 @@ var $author$project$View$Components$importFileSection = function (model) {
 				function () {
 				var _v0 = model.qrResult;
 				if (_v0.$ === 'Just') {
-					var result = _v0.a;
 					return A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('notification is-success mt-4')
+								$elm$html$Html$Attributes$class('notification is-success asgla-msg')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$h4,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('content')
+										$elm$html$Html$Attributes$class('title is-5')
 									]),
 								_List_fromArray(
 									[
-										A2(
-										$elm$html$Html$h4,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('title is-5')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Datenimport erfolgreich!')
-											]))
-									]))
-							]));
-				} else {
-					return $elm$html$Html$text('');
-				}
-			}(),
-				function () {
-				var _v1 = model.error;
-				if (_v1.$ === 'Just') {
-					var errorMsg = _v1.a;
-					return A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('notification is-danger mt-4')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('content')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$h4,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('title is-5')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Error:')
-											])),
-										A2(
-										$elm$html$Html$p,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text(errorMsg)
-											]))
+										$elm$html$Html$text('Datenimport erfolgreich!')
 									]))
 							]));
 				} else {
@@ -17430,6 +17537,16 @@ var $author$project$Types$Export = function (a) {
 };
 var $author$project$Types$ExportPdf = {$: 'ExportPdf'};
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $author$project$View$Components$dativMitArtikel = function (person) {
+	if (person.$ === 'Vater') {
+		return 'dem Vater';
+	} else {
+		return 'der Mutter';
+	}
+};
+var $elm$html$Html$dd = _VirtualDom_node('dd');
+var $elm$html$Html$dl = _VirtualDom_node('dl');
+var $elm$html$Html$dt = _VirtualDom_node('dt');
 var $author$project$Constants$zahlungsdeckelTabelle2023 = {
 	eintraege: _List_fromArray(
 		[
@@ -17851,12 +17968,41 @@ var $elm$core$List$intersperse = F2(
 			return A2($elm$core$List$cons, hd, spersed);
 		}
 	});
+var $author$project$View$Components$nominativMitArtikel = function (person) {
+	if (person.$ === 'Vater') {
+		return 'Der Vater';
+	} else {
+		return 'Die Mutter';
+	}
+};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $author$project$View$Components$skriptLink = F2(
+	function (anker, label) {
+		return A2(
+			$elm$html$Html$a,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$href('#'),
+					A2($elm$html$Html$Attributes$attribute, 'data-skript', anker),
+					$elm$html$Html$Attributes$class('skript-link'),
+					A2($elm$html$Html$Attributes$attribute, 'title', 'Im Skript nachlesen')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(label)
+				]));
+	});
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
-var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$View$Components$viewBegrenzungHinweis = F4(
 	function (elternteilGenitiv, urspruenglicherBetrag, begrenzterBetrag, verteilbarerBetrag) {
@@ -17869,8 +18015,117 @@ var $author$project$View$Components$viewBegrenzungHinweis = F4(
 			_List_fromArray(
 				[
 					$elm$html$Html$text(
-					'Der ursprünglich berechnete Haftungsbetrag ' + (elternteilGenitiv + (' von ' + ($author$project$Utils$Format$formatEuroRounded(urspruenglicherBetrag) + (' € übersteigt den verteilbaren Betrag von ' + ($author$project$Utils$Format$formatEuroRounded(verteilbarerBetrag) + ' €. Der Haftungsbetrag wurde entsprechend begrenzt.'))))))
+					'Der ursprünglich berechnete Haftungsbetrag ' + (elternteilGenitiv + (' von ' + ($author$project$Utils$Format$formatEuroRounded(urspruenglicherBetrag) + ('\u00A0€ übersteigt den verteilbaren Betrag von ' + ($author$project$Utils$Format$formatEuroRounded(verteilbarerBetrag) + '\u00A0€. Der Haftungsbetrag wurde entsprechend begrenzt.'))))))
 				])) : $elm$html$Html$text('');
+	});
+var $author$project$View$Components$viewErgebnisKachel = F3(
+	function (icon, labelInhalt, wert) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('ergebnis-kachel')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('ergebnis-kachel-icon')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$i,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('fas ' + icon),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('ergebnis-kachel-label')
+								]),
+							labelInhalt),
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('ergebnis-kachel-wert')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(wert)
+								]))
+						]))
+				]));
+	});
+var $author$project$View$Components$viewErgebnisPerson = F2(
+	function (rolle, person) {
+		var klasse = function () {
+			if (person.$ === 'Vater') {
+				return 'vater';
+			} else {
+				return 'mutter';
+			}
+		}();
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('ergebnis-person ergebnis-person--' + klasse)
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('ergebnis-person-rolle')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(rolle)
+						])),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('ergebnis-person-icon')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$i,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('fas fa-user'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('ergebnis-person-name')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$author$project$Utils$Format$personToString(person))
+						]))
+				]));
 	});
 var $author$project$Types$ApplyHaftungsbetraege = F3(
 	function (a, b, c) {
@@ -17887,7 +18142,6 @@ var $author$project$Types$UpdateHaftungsbetragInput = F2(
 		return {$: 'UpdateHaftungsbetragInput', a: a, b: b};
 	});
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$View$Components$viewVorschlagHaftungsanteil = F4(
 	function (model, ergebnis, elterenteil, vorschlag) {
@@ -17995,7 +18249,7 @@ var $author$project$View$Components$viewVorschlagHaftungsanteil = F4(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Bitte nutzen Sie diese Funktion nur, wenn Sie einem ausnahmsweisen Sonderfall haben.')
+							$elm$html$Html$text('Bitte nutzen Sie diese Funktion nur, wenn bei Ihnen ein Sonderfall vorliegt.')
 						]))
 				]));
 	});
@@ -18007,9 +18261,9 @@ var $author$project$View$Components$viewHHinweisAnteilEltern = F6(
 		var vaterWert = _Utils_eq(elterenteil, $author$project$Types$Vater) ? A2($elm$core$Maybe$withDefault, 0, hoechstbetrag) : anteilVater;
 		var elternText = function () {
 			if (elterenteil.$ === 'Vater') {
-				return 'Kindsvater';
+				return 'Vater';
 			} else {
-				return 'Kindsmutter';
+				return 'Mutter';
 			}
 		}();
 		return A2(
@@ -18030,7 +18284,9 @@ var $author$project$View$Components$viewHHinweisAnteilEltern = F6(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							'Der Haftungsbetrag von ' + (elternText + (' (' + ($author$project$Utils$Format$formatEuroRounded(spiegelWert) + ' €) ist höher als der Zahlungsbetrag, der im Residenzmodell zu leisten wäre. Daher wird der Haftungsanteil auf diesen Zahlungsbetrag gedeckelt.')))),
+							'Der Haftungsbetrag von ' + (elternText + (' (' + ($author$project$Utils$Format$formatEuroRounded(spiegelWert) + '\u00A0€) ist höher als der Zahlungsbetrag, der im ')))),
+							A2($author$project$View$Components$skriptLink, 'haftungsanteile', 'Residenzmodell'),
+							$elm$html$Html$text(' (Kind lebt überwiegend bei einem Elternteil) zu leisten wäre. Eine Begrenzung des Haftungsanteils auf diesen Zahlungsbetrag kommt daher in Betracht. (Haftungsanteil = der Teil der Kosten des Kindes, den ein Elternteil nach seinem Einkommen trägt)'),
 							A2(
 							$elm$html$Html$p,
 							_List_fromArray(
@@ -18040,8 +18296,8 @@ var $author$project$View$Components$viewHHinweisAnteilEltern = F6(
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
-									'Daher der Haftungsanteil von ' + (elternText + (': ' + ($author$project$Utils$Format$formatEuroRounded(
-										A2($elm$core$Maybe$withDefault, 0, hoechstbetrag)) + ' €'))))
+									'Möglicher Anteil von ' + (elternText + (' bei Begrenzung: ' + ($author$project$Utils$Format$formatEuroRounded(
+										A2($elm$core$Maybe$withDefault, 0, hoechstbetrag)) + '\u00A0€ (noch nicht angewendet)'))))
 								]))
 						])),
 					A2(
@@ -18137,7 +18393,7 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 							A2(
 								$elm$core$Maybe$withDefault,
 								0,
-								$author$project$Utils$Format$formatInputToFloat(item.kosten))) + ' €')))
+								$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€')))
 					]));
 		};
 		var renderItems = function (items) {
@@ -18289,7 +18545,7 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 													_List_fromArray(
 														[
 															$elm$html$Html$text(
-															'Summe: ' + ($author$project$Utils$Format$formatEuroRounded(paidByVater) + ' €'))
+															'Summe: ' + ($author$project$Utils$Format$formatEuroRounded(paidByVater) + '\u00A0€'))
 														]))
 												])),
 											A2(
@@ -18303,7 +18559,7 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 													_List_fromArray(
 														[
 															$elm$html$Html$text(
-															'Summe: ' + ($author$project$Utils$Format$formatEuroRounded(paidByMutter) + ' €'))
+															'Summe: ' + ($author$project$Utils$Format$formatEuroRounded(paidByMutter) + '\u00A0€'))
 														]))
 												]))
 										])),
@@ -18338,7 +18594,7 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													'' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragVater) + (' - ' + ($author$project$Utils$Format$formatEuroRounded(paidByVater) + (' + ' + ($author$project$Utils$Format$formatEuroRounded(abzugVater) + (' = ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilVaterGesamtbedarf) + ' €'))))))))
+													'' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragVater) + (' - ' + ($author$project$Utils$Format$formatEuroRounded(paidByVater) + (' + ' + ($author$project$Utils$Format$formatEuroRounded(abzugVater) + (' = ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilVaterGesamtbedarf) + '\u00A0€'))))))))
 												])),
 											A2(
 											$elm$html$Html$td,
@@ -18346,7 +18602,7 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													'' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragMutter) + (' - ' + ($author$project$Utils$Format$formatEuroRounded(paidByMutter) + (' + ' + ($author$project$Utils$Format$formatEuroRounded(abzugMutter) + (' = ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilMutterGesamtbedarf) + ' €'))))))))
+													'' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragMutter) + (' - ' + ($author$project$Utils$Format$formatEuroRounded(paidByMutter) + (' + ' + ($author$project$Utils$Format$formatEuroRounded(abzugMutter) + (' = ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilMutterGesamtbedarf) + '\u00A0€'))))))))
 												]))
 										])),
 									A2(
@@ -18360,7 +18616,7 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													'Haftungsbetrag nach Anrechnung ' + ($author$project$Utils$Format$personToString($author$project$Types$Vater) + (': ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilVaterGesamtbedarf) + ' €'))))
+													'Haftungsbetrag nach Anrechnung ' + ($author$project$Utils$Format$personToString($author$project$Types$Vater) + (': ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilVaterGesamtbedarf) + '\u00A0€'))))
 												])),
 											A2(
 											$elm$html$Html$td,
@@ -18368,13 +18624,25 @@ var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													'Haftungsbetrag nach Anrechnung ' + ($author$project$Utils$Format$personToString($author$project$Types$Mutter) + (': ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilMutterGesamtbedarf) + ' €'))))
+													'Haftungsbetrag nach Anrechnung ' + ($author$project$Utils$Format$personToString($author$project$Types$Mutter) + (': ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.anteilMutterGesamtbedarf) + '\u00A0€'))))
 												]))
 										]))
 								]))
 						]))
 				]));
 	});
+var $author$project$View$Components$zusatzKachel = A2(
+	$elm$html$Html$span,
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'display', 'block'),
+			A2($elm$html$Html$Attributes$style, 'font-size', '0.8em'),
+			A2($elm$html$Html$Attributes$style, 'font-weight', '400')
+		]),
+	_List_fromArray(
+		[
+			$elm$html$Html$text('Anteil an den Kosten des Kindes')
+		]));
 var $author$project$View$Components$showErgebnis = function (model) {
 	var rowWithLines = F2(
 		function (lines, value) {
@@ -18459,7 +18727,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 					$author$project$Utils$Format$formatInputToFloat(item.kosten));
 			},
 			model.kind.einkuenfte));
-	var kindEinkuenfteUeberschrift = 'Abzug ' + (((model.kind.alter < 18) ? 'hälftiger' : 'vollständiger') + (' Einkünfte des Kindes iHv. ' + ($author$project$Utils$Format$formatEuroRounded(kindEinkuenfteSum) + ' €')));
+	var kindEinkuenfteUeberschrift = 'Abzug ' + (((model.kind.alter < 18) ? 'hälftiger' : 'vollständiger') + (' Einkünfte des Kindes iHv. ' + ($author$project$Utils$Format$formatEuroRounded(kindEinkuenfteSum) + '\u00A0€')));
 	var kindEinkuenftePositionen = A2(
 		$elm$core$List$filter,
 		function (item) {
@@ -18480,7 +18748,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 					A2(
 						$elm$core$Maybe$withDefault,
 						0,
-						$author$project$Utils$Format$formatInputToFloat(item.kosten))) + ' €)')));
+						$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€)')));
 			},
 			kindEinkuenftePositionen));
 	var header = F2(
@@ -18522,6 +18790,11 @@ var $author$project$View$Components$showErgebnis = function (model) {
 		$elm$core$Maybe$withDefault,
 		hoechstbetragFallback,
 		A3($author$project$Constants$getHoechstbetrag, model.jahr, ergebnis.bereinigtesEinkommenVater, model.kind.alter));
+	var hinweisNoetig = ((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) || ((_Utils_cmp(ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater) > 0) || ((_Utils_cmp(ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter) > 0) || ((_Utils_cmp(
+		A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
+		hoechstbetragVater) > 0) || (_Utils_cmp(
+		A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
+		hoechstbetragMutter) > 0))));
 	var renderPersonSection = F2(
 		function (title, person) {
 			var weitereEinkuenfte = function () {
@@ -18540,9 +18813,9 @@ var $author$project$View$Components$showErgebnis = function (model) {
 			}();
 			var textPerson = function () {
 				if (person.$ === 'Vater') {
-					return 'den Kindsvater';
+					return 'den Vater';
 				} else {
-					return 'die Kindsmutter';
+					return 'die Mutter';
 				}
 			}();
 			var modelPerson = function () {
@@ -18639,7 +18912,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 											A2(
 											row,
 											'Einkommen',
-											$author$project$Utils$Format$formatEuroRounded(einkommen) + ' €'),
+											$author$project$Utils$Format$formatEuroRounded(einkommen) + '\u00A0€'),
 											A2(
 											row,
 											'\u00A0\u00A0Einkünfte aus Haupttätigkeit',
@@ -18647,11 +18920,11 @@ var $author$project$View$Components$showErgebnis = function (model) {
 												A2(
 													$elm$core$Maybe$withDefault,
 													0,
-													$author$project$Utils$Format$formatInputToFloat(modelPerson.haupttaetigkeit))) + ' €'),
+													$author$project$Utils$Format$formatInputToFloat(modelPerson.haupttaetigkeit))) + '\u00A0€'),
 											A2(
 											row,
 											'\u00A0\u00A0Weitere Einkünfte Gesamt',
-											$author$project$Utils$Format$formatEuroRounded(weitereEinkuenfte) + ' €')
+											$author$project$Utils$Format$formatEuroRounded(weitereEinkuenfte) + '\u00A0€')
 										]),
 									_Utils_ap(
 										A2(
@@ -18664,7 +18937,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 														A2(
 															$elm$core$Maybe$withDefault,
 															0.0,
-															$author$project$Utils$Format$formatInputToFloat(item.kosten))) + ' €');
+															$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€');
 											},
 											A2(
 												$elm$core$List$filter,
@@ -18678,7 +18951,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 												A2(
 													row,
 													'Abzug Gesamt',
-													$author$project$Utils$Format$formatEuroRounded(gesamtAbzug) + ' €'),
+													$author$project$Utils$Format$formatEuroRounded(gesamtAbzug) + '\u00A0€'),
 												A2(
 													$elm$core$List$map,
 													function (item) {
@@ -18689,7 +18962,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 																A2(
 																	$elm$core$Maybe$withDefault,
 																	0.0,
-																	$author$project$Utils$Format$formatInputToFloat(item.kosten))) + ' €');
+																	$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€');
 													},
 													A2(
 														$elm$core$List$filter,
@@ -18702,7 +18975,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 													A2(
 													row,
 													'Bereinigtes Einkommen',
-													$author$project$Utils$Format$formatEuroRounded(bereinigtesEinkommen) + ' €'),
+													$author$project$Utils$Format$formatEuroRounded(bereinigtesEinkommen) + '\u00A0€'),
 													A2(
 													row,
 													'Selbstbehalt (' + (selbstbehaltText + ')'),
@@ -18711,11 +18984,11 @@ var $author$project$View$Components$showErgebnis = function (model) {
 															$elm$core$Maybe$withDefault,
 															0.0,
 															$author$project$Utils$Format$formatInputToFloat(
-																$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt)))) + ' €'),
+																$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt)))) + '\u00A0€'),
 													A2(
 													row,
 													'= verteilbarer Betrag ',
-													$author$project$Utils$Format$formatEuroRounded(verteilbarerBetrag) + ' €')
+													$author$project$Utils$Format$formatEuroRounded(verteilbarerBetrag) + '\u00A0€')
 												])))))
 							])),
 						A2(
@@ -18726,7 +18999,9 @@ var $author$project$View$Components$showErgebnis = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Für ' + (textPerson + (' wurde der ' + (selbstbehaltTextMitArtikel + ' berücksichtigt.'))))
+								$elm$html$Html$text('Für ' + (textPerson + ' wurde der ')),
+								A2($author$project$View$Components$skriptLink, 'sockelbetrag', selbstbehaltTextMitArtikel),
+								$elm$html$Html$text(' berücksichtigt.')
 							]))
 					]));
 		});
@@ -18735,10 +19010,14 @@ var $author$project$View$Components$showErgebnis = function (model) {
 	var anzurechnendeKindEinkuenfte = (model.kind.alter < 18) ? (kindEinkuenfteSum / 2) : kindEinkuenfteSum;
 	var anspruchsberechtigtNachAnrechnung = (_Utils_cmp(ergebnis.anteilVaterGesamtbedarf, ergebnis.anteilMutterGesamtbedarf) > 0) ? $author$project$Types$Mutter : $author$project$Types$Vater;
 	var ausgleichsanspruchNachAnrechnung = _Utils_eq(anspruchsberechtigtNachAnrechnung, $author$project$Types$Mutter) ? (_Utils_eq(model.kindergeldEmpfaenger, $author$project$Types$Vater) ? (auszugleichenderBetragNachAnrechnung + ($author$project$Constants$getKindergeld(model.jahr) / 4)) : (auszugleichenderBetragNachAnrechnung - ($author$project$Constants$getKindergeld(model.jahr) / 4))) : (_Utils_eq(model.kindergeldEmpfaenger, $author$project$Types$Mutter) ? (auszugleichenderBetragNachAnrechnung + ($author$project$Constants$getKindergeld(model.jahr) / 4)) : (auszugleichenderBetragNachAnrechnung - ($author$project$Constants$getKindergeld(model.jahr) / 4)));
+	var zahlbetrag = (ausgleichsanspruchNachAnrechnung < 0) ? $elm$core$Basics$ceiling(
+		$elm$core$Basics$abs(ausgleichsanspruchNachAnrechnung)) : $elm$core$Basics$ceiling(ausgleichsanspruchNachAnrechnung);
 	var kindergeldWirdAddiert = _Utils_eq(anspruchsberechtigtNachAnrechnung, nichtKindergeldEmpfänger);
 	var ausgleichsanspruchRechenzeichen = kindergeldWirdAddiert ? '+' : '-';
-	var ausgleichsanspruchZwischenschritt = $author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + (' € ' + (ausgleichsanspruchRechenzeichen + (' ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + (' € = ' + ($author$project$Utils$Format$formatEuroRounded(ausgleichsanspruchNachAnrechnung) + ' €'))))));
+	var ausgleichsanspruchZwischenschritt = $author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + ('\u00A0€ ' + (ausgleichsanspruchRechenzeichen + (' ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + ('\u00A0€ = ' + ($author$project$Utils$Format$formatEuroRounded(ausgleichsanspruchNachAnrechnung) + '\u00A0€'))))));
 	var nichtAnspruchsberechtigtNachAnrechnung = _Utils_eq(anspruchsberechtigtNachAnrechnung, $author$project$Types$Vater) ? $author$project$Types$Mutter : $author$project$Types$Vater;
+	var empfaenger = (ausgleichsanspruchNachAnrechnung < 0) ? nichtAnspruchsberechtigtNachAnrechnung : anspruchsberechtigtNachAnrechnung;
+	var zahler = (ausgleichsanspruchNachAnrechnung < 0) ? anspruchsberechtigtNachAnrechnung : nichtAnspruchsberechtigtNachAnrechnung;
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -18752,7 +19031,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+						$elm$html$Html$Attributes$class('ergebnis-karte')
 					]),
 				_List_fromArray(
 					[
@@ -18760,22 +19039,206 @@ var $author$project$View$Components$showErgebnis = function (model) {
 						$elm$html$Html$h2,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('title is-4 mb-0')
+								$elm$html$Html$Attributes$class('title is-4 ergebnis-titel')
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Ausgleichsanspruch Berechnung')
+								$elm$html$Html$text('Wer zahlt an wen?')
 							])),
 						A2(
-						$elm$html$Html$button,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('button is-primary'),
-								$elm$html$Html$Attributes$type_('button'),
-								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Export PDF'),
-								$elm$html$Html$Attributes$title('Export PDF'),
-								$elm$html$Html$Events$onClick(
-								$author$project$Types$Export($author$project$Types$ExportPdf))
+								$elm$html$Html$Attributes$class('ergebnis-flow')
+							]),
+						_List_fromArray(
+							[
+								A2($author$project$View$Components$viewErgebnisPerson, 'Zahlt', zahler),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('ergebnis-mitte')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('ergebnis-pfeil')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fas fa-arrow-right'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('ergebnis-betrag')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												$author$project$Utils$Format$formatEuroRounded(zahlbetrag) + '\u00A0€')
+											])),
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('ergebnis-betrag-label')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Ausgleichszahlung pro Monat')
+											]))
+									])),
+								A2($author$project$View$Components$viewErgebnisPerson, 'Erhält', empfaenger)
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('ergebnis-satz')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$author$project$View$Components$nominativMitArtikel(zahler) + (' zahlt ' + ($author$project$View$Components$dativMitArtikel(empfaenger) + (' ' + ($author$project$Utils$Format$formatEuroRounded(zahlbetrag) + '\u00A0€ pro Monat.')))))
+							])),
+						hinweisNoetig ? A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('notification is-warning is-light ergebnis-hinweis')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Hinweis: Das Ergebnis oben beruht auf den berechneten Kostenanteilen. Im Rechenweg können Sie prüfen, ob für einen Elternteil eine '),
+										A2($author$project$View$Components$skriptLink, 'haftungsanteile', 'Begrenzung'),
+										$elm$html$Html$text(' des Anteils in Betracht kommt, und sie bei Bedarf übernehmen.')
+									]))
+							])) : $elm$html$Html$text(''),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('ergebnis-kacheln')
+							]),
+						_List_fromArray(
+							[
+								A3(
+								$author$project$View$Components$viewErgebnisKachel,
+								'fa-percent',
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Haftungsanteil Vater'),
+										$author$project$View$Components$zusatzKachel
+									]),
+								$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + ' %'),
+								A3(
+								$author$project$View$Components$viewErgebnisKachel,
+								'fa-percent',
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Haftungsanteil Mutter'),
+										$author$project$View$Components$zusatzKachel
+									]),
+								$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + ' %'),
+								A3(
+								$author$project$View$Components$viewErgebnisKachel,
+								'fa-child',
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Gesamtbedarf des Kindes')
+									]),
+								$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + '\u00A0€')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('ergebnis-aktion')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button is-primary'),
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Events$onClick(
+										$author$project$Types$Export($author$project$Types$ExportPdf))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fas fa-download'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('PDF exportieren')
+											]))
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('ergebnis-disclaimer')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Der Rechner liefert eine Einschätzung und ersetzt keine rechtliche Beratung.')
+					])),
+				A2(
+				$elm$html$Html$details,
+				A2(
+					$elm$core$List$cons,
+					$elm$html$Html$Attributes$class('ergebnis-details'),
+					hinweisNoetig ? _List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$attribute, 'open', '')
+						]) : _List_Nil),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$summary,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button is-primary is-outlined ergebnis-details-summary')
 							]),
 						_List_fromArray(
 							[
@@ -18791,118 +19254,83 @@ var $author$project$View$Components$showErgebnis = function (model) {
 										$elm$html$Html$i,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('fas fa-file-export')
+												$elm$html$Html$Attributes$class('fas fa-list-ol'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Rechenweg im Detail')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('icon ergebnis-chevron')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$i,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('fas fa-chevron-down'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
 											]),
 										_List_Nil)
 									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('columns is-variable is-3')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column')
-							]),
-						_List_fromArray(
-							[
-								A2(renderPersonSection, 'Vater', $author$project$Types$Vater)
 							])),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('column')
-							]),
-						_List_fromArray(
-							[
-								A2(renderPersonSection, 'Mutter', $author$project$Types$Mutter)
-							]))
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Relevantes Gesamteinkommen für den Regelbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtEinkommen) + ' €'))
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Verteilbarer Betrag Gesamt: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.verteilbarerBetragGesamt) + ' €'))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('columns is-variable is-3')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column')
+								$elm$html$Html$Attributes$class('ergebnis-details-inhalt')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$p,
+								$elm$html$Html$h2,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('mt-4')
+										$elm$html$Html$Attributes$class('title is-4 mb-0')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										'Haftungsanteil Vater: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '%'))
+										$elm$html$Html$text('Rechenweg')
 									])),
-								(!ergebnis.haftungsanteilVater) ? A2(
-								$elm$html$Html$p,
+								A2(
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+										$elm$html$Html$Attributes$class('columns is-variable is-3')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der Regelbedarf des Kindes allein aufgrund des Einkommens der Mutter.')
-									])) : ((!ergebnis.haftungsanteilMutter) ? A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4 has-text-danger')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der Regelbedarf des Kindes allein aufgrund des Einkommens des Vaters.')
-									])) : $elm$html$Html$text(''))
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column')
-							]),
-						_List_fromArray(
-							[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('column')
+											]),
+										_List_fromArray(
+											[
+												A2(renderPersonSection, 'Vater', $author$project$Types$Vater)
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('column')
+											]),
+										_List_fromArray(
+											[
+												A2(renderPersonSection, 'Mutter', $author$project$Types$Mutter)
+											]))
+									])),
 								A2(
 								$elm$html$Html$p,
 								_List_fromArray(
@@ -18912,413 +19340,646 @@ var $author$project$View$Components$showErgebnis = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Haftungsanteil Mutter: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '%'))
-									]))
-							]))
-					])),
-				A2($elm$html$Html$hr, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$h4,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('title is-5 mt-5')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Bedarf des Kindes (Alter: ' + ($elm$core$String$fromInt(model.kind.alter) + ' Jahre)'))
-					])),
-				A2(
-				$elm$html$Html$table,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$thead,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(header, 'Bezeichnung', 'Betrag')
-							])),
-						A2(
-						$elm$html$Html$tbody,
-						_List_Nil,
-						_Utils_ap(
-							_List_fromArray(
-								[
-									A2(
-									row,
-									'Regelbedarf' + (model.customRegelbedarf ? '**' : ''),
-									$author$project$Utils$Format$formatEuroRounded(
-										A2($elm$core$Maybe$withDefault, 0, ergebnis.regelbedarf)) + ' €'),
-									A2(
-									row,
-									'Zusatzbedarf',
-									$author$project$Utils$Format$formatEuroRounded(
-										$elm$core$List$sum(
-											A2(
-												$elm$core$List$map,
-												function (item) {
-													return A2(
-														$elm$core$Maybe$withDefault,
-														0,
-														$author$project$Utils$Format$formatInputToFloat(item.kosten));
-												},
-												model.kind.mehrbedarf)) + $elm$core$List$sum(
-											A2(
-												$elm$core$List$map,
-												function (item) {
-													return A2(
-														$elm$core$Maybe$withDefault,
-														0,
-														$author$project$Utils$Format$formatInputToFloat(item.kosten));
-												},
-												model.kind.sonderbedarf))) + ' €'),
-									A2(
-									row,
-									'davon Mehrbedarf',
-									$author$project$Utils$Format$formatEuroRounded(
-										$elm$core$List$sum(
-											A2(
-												$elm$core$List$map,
-												function (item) {
-													return A2(
-														$elm$core$Maybe$withDefault,
-														0,
-														$author$project$Utils$Format$formatInputToFloat(item.kosten));
-												},
-												model.kind.mehrbedarf))) + ' €')
-								]),
-							_Utils_ap(
+										'Relevantes Gesamteinkommen für den Regelbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtEinkommen) + '\u00A0€'))
+									])),
 								A2(
-									$elm$core$List$map,
-									function (item) {
-										return A2(
-											row,
-											'\u00A0\u00A0' + (item.bezeichnung + (' \u00A0\u00A0 (Bereits bezahlt von: ' + (A2(
-												$elm$core$Maybe$withDefault,
-												'Nicht angegeben',
-												A2($elm$core$Maybe$map, $author$project$Utils$Format$personToString, item.bezahltVon)) + ')'))),
-											$author$project$Utils$Format$formatEuroRounded(
-												A2(
-													$elm$core$Maybe$withDefault,
-													0,
-													$author$project$Utils$Format$formatInputToFloat(item.kosten))) + ' €');
-									},
-									A2(
-										$elm$core$List$filter,
-										function (item) {
-											return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
-										},
-										model.kind.mehrbedarf)),
-								_Utils_ap(
-									_List_fromArray(
-										[
-											A2(
-											row,
-											'davon Sonderbedarf',
-											$author$project$Utils$Format$formatEuroRounded(
-												$elm$core$List$sum(
-													A2(
-														$elm$core$List$map,
-														function (item) {
-															return A2(
-																$elm$core$Maybe$withDefault,
-																0,
-																$author$project$Utils$Format$formatInputToFloat(item.kosten));
-														},
-														model.kind.sonderbedarf))) + ' €')
-										]),
-									_Utils_ap(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mt-4')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										'Verteilbarer Betrag Gesamt: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.verteilbarerBetragGesamt) + '\u00A0€'))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('columns is-variable is-3')
+									]),
+								_List_fromArray(
+									[
 										A2(
-											$elm$core$List$map,
-											function (item) {
-												return A2(
-													row,
-													'\u00A0\u00A0' + (item.bezeichnung + ('\u00A0\u00A0 (Bereits bezahlt von: ' + (A2(
-														$elm$core$Maybe$withDefault,
-														'Nicht angegeben',
-														A2($elm$core$Maybe$map, $author$project$Utils$Format$personToString, item.bezahltVon)) + ')'))),
-													$author$project$Utils$Format$formatEuroRounded(
-														A2(
-															$elm$core$Maybe$withDefault,
-															0,
-															$author$project$Utils$Format$formatInputToFloat(item.kosten))) + ' €');
-											},
-											A2(
-												$elm$core$List$filter,
-												function (item) {
-													return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
-												},
-												model.kind.sonderbedarf)),
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('column')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mt-4')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														'Haftungsanteil Vater: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '%'))
+													])),
+												(!ergebnis.haftungsanteilVater) ? A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der '),
+														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
+														$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens der Mutter.')
+													])) : ((!ergebnis.haftungsanteilMutter) ? A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der '),
+														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
+														$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens des Vaters.')
+													])) : $elm$html$Html$text(''))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('column')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mt-4')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														'Haftungsanteil Mutter: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '%'))
+													]))
+											]))
+									])),
+								A2($elm$html$Html$hr, _List_Nil, _List_Nil),
+								A2(
+								$elm$html$Html$h4,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('title is-5 mt-5')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										'Bedarf des Kindes (Alter: ' + ($elm$core$String$fromInt(model.kind.alter) + ' Jahre)'))
+									])),
+								A2(
+								$elm$html$Html$table,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$thead,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(header, 'Bezeichnung', 'Betrag')
+											])),
+										A2(
+										$elm$html$Html$tbody,
+										_List_Nil,
 										_Utils_ap(
-											(!$elm$core$List$isEmpty(kindEinkuenftePositionen)) ? _List_fromArray(
-												[
-													A2(
-													rowWithLines,
-													kindEinkuenfteZeilen,
-													$author$project$Utils$Format$formatEuroRounded(anzurechnendeKindEinkuenfte) + ' €')
-												]) : _List_Nil,
 											_List_fromArray(
 												[
 													A2(
 													row,
-													'Abzug hälftiges Kindergeld',
+													'Regelbedarf' + (model.customRegelbedarf ? '**' : ''),
 													$author$project$Utils$Format$formatEuroRounded(
-														$author$project$Constants$getKindergeld(model.jahr) / 2) + ' €'),
+														A2($elm$core$Maybe$withDefault, 0, ergebnis.regelbedarf)) + '\u00A0€'),
 													A2(
 													row,
-													'Gesamtbedarf',
-													$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + ' €')
-												])))))))
-					])),
-				A2($elm$html$Html$hr, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('columns is-variable is-3 mt-4')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column')
-							]),
-						_List_fromArray(
-							[
+													'Zusätzliche Kosten des Kindes',
+													$author$project$Utils$Format$formatEuroRounded(
+														$elm$core$List$sum(
+															A2(
+																$elm$core$List$map,
+																function (item) {
+																	return A2(
+																		$elm$core$Maybe$withDefault,
+																		0,
+																		$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																},
+																model.kind.mehrbedarf)) + $elm$core$List$sum(
+															A2(
+																$elm$core$List$map,
+																function (item) {
+																	return A2(
+																		$elm$core$Maybe$withDefault,
+																		0,
+																		$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																},
+																model.kind.sonderbedarf))) + '\u00A0€'),
+													A2(
+													row,
+													'davon Mehrbedarf',
+													$author$project$Utils$Format$formatEuroRounded(
+														$elm$core$List$sum(
+															A2(
+																$elm$core$List$map,
+																function (item) {
+																	return A2(
+																		$elm$core$Maybe$withDefault,
+																		0,
+																		$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																},
+																model.kind.mehrbedarf))) + '\u00A0€')
+												]),
+											_Utils_ap(
+												A2(
+													$elm$core$List$map,
+													function (item) {
+														return A2(
+															row,
+															'\u00A0\u00A0' + (item.bezeichnung + (' \u00A0\u00A0 (' + (A2(
+																$elm$core$Maybe$withDefault,
+																'noch nicht bezahlt',
+																A2(
+																	$elm$core$Maybe$map,
+																	function (bezahler) {
+																		return 'bezahlt von ' + $author$project$Utils$Format$personToString(bezahler);
+																	},
+																	item.bezahltVon)) + ')'))),
+															$author$project$Utils$Format$formatEuroRounded(
+																A2(
+																	$elm$core$Maybe$withDefault,
+																	0,
+																	$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€');
+													},
+													A2(
+														$elm$core$List$filter,
+														function (item) {
+															return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
+														},
+														model.kind.mehrbedarf)),
+												_Utils_ap(
+													_List_fromArray(
+														[
+															A2(
+															row,
+															'davon Sonderbedarf',
+															$author$project$Utils$Format$formatEuroRounded(
+																$elm$core$List$sum(
+																	A2(
+																		$elm$core$List$map,
+																		function (item) {
+																			return A2(
+																				$elm$core$Maybe$withDefault,
+																				0,
+																				$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																		},
+																		model.kind.sonderbedarf))) + '\u00A0€')
+														]),
+													_Utils_ap(
+														A2(
+															$elm$core$List$map,
+															function (item) {
+																return A2(
+																	row,
+																	'\u00A0\u00A0' + (item.bezeichnung + ('\u00A0\u00A0 (' + (A2(
+																		$elm$core$Maybe$withDefault,
+																		'noch nicht bezahlt',
+																		A2(
+																			$elm$core$Maybe$map,
+																			function (bezahler) {
+																				return 'bezahlt von ' + $author$project$Utils$Format$personToString(bezahler);
+																			},
+																			item.bezahltVon)) + ')'))),
+																	$author$project$Utils$Format$formatEuroRounded(
+																		A2(
+																			$elm$core$Maybe$withDefault,
+																			0,
+																			$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€');
+															},
+															A2(
+																$elm$core$List$filter,
+																function (item) {
+																	return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
+																},
+																model.kind.sonderbedarf)),
+														_Utils_ap(
+															(!$elm$core$List$isEmpty(kindEinkuenftePositionen)) ? _List_fromArray(
+																[
+																	A2(
+																	rowWithLines,
+																	kindEinkuenfteZeilen,
+																	$author$project$Utils$Format$formatEuroRounded(anzurechnendeKindEinkuenfte) + '\u00A0€')
+																]) : _List_Nil,
+															_List_fromArray(
+																[
+																	A2(
+																	row,
+																	'Abzug hälftiges Kindergeld',
+																	$author$project$Utils$Format$formatEuroRounded(
+																		$author$project$Constants$getKindergeld(model.jahr) / 2) + '\u00A0€'),
+																	A2(
+																	row,
+																	'Gesamtbedarf',
+																	$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + '\u00A0€')
+																])))))))
+									])),
+								A2($elm$html$Html$hr, _List_Nil, _List_Nil),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('columns is-variable is-3 mt-4')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('column')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$p,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														'Anteil Vater am Gesamtbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragVater) + '\u00A0€'))
+													])),
+												A4($author$project$View$Components$viewBegrenzungHinweis, 'Vaters', ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater, ergebnis.verteilbarerBetragVater),
+												(_Utils_cmp(
+												A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
+												hoechstbetragVater) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Vater, ergebnis.bereinigtesEinkommenVater, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('column')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$p,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														'Anteil Mutter am Gesamtbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragMutter) + '\u00A0€'))
+													])),
+												A4($author$project$View$Components$viewBegrenzungHinweis, 'Mutters', ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter, ergebnis.verteilbarerBetragMutter),
+												(_Utils_cmp(
+												A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
+												hoechstbetragMutter) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Mutter, ergebnis.bereinigtesEinkommenMutter, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
+											]))
+									])),
+								((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) ? A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												A2($elm$html$Html$Attributes$style, 'color', '#ff0000'),
+												$elm$html$Html$Attributes$class('has-text-centered')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												'Ungedeckter Kindsbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) + '\u00A0€'))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('notification mt-4')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$p,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag.'),
+														function () {
+														var _v0 = model.vater.selbstbehalt;
+														if (_v0.$ === 'Angemessen') {
+															return A2(
+																$elm$html$Html$span,
+																_List_Nil,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text(' Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen '),
+																		A2($author$project$View$Components$skriptLink, 'sockelbetrag', 'Selbstbehalts'),
+																		$elm$html$Html$text(' den notwendigen Selbstbehalt anzusetzen.')
+																	]));
+														} else {
+															return $elm$html$Html$text(' Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen.');
+														}
+													}()
+													]))
+											]))
+									])) : $elm$html$Html$text(''),
+								A2($author$project$View$Components$viewZusatzbedarfLeistungen, model, ergebnis),
 								A2(
 								$elm$html$Html$p,
-								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mt-4')
+									]),
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Anteil Vater am Gesamtbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragVater) + ' €'))
+										'Differenz: ' + ($author$project$Utils$Format$formatEuroRounded(differenzNachAnrechnung) + '\u00A0€'))
 									])),
-								A4($author$project$View$Components$viewBegrenzungHinweis, 'Vaters', ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater, ergebnis.verteilbarerBetragVater),
-								(_Utils_cmp(
-								A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
-								hoechstbetragVater) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Vater, ergebnis.bereinigtesEinkommenVater, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column')
-							]),
-						_List_fromArray(
-							[
 								A2(
 								$elm$html$Html$p,
-								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mt-4')
+									]),
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Anteil Mutter am Gesamtbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragMutter) + ' €'))
+										'Auszugleichender Betrag (1/2) von ' + ($author$project$Utils$Format$personToString(nichtAnspruchsberechtigtNachAnrechnung) + (' zu leisten an ' + ($author$project$Utils$Format$personToString(anspruchsberechtigtNachAnrechnung) + (': ' + ($author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + '\u00A0€'))))))
 									])),
-								A4($author$project$View$Components$viewBegrenzungHinweis, 'Mutters', ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter, ergebnis.verteilbarerBetragMutter),
-								(_Utils_cmp(
-								A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
-								hoechstbetragMutter) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Mutter, ergebnis.bereinigtesEinkommenMutter, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
-							]))
-					])),
-				((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) ? A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'color', '#ff0000'),
-								$elm$html$Html$Attributes$class('has-text-centered')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'Ungedeckter Kindsbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) + ' €'))
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('notification mt-4')
-							]),
-						_List_fromArray(
-							[
 								A2(
-								$elm$html$Html$p,
-								_List_Nil,
+								$elm$html$Html$h4,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag.'),
-										function () {
-										var _v0 = model.vater.selbstbehalt;
-										if (_v0.$ === 'Angemessen') {
-											return $elm$html$Html$text(' Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen Selbstbehalts den notwendigen Selbstbehalt anzusetzen.');
-										} else {
-											return $elm$html$Html$text(' Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen.');
-										}
-									}()
+										$elm$html$Html$Attributes$class('title is-5 mt-5')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Kindergeldverrechnung ')
+									])),
+								A2(
+								$elm$html$Html$table,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$thead,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(header, 'Bezeichnung', 'Betrag')
+											])),
+										A2(
+										$elm$html$Html$tbody,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												row,
+												'Kindergeld',
+												$author$project$Utils$Format$formatEuroRounded(
+													$author$project$Constants$getKindergeld(model.jahr)) + '\u00A0€'),
+												A2(
+												row,
+												'Kindergeldempfänger',
+												$author$project$Utils$Format$personToString(model.kindergeldEmpfaenger)),
+												A2(
+												row,
+												'Betreuungsanteil Mutter',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + '\u00A0€'),
+												A2(
+												row,
+												'Baranteil Mutter',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilMutter) + '\u00A0€'),
+												A2(
+												row,
+												'Betreuungsanteil Vater',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + '\u00A0€'),
+												A2(
+												row,
+												'Baranteil Vater',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilVater) + '\u00A0€')
+											]))
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mt-4')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des '),
+										A2($author$project$View$Components$skriptLink, 'kindergeldverrechnung', 'Betreuungsanteils'),
+										$elm$html$Html$text(
+										' in Höhe von ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + ('\u00A0€ von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + ($author$project$Utils$Format$personToString(nichtKindergeldEmpfänger) + ': '))))))
+									])),
+								A2(
+								$elm$html$Html$table,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth mt-4')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$thead,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(header, 'Zwischenschritt', 'Betrag')
+											])),
+										A2(
+										$elm$html$Html$tbody,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												row,
+												'Auszugleichender Betrag (1/2)',
+												$author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + '\u00A0€'),
+												A2(
+												row,
+												'Betreuungsanteil Kindergeld von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + $author$project$Utils$Format$personToString(nichtKindergeldEmpfänger))),
+												ausgleichsanspruchRechenzeichen + (' ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + '\u00A0€'))),
+												A2(row, 'Rechnung Ausgleichsanspruch', ausgleichsanspruchZwischenschritt)
+											]))
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mt-4')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Der Ausgleichsanspruch ist auf volle Euro aufzurunden.')
+									])),
+								A2($elm$html$Html$hr, _List_Nil, _List_Nil),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('box content has-text-weight-bold mt-4 has-text-centered'),
+										A2($elm$html$Html$Attributes$style, 'border', '1px solid #ccc'),
+										A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+										A2($elm$html$Html$Attributes$style, 'padding', '1rem')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										'Daher insgesamt von ' + ($author$project$Utils$Format$personToString(zahler) + (' an ' + ($author$project$Utils$Format$personToString(empfaenger) + (' zu leistende Ausgleichszahlung: ' + ($author$project$Utils$Format$formatEuroRounded(zahlbetrag) + '\u00A0€'))))))
+									])),
+								A2(
+								$elm$html$Html$details,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('ergebnis-glossar')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$summary,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Begriffe kurz erklärt')
+											])),
+										A2(
+										$elm$html$Html$dl,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Ausgleichszahlung')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Betrag, den ein Elternteil dem anderen monatlich zahlt, damit die Kosten des Kindes fair verteilt sind.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Bedarf des Kindes')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Die monatlichen Kosten des Kindes.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2($author$project$View$Components$skriptLink, 'sockelbetrag', 'Selbstbehalt')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Betrag, der einem Elternteil für den eigenen Lebensunterhalt bleibt.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2($author$project$View$Components$skriptLink, 'bereinigtes-einkommen', 'Bereinigtes Einkommen')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Einkommen nach Abzügen.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2($author$project$View$Components$skriptLink, 'haftungsanteile', 'Haftungsanteil')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Anteil an den Kosten des Kindes, den ein Elternteil nach seinem Einkommen trägt.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2($author$project$View$Components$skriptLink, 'kindergeldverrechnung', 'Betreuungsanteil / Baranteil')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Betreuungsanteil: der Anteil, den ein Elternteil durch Zeit mit dem Kind leistet. Baranteil: der Anteil, den er mit Geld leistet.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2($author$project$View$Components$skriptLink, 'kindergeldverrechnung', 'Kindergeldverrechnung')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Das Kindergeld wird zwischen den Eltern angerechnet, weil es nur an eine Person gezahlt wird.')
+													])),
+												A2(
+												$elm$html$Html$dt,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2($author$project$View$Components$skriptLink, 'haftungsanteile', 'Begrenzung')
+													])),
+												A2(
+												$elm$html$Html$dd,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Der Anteil wird auf einen Höchstbetrag beschränkt.')
+													]))
+											]))
 									]))
 							]))
-					])) : $elm$html$Html$text(''),
-				A2($author$project$View$Components$viewZusatzbedarfLeistungen, model, ergebnis),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Differenz: ' + ($author$project$Utils$Format$formatEuroRounded(differenzNachAnrechnung) + ' €'))
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Auszugleichender Betrag (1/2) von ' + ($author$project$Utils$Format$personToString(nichtAnspruchsberechtigtNachAnrechnung) + (' zu leisten an ' + ($author$project$Utils$Format$personToString(anspruchsberechtigtNachAnrechnung) + (': ' + ($author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + ' €'))))))
-					])),
-				A2(
-				$elm$html$Html$h4,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('title is-5 mt-5')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Kindergeldverrechnung ')
-					])),
-				A2(
-				$elm$html$Html$table,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$thead,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(header, 'Bezeichnung', 'Betrag')
-							])),
-						A2(
-						$elm$html$Html$tbody,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								row,
-								'Kindergeld',
-								$author$project$Utils$Format$formatEuroRounded(
-									$author$project$Constants$getKindergeld(model.jahr)) + ' €'),
-								A2(
-								row,
-								'Kindergeldempfänger',
-								$author$project$Utils$Format$personToString(model.kindergeldEmpfaenger)),
-								A2(
-								row,
-								'Betreuungsanteil Mutter',
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + ' €'),
-								A2(
-								row,
-								'Baranteil Mutter',
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilMutter) + ' €'),
-								A2(
-								row,
-								'Betreuungsanteil Vater',
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + ' €'),
-								A2(
-								row,
-								'Baranteil Vater',
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilVater) + ' €')
-							]))
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des Betreuungsanteils in Höhe von ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + (' € von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + ($author$project$Utils$Format$personToString(nichtKindergeldEmpfänger) + ': '))))))
-					])),
-				A2(
-				$elm$html$Html$table,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth mt-4')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$thead,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(header, 'Zwischenschritt', 'Betrag')
-							])),
-						A2(
-						$elm$html$Html$tbody,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								row,
-								'Auszugleichender Betrag (1/2)',
-								$author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + ' €'),
-								A2(
-								row,
-								'Betreuungsanteil Kindergeld von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + $author$project$Utils$Format$personToString(nichtKindergeldEmpfänger))),
-								ausgleichsanspruchRechenzeichen + (' ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + ' €'))),
-								A2(row, 'Rechnung Ausgleichsanspruch', ausgleichsanspruchZwischenschritt)
-							]))
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Der Ausgleichsanspruch ist auf volle Euro aufzurunden.')
-					])),
-				A2($elm$html$Html$hr, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('box content has-text-weight-bold mt-4 has-text-centered'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #ccc'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-						A2($elm$html$Html$Attributes$style, 'padding', '1rem')
-					]),
-				_List_fromArray(
-					[
-						(ausgleichsanspruchNachAnrechnung < 0) ? $elm$html$Html$text(
-						'Daher insgesamt von ' + ($author$project$Utils$Format$personToString(anspruchsberechtigtNachAnrechnung) + (' an ' + ($author$project$Utils$Format$personToString(nichtAnspruchsberechtigtNachAnrechnung) + (' zu leistende Ausgleichszahlung: ' + ($author$project$Utils$Format$formatEuroRounded(
-							$elm$core$Basics$ceiling(
-								$elm$core$Basics$abs(ausgleichsanspruchNachAnrechnung))) + ' €')))))) : $elm$html$Html$text(
-						'Daher insgesamt von ' + ($author$project$Utils$Format$personToString(nichtAnspruchsberechtigtNachAnrechnung) + (' an ' + ($author$project$Utils$Format$personToString(anspruchsberechtigtNachAnrechnung) + (' zu leistende Ausgleichszahlung: ' + ($author$project$Utils$Format$formatEuroRounded(
-							$elm$core$Basics$ceiling(ausgleichsanspruchNachAnrechnung)) + ' €'))))))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -19357,21 +20018,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 							[
 								$elm$html$Html$text('** Individueller Regelbedarf wurde verwendet.')
 							]))
-					]) : _List_Nil),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('button is-primary'),
-						$elm$html$Html$Attributes$type_('button'),
-						A2($elm$html$Html$Attributes$style, 'margin-top', '1rem'),
-						$elm$html$Html$Events$onClick(
-						$author$project$Types$Export($author$project$Types$ExportPdf))
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Export PDF')
-					]))
+					]) : _List_Nil)
 			]));
 };
 var $author$project$Types$ToggleUeberUns = {$: 'ToggleUeberUns'};
@@ -19407,28 +20054,21 @@ var $author$project$View$Components$ueberUns = A2(
 			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Jährlich werden in Deutschland zahlreiche Unterhaltsberechnungen für das Wechselmodell erstellt, und fast jede davon ist eine Herausforderung. Warum? Weil die Berechnung nach aktuellen Gerichtsleitlinien so komplex ist, dass selbst erfahrene Jurist:innen regelmäßig zum Taschenrechner greifen müssen.')
+					$elm$html$Html$text('Jährlich werden in Deutschland zahlreiche Unterhaltsberechnungen für das Wechselmodell erstellt, und fast jede davon ist eine Herausforderung. Warum? Weil die Berechnung nach den üblichen Berechnungsgrundlagen der Gerichte so komplex ist, dass selbst erfahrene Jurist:innen regelmäßig zum Taschenrechner greifen müssen.')
 				])),
 			A2(
 			$elm$html$Html$p,
 			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Unser digitaler Rechner löst dieses Problem für alle Beteiligten: In wenigen Klicks erhalten Eltern eine verlässliche erste Einschätzung ihrer finanziellen Situation, während Richter:innen und Jugendämter ihre Berechnungen standardisiert und effizient durchführen können.')
+					$elm$html$Html$text('Der digitale Rechner soll Eltern eine erste Einschätzung ihrer finanziellen Situation ermöglichen und Richter:innen sowie Jugendämtern helfen, Berechnungen einheitlich durchzuführen.')
 				])),
 			A2(
 			$elm$html$Html$p,
 			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Ihre Daten bleiben dabei vollständig geschützt: Das integrierte QR-Code-System ermöglicht die sichere lokale Speicherung direkt auf Ihrem Gerät – ohne zentrale Server, ohne Datenweitergabe.')
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Ein Tool, zwei Perspektiven, eine gemeinsame Basis für faire Entscheidungen.')
+					$elm$html$Html$text('Eingaben können über das Menü „Eingabe zwischenspeichern“ als QR-Code oder als Datei gespeichert und später wieder importiert werden.')
 				])),
 			A2(
 			$elm$html$Html$h3,
@@ -19452,14 +20092,7 @@ var $author$project$View$Components$ueberUns = A2(
 			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Seit März 2025 wird sie dabei professionell unterstützt: Adelia Arvinta, Entwickler:in, übernimmt die moderne Webentwicklung in Elm und implementiert nutzerfreundliche Funktionen. Luis Bartsch, Student der Rechtswissenschaften an der Uni Halle und ehemalige wissenschaftliche Hilfskraft des JTC Legal Tech Labs, gewährleistet die rechtliche Korrektheit sowie kommunikative Zusammenarbeit mit wichtigen Praxispartner:innen.')
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Diese interdisziplinäre Zusammenarbeit zwischen Recht, Technik und Praxis stellt sicher, dass das Tool sowohl juristisch fundiert als auch intuitiv bedienbar ist.')
+					$elm$html$Html$text('Seit März 2025 wird sie dabei professionell unterstützt: Adelia Arvinta, Entwickler:in, übernimmt die moderne Webentwicklung in Elm und implementiert nutzerfreundliche Funktionen. Luis Bartsch, Student der Rechtswissenschaften an der Uni Halle und ehemalige wissenschaftliche Hilfskraft des JTC Legal Tech Labs, begleitet die rechtlichen Fragen und die Zusammenarbeit mit Praxispartner:innen.')
 				])),
 			A2(
 			$elm$html$Html$h3,
@@ -19583,8 +20216,7 @@ var $author$project$View$Components$ueberUnsSection = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('card'),
-				A2($elm$html$Html$Attributes$style, 'margin-top', '-1rem')
+				$elm$html$Html$Attributes$class('card asgla-ueberuns')
 			]),
 		_List_fromArray(
 			[
@@ -19592,60 +20224,96 @@ var $author$project$View$Components$ueberUnsSection = function (model) {
 				$elm$html$Html$header,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('card-header'),
-						$elm$html$Html$Events$onClick(
-						$author$project$Types$ToggleView($author$project$Types$ToggleUeberUns))
+						$elm$html$Html$Attributes$class('card-header asgla-ueberuns-header')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$p,
+						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('card-header-title')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Über uns')
-							])),
-						A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('card-header-icon')
+								$elm$html$Html$Attributes$class('asgla-ueberuns-toggle'),
+								$elm$html$Html$Attributes$type_('button'),
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'aria-expanded',
+								model.showUeberUns ? 'true' : 'false'),
+								$elm$html$Html$Events$onClick(
+								$author$project$Types$ToggleView($author$project$Types$ToggleUeberUns))
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$i,
+								$elm$html$Html$span,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class(
-										'fas ' + (model.showUeberUns ? 'fa-angle-up' : 'fa-angle-down'))
+										$elm$html$Html$Attributes$class('asgla-ueberuns-title')
 									]),
-								_List_Nil)
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Über uns')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-ueberuns-icon')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$i,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class(
+												'fas ' + (model.showUeberUns ? 'fa-angle-up' : 'fa-angle-down')),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+											]),
+										_List_Nil)
+									]))
 							]))
 					])),
 				model.showUeberUns ? $author$project$View$Components$ueberUns : $elm$html$Html$text('')
 			]));
 };
-var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $elm$html$Html$Attributes$href = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'href',
-		_VirtualDom_noJavaScriptUri(url));
-};
-var $elm$html$Html$img = _VirtualDom_node('img');
+var $author$project$View$Layout$externerHinweis = A2(
+	$elm$html$Html$span,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('is-sr-only')
+		]),
+	_List_fromArray(
+		[
+			$elm$html$Html$text(' (öffnet in neuem Tab)')
+		]));
 var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
+var $author$project$View$Layout$footerLink = F2(
+	function (url, titel) {
+		return A2(
+			$elm$html$Html$a,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('button is-text footer-link'),
+					A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
+					$elm$html$Html$Attributes$href(url),
+					$elm$html$Html$Attributes$target('_blank'),
+					$elm$html$Html$Attributes$rel('noopener noreferrer')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(titel),
+					$author$project$View$Layout$externerHinweis
+				]));
+	});
+var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
 		'src',
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
-var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $author$project$View$Layout$viewFooter = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -19701,62 +20369,10 @@ var $author$project$View$Layout$viewFooter = A2(
 										]),
 									_List_fromArray(
 										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('button is-text footer-link'),
-													A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
-													$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/impressum/'),
-													$elm$html$Html$Attributes$target('_blank'),
-													$elm$html$Html$Attributes$rel('noopener noreferrer')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Impressum')
-												])),
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('button is-text footer-link'),
-													A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
-													$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/datenschutz/'),
-													$elm$html$Html$Attributes$target('_blank'),
-													$elm$html$Html$Attributes$rel('noopener noreferrer')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Datenschutz')
-												])),
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('button is-text footer-link'),
-													A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
-													$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/kontakt/'),
-													$elm$html$Html$Attributes$target('_blank'),
-													$elm$html$Html$Attributes$rel('noopener noreferrer')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Kontakt')
-												])),
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('button is-text footer-link'),
-													A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
-													$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/asgla-rechner/'),
-													$elm$html$Html$Attributes$target('_blank'),
-													$elm$html$Html$Attributes$rel('noopener noreferrer')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Link zum Projekt')
-												]))
+											A2($author$project$View$Layout$footerLink, 'https://jtc.uni-halle.de/impressum/', 'Impressum'),
+											A2($author$project$View$Layout$footerLink, 'https://jtc.uni-halle.de/datenschutz/', 'Datenschutz'),
+											A2($author$project$View$Layout$footerLink, 'https://jtc.uni-halle.de/kontakt/', 'Kontakt'),
+											A2($author$project$View$Layout$footerLink, 'https://jtc.uni-halle.de/asgla-rechner/', 'Link zum Projekt')
 										]))
 								]))
 						]))
@@ -19902,6 +20518,16 @@ var $author$project$View$Components$saveModal = function (model) {
 						_List_fromArray(
 							[
 								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mb-4')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Speichern Sie Ihre Eingaben, um später weiterzuarbeiten. Sie können sie danach über „Gespeicherte Berechnung importieren“ wieder laden.')
+									])),
+								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
@@ -19928,7 +20554,7 @@ var $author$project$View$Components$saveModal = function (model) {
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('QR Code speichern')
+												$elm$html$Html$text('QR-Code als Bild speichern')
 											]))
 									])),
 								A2(
@@ -19941,48 +20567,66 @@ var $author$project$View$Components$saveModal = function (model) {
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$p,
+										$elm$html$Html$details,
 										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('JSON String:')
-											])),
-										A2(
-										$elm$html$Html$textarea,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('textarea is-family-monospace'),
-												$elm$html$Html$Attributes$readonly(true),
-												$elm$html$Html$Attributes$value(
-												$author$project$ImportExport$encodeModeltoQRCode(model))
-											]),
-										_List_Nil),
+												A2(
+												$elm$html$Html$summary,
+												_List_fromArray(
+													[
+														A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Gespeicherten Text anzeigen (zum Kopieren)')
+													])),
+												A2(
+												$elm$html$Html$textarea,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('textarea is-family-monospace mt-2'),
+														$elm$html$Html$Attributes$readonly(true),
+														$elm$html$Html$Attributes$value(
+														$author$project$ImportExport$encodeModeltoQRCode(model))
+													]),
+												_List_Nil),
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('button is-small mt-2'),
+														$elm$html$Html$Attributes$type_('button'),
+														$elm$html$Html$Events$onClick(
+														$author$project$Types$Export($author$project$Types$CopyJsonToClipboard))
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Text kopieren')
+													]))
+											]))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('field'),
+										A2($elm$html$Html$Attributes$style, 'margin-top', '1rem')
+									]),
+								_List_fromArray(
+									[
 										A2(
 										$elm$html$Html$button,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('button is-small mt-2'),
-												$elm$html$Html$Attributes$type_('button'),
-												$elm$html$Html$Events$onClick(
-												$author$project$Types$Export($author$project$Types$CopyJsonToClipboard))
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Copy')
-											])),
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('button is-small mt-2'),
-												A2($elm$html$Html$Attributes$style, 'margin-left', '0.5rem'),
+												$elm$html$Html$Attributes$class('button is-small'),
 												$elm$html$Html$Attributes$type_('button'),
 												$elm$html$Html$Events$onClick(
 												$author$project$Types$Export($author$project$Types$DownloadJson))
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('JSON speichern')
+												$elm$html$Html$text('Als Datei speichern')
 											]))
 									]))
 							]))
@@ -19991,41 +20635,12 @@ var $author$project$View$Components$saveModal = function (model) {
 };
 var $author$project$Types$ToggleDurchschnittseinkommen = {$: 'ToggleDurchschnittseinkommen'};
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $author$project$View$Components$showTooltip = function (tooltipText) {
-	return A2(
-		$elm$html$Html$span,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('tooltip-container')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$i,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('fas fa-question-circle')
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$span,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('tooltip-text')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(tooltipText)
-					]))
-			]));
-};
 var $author$project$View$Components$viewCheckboxDurchschnittseinkommen = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('field'),
-				A2($elm$html$Html$Attributes$style, 'margin-top', '1rem')
+				$elm$html$Html$Attributes$class('field asgla-checkbox-block')
 			]),
 		_List_fromArray(
 			[
@@ -20041,7 +20656,7 @@ var $author$project$View$Components$viewCheckboxDurchschnittseinkommen = functio
 						$elm$html$Html$label,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('checkbox')
+								$elm$html$Html$Attributes$class('checkbox asgla-checkbox')
 							]),
 						_List_fromArray(
 							[
@@ -20063,11 +20678,117 @@ var $author$project$View$Components$viewCheckboxDurchschnittseinkommen = functio
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Statt Monatsberechnung Durchschnittsberechnung durchführen')
-									])),
-								$author$project$View$Components$showTooltip('Aktivieren Sie diese Option, um die durchschnittliche Monatszahlung zu berechnen.')
+										$elm$html$Html$text('Durchschnitt aus mehreren Monaten berechnen')
+									]))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Nutzen Sie diese Option, wenn das Einkommen schwankt. Sie tragen dann bei den Einkünften mehrere Monate ein und der Rechner bildet den Durchschnitt.')
 							]))
 					]))
+			]));
+};
+var $author$project$View$Layout$viewFortschritt = function (model) {
+	var hatEinkommen = A2(
+		$elm$core$List$any,
+		function (v) {
+			return v > 0;
+		},
+		A2(
+			$elm$core$List$filterMap,
+			$author$project$Utils$Format$formatInputToFloat,
+			_List_fromArray(
+				[model.vater.haupttaetigkeit, model.mutter.haupttaetigkeit])));
+	var hatAlter = _Utils_eq(
+		$author$project$Utils$Validation$validateAgeOrBirthday(model.kind.alterInput),
+		$elm$core$Maybe$Nothing);
+	var punkte = _List_fromArray(
+		[
+			_Utils_Tuple3(true, 'Zeitraum gewählt', ''),
+			_Utils_Tuple3(hatEinkommen, 'Einkommen eingetragen', 'Einkommen von Vater oder Mutter eintragen (Reiter „Vater“ oder „Mutter“)'),
+			_Utils_Tuple3(hatAlter, 'Alter des Kindes eingetragen', 'Alter des Kindes eintragen (Reiter „Kind“)')
+		]);
+	var fehlend = A2(
+		$elm$core$List$filter,
+		function (_v1) {
+			var ok = _v1.a;
+			return !ok;
+		},
+		punkte);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('asgla-fortschritt'),
+				A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('asgla-fortschritt-titel')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$List$isEmpty(fehlend) ? 'Alles ausgefüllt. Sie können jetzt berechnen.' : 'Vor dem Berechnen fehlt noch:')
+					])),
+				A2(
+				$elm$html$Html$ul,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('asgla-fortschritt-liste')
+					]),
+				A2(
+					$elm$core$List$map,
+					function (_v0) {
+						var ok = _v0.a;
+						var erledigt = _v0.b;
+						var offen = _v0.c;
+						return A2(
+							$elm$html$Html$li,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$classList(
+									_List_fromArray(
+										[
+											_Utils_Tuple2('is-done', ok),
+											_Utils_Tuple2('is-open', !ok)
+										]))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('asgla-fortschritt-icon'),
+											A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$i,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class(
+													ok ? 'fas fa-circle-check' : 'far fa-circle')
+												]),
+											_List_Nil)
+										])),
+									$elm$html$Html$text(
+									ok ? erledigt : offen)
+								]));
+					},
+					punkte))
 			]));
 };
 var $author$project$Types$UpdateMonat = function (a) {
@@ -20077,6 +20798,7 @@ var $author$project$View$Components$monate = _List_fromArray(
 	['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']);
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
 var $author$project$View$Components$viewMonth = F2(
 	function (columnClass, model) {
 		return A2(
@@ -20091,12 +20813,33 @@ var $author$project$View$Components$viewMonth = F2(
 					$elm$html$Html$label,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('label')
+							$elm$html$Html$Attributes$class('label'),
+							$elm$html$Html$Attributes$for('monat')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Monat * '),
-							$author$project$View$Components$showTooltip('Wählen Sie den Monat aus, für den die Berechnung durchgeführt werden soll.')
+							$elm$html$Html$text('Monat'),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-required'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' *')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-sr-only')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' (Pflichtfeld)')
+								]))
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -20118,6 +20861,7 @@ var $author$project$View$Components$viewMonth = F2(
 									$elm$html$Html$select,
 									_List_fromArray(
 										[
+											$elm$html$Html$Attributes$id('monat'),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeL, $author$project$Types$Update, $author$project$Types$UpdateMonat)),
 											$elm$html$Html$Attributes$value(model.monat)
@@ -20129,7 +20873,9 @@ var $author$project$View$Components$viewMonth = F2(
 												$elm$html$Html$option,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$value(m)
+														$elm$html$Html$Attributes$value(m),
+														$elm$html$Html$Attributes$selected(
+														_Utils_eq(m, model.monat))
 													]),
 												_List_fromArray(
 													[
@@ -20138,23 +20884,328 @@ var $author$project$View$Components$viewMonth = F2(
 										},
 										$author$project$View$Components$monate))
 								]))
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-help')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Der Monat, für den die Berechnung gelten soll.')
 						]))
+				]));
+	});
+var $author$project$View$Layout$viewSchritt = F4(
+	function (nummer, titel, hilfe, inhalt) {
+		return A2(
+			$elm$html$Html$section,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('asgla-step')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-step-header')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-step-number'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(nummer)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h2,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('asgla-step-title')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(titel)
+										])),
+									A2(
+									$elm$html$Html$p,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('asgla-step-help')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(hilfe)
+										]))
+								]))
+						])),
+					A2($elm$html$Html$div, _List_Nil, inhalt)
 				]));
 	});
 var $author$project$Types$Middle = {$: 'Middle'};
 var $author$project$Types$Right = {$: 'Right'};
-var $author$project$Types$Abzugsposten = {$: 'Abzugsposten'};
-var $author$project$Types$ApplyDurchschnittseinkommen = {$: 'ApplyDurchschnittseinkommen'};
-var $author$project$Types$EinkommenzumDurchschnittsberechnung = {$: 'EinkommenzumDurchschnittsberechnung'};
+var $author$project$Types$Select = function (a) {
+	return {$: 'Select', a: a};
+};
+var $author$project$View$Layout$accentKlasse = function (tab) {
+	switch (tab.$) {
+		case 'Left':
+			return 'asgla-accent-vater';
+		case 'Middle':
+			return 'asgla-accent-mutter';
+		default:
+			return 'asgla-accent-kind';
+	}
+};
+var $author$project$View$Layout$tabButton = F4(
+	function (tab, titel, icon, aktiv) {
+		var istAktiv = _Utils_eq(tab, aktiv);
+		return A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$type_('button'),
+					$elm$html$Html$Attributes$class(
+					'asgla-tab ' + $author$project$View$Layout$accentKlasse(tab)),
+					$elm$html$Html$Attributes$classList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2('is-active', istAktiv)
+						])),
+					A2($elm$html$Html$Attributes$attribute, 'role', 'tab'),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'aria-selected',
+					istAktiv ? 'true' : 'false'),
+					$elm$html$Html$Events$onClick(
+					$author$project$Types$ToggleView(
+						$author$project$Types$Select(tab)))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('icon')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$i,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('fas ' + icon),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(titel)
+						]))
+				]));
+	});
+var $author$project$View$Components$showTooltip = function (tooltipText) {
+	return A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('tooltip-container'),
+				A2($elm$html$Html$Attributes$attribute, 'tabindex', '0'),
+				A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Hilfe anzeigen')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$i,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('fas fa-question-circle'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('tooltip-text')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(tooltipText)
+					]))
+			]));
+};
+var $author$project$Types$AddAbzugsVorlage = F2(
+	function (a, b) {
+		return {$: 'AddAbzugsVorlage', a: a, b: b};
+	});
+var $author$project$Types$ChangePosten = function (a) {
+	return {$: 'ChangePosten', a: a};
+};
 var $author$project$Types$UpdateElternDaten = F2(
 	function (a, b) {
 		return {$: 'UpdateElternDaten', a: a, b: b};
 	});
+var $author$project$View$Eltern$viewAbzugsVorlagen = F2(
+	function (p, haupttaetigkeit) {
+		var netto = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$author$project$Utils$Format$formatInputToFloat(haupttaetigkeit));
+		var pauschale = netto * 0.05;
+		var hatEinkommen = netto > 0;
+		var pauschaleText = hatEinkommen ? ('5\u00A0% Pauschale (' + ($author$project$Utils$Format$formatEuroRounded(pauschale) + '\u00A0€)')) : '5\u00A0% Pauschale';
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('asgla-vorlagen')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-vorlagen-titel')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Schnell hinzufügen:')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-vorlagen-buttons')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('button is-small is-light asgla-vorlage'),
+									$elm$html$Html$Attributes$type_('button'),
+									$elm$html$Html$Attributes$disabled(!hatEinkommen),
+									A2(
+									$elm$html$Html$Attributes$attribute,
+									'title',
+									hatEinkommen ? 'Berufsbedingte Aufwendungen: im Allgemeinen 5 % des Nettoeinkommens' : 'Bitte tragen Sie zuerst das Einkommen ein.'),
+									$elm$html$Html$Events$onClick(
+									A2(
+										$author$project$Types$UpdateElternDaten,
+										p,
+										$author$project$Types$ChangePosten(
+											A2(
+												$author$project$Types$AddAbzugsVorlage,
+												'Berufskosten (5 % Pauschale)',
+												$author$project$Utils$Format$formatEuroRounded(pauschale)))))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('icon is-small')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$i,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('fas fa-percent'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+												]),
+											_List_Nil)
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(pauschaleText)
+										]))
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('button is-small is-light asgla-vorlage'),
+									$elm$html$Html$Attributes$type_('button'),
+									A2($elm$html$Html$Attributes$attribute, 'title', 'Pro gefahrenem Kilometer 0,42 € (bei langen Strecken ab ca. 30 km einfach 0,28 €)'),
+									$elm$html$Html$Events$onClick(
+									A2(
+										$author$project$Types$UpdateElternDaten,
+										p,
+										$author$project$Types$ChangePosten(
+											A2($author$project$Types$AddAbzugsVorlage, 'Fahrtkosten (0,42 € je km)', ''))))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('icon is-small')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$i,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('fas fa-car'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+												]),
+											_List_Nil)
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Fahrtkosten')
+										]))
+								]))
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-help')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Fahrtkosten gehören zu den berufsbedingten Kosten. In der Regel setzen Sie entweder die 5\u00A0%-Pauschale oder die tatsächlichen Fahrtkosten an. Fahrtkosten: 0,42\u00A0€ je gefahrenem Kilometer, bei langen Strecken (ab ca. 30\u00A0km einfach) meist 0,28\u00A0€. Den Betrag tragen Sie selbst ein.')
+						]))
+				]));
+	});
+var $author$project$Types$ApplyDurchschnittseinkommen = {$: 'ApplyDurchschnittseinkommen'};
+var $author$project$Types$EinkommenzumDurchschnittsberechnung = {$: 'EinkommenzumDurchschnittsberechnung'};
 var $author$project$Types$AddPosten = function (a) {
 	return {$: 'AddPosten', a: a};
-};
-var $author$project$Types$ChangePosten = function (a) {
-	return {$: 'ChangePosten', a: a};
 };
 var $author$project$Types$RemovePosten = F2(
 	function (a, b) {
@@ -20164,6 +21215,7 @@ var $author$project$Types$UpdatePosten = F3(
 	function (a, b, c) {
 		return {$: 'UpdatePosten', a: a, b: b, c: c};
 	});
+var $author$project$Types$WeitereEinkuenfte = {$: 'WeitereEinkuenfte'};
 var $author$project$View$Eltern$moneyHelp = function (value) {
 	var _v0 = $author$project$Utils$Validation$validateMoney(value);
 	if (_v0.$ === 'Just') {
@@ -20182,7 +21234,6 @@ var $author$project$View$Eltern$moneyHelp = function (value) {
 		return $elm$html$Html$text('');
 	}
 };
-var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
 var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
 	var isRemovable = _v0.isRemovable;
 	var isAtLimit = _v0.isAtLimit;
@@ -20194,7 +21245,7 @@ var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('control')
+					$elm$html$Html$Attributes$class('control entry-remove-control')
 				]),
 			_List_fromArray(
 				[
@@ -20205,7 +21256,7 @@ var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
 							$elm$html$Html$Attributes$class('button is-light entry-action entry-remove'),
 							$elm$html$Html$Events$onClick(onRemove),
 							$elm$html$Html$Attributes$type_('button'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Eintrag entfernen')
+							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Zeile entfernen')
 						]),
 					_List_fromArray(
 						[
@@ -20216,7 +21267,7 @@ var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('control')
+					$elm$html$Html$Attributes$class('control entry-add-control')
 				]),
 			_List_fromArray(
 				[
@@ -20227,7 +21278,8 @@ var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
 							$elm$html$Html$Attributes$class('button is-primary entry-action entry-add'),
 							$elm$html$Html$Attributes$type_('button'),
 							$elm$html$Html$Attributes$disabled(isAtLimit),
-							$elm$html$Html$Events$onClick(onAdd)
+							$elm$html$Html$Events$onClick(onAdd),
+							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Zeile hinzufügen')
 						]),
 					_List_fromArray(
 						[
@@ -20303,7 +21355,8 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 															$elm$core$Maybe$Nothing))
 													])),
 												$elm$html$Html$Attributes$type_('text'),
-												$elm$html$Html$Attributes$placeholder('Kosten (€)'),
+												$elm$html$Html$Attributes$placeholder('z. B. 150'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Betrag in Euro'),
 												$elm$html$Html$Attributes$value(eingabe.kosten),
 												$elm$html$Html$Events$onInput(
 												function (newKosten) {
@@ -20471,7 +21524,7 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 														[
 															$elm$html$Html$Attributes$class('input  entry-input'),
 															$elm$html$Html$Attributes$type_('text'),
-															$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Fahrtkosten'),
+															$elm$html$Html$Attributes$placeholder('z. B. Fahrtkosten'),
 															$elm$html$Html$Attributes$value(eingabe.bezeichnung),
 															$elm$html$Html$Events$onInput(
 															function (newBezeichnung) {
@@ -20494,7 +21547,7 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 														[
 															$elm$html$Html$Attributes$class('input  entry-input'),
 															$elm$html$Html$Attributes$type_('text'),
-															$elm$html$Html$Attributes$placeholder('Bezeichnung z.B. Monat 1'),
+															$elm$html$Html$Attributes$placeholder('z. B. Monat 1'),
 															$elm$html$Html$Attributes$value(eingabe.bezeichnung),
 															$elm$html$Html$Events$onInput(
 															function (newBezeichnung) {
@@ -20536,7 +21589,19 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$author$project$View$Eltern$moneyHelp(eingabe.kosten)
+							$author$project$View$Eltern$moneyHelp(eingabe.kosten),
+							(_Utils_eq(postenType, $author$project$Types$WeitereEinkuenfte) && ($elm$core$String$isEmpty(
+							$elm$core$String$trim(eingabe.bezeichnung)) && (!$elm$core$String$isEmpty(
+							$elm$core$String$trim(eingabe.kosten))))) ? A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-art-hinweis')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Bitte wählen Sie die Art der Einkunft.')
+								])) : $elm$html$Html$text('')
 						]))
 				]));
 	});
@@ -20598,7 +21663,7 @@ var $author$project$View$Eltern$viewDurchschnittseinkommen = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Einkommen zum Durchschnittsberechnung')
+									$elm$html$Html$text('Einkommen für die Durchschnittsberechnung')
 								])),
 							A2(
 							$elm$html$Html$div,
@@ -20654,6 +21719,16 @@ var $author$project$View$Eltern$viewEinkommenMonat = F3(
 				return model.mutter;
 			}
 		}();
+		var einkommenFehlt = (!_Utils_eq(model.error, $elm$core$Maybe$Nothing)) && (($elm$core$String$trim(modelPerson.haupttaetigkeit) === '') && (!A2(
+			$elm$core$List$any,
+			function (v) {
+				return A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$author$project$Utils$Format$formatInputToFloat(v)) > 0;
+			},
+			_List_fromArray(
+				[model.vater.haupttaetigkeit, model.mutter.haupttaetigkeit]))));
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -20692,12 +21767,12 @@ var $author$project$View$Eltern$viewEinkommenMonat = F3(
 											_Utils_Tuple2('input', true),
 											_Utils_Tuple2(
 											'is-danger',
-											!_Utils_eq(
+											(!_Utils_eq(
 												$author$project$Utils$Validation$validateMoney(modelPerson.haupttaetigkeit),
-												$elm$core$Maybe$Nothing))
+												$elm$core$Maybe$Nothing)) || einkommenFehlt)
 										])),
 									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('z.B. 5000'),
+									$elm$html$Html$Attributes$placeholder('z. B. 2500'),
 									$elm$html$Html$Attributes$value(modelPerson.haupttaetigkeit),
 									$elm$html$Html$Events$onInput(
 									function (val) {
@@ -20708,6 +21783,16 @@ var $author$project$View$Eltern$viewEinkommenMonat = F3(
 									})
 								]),
 							_List_Nil),
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-help')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Das monatliche Netto-Einkommen, also nach Abzug von Steuern und Sozialabgaben. Ungefähre Beträge reichen aus.')
+								])),
 							$author$project$View$Eltern$moneyHelp(modelPerson.haupttaetigkeit)
 						]))
 				]));
@@ -20719,6 +21804,18 @@ var $author$project$Types$UpdateSelbstbehalt = function (a) {
 	return {$: 'UpdateSelbstbehalt', a: a};
 };
 var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
+var $author$project$View$Eltern$selbstbehaltErklaerung = function (typOption) {
+	switch (typOption.$) {
+		case 'Angemessen':
+			return 'Standard: Dieser Betrag gilt, wenn Sie nichts anderes angeben.';
+		case 'NotwendigErwerbstaetig':
+			return 'Ein niedrigerer Betrag, z. B. bei geringem Einkommen. Mit dem Häkchen darunter gilt er für nicht erwerbstätige Personen.';
+		case 'NotwendigNichtErwerbstaetig':
+			return 'Ein niedrigerer Betrag, z. B. bei geringem Einkommen, für nicht erwerbstätige Personen.';
+		default:
+			return 'Sie tragen einen eigenen Betrag ein.';
+	}
+};
 var $author$project$Utils$Format$selbstbehaltToString = function (typ) {
 	switch (typ.$) {
 		case 'Angemessen':
@@ -20790,9 +21887,9 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 		var jahr = model.jahr;
 		var elternText = function () {
 			if (person.$ === 'Vater') {
-				return 'Kindsvater';
+				return 'den Vater';
 			} else {
-				return 'Kindsmutter';
+				return 'die Mutter';
 			}
 		}();
 		var personClass = function () {
@@ -20827,9 +21924,21 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 								]),
 							_List_fromArray(
 								[
+									$elm$html$Html$text('Für ' + (elternText + ' wird ')),
+									A2($author$project$View$Components$skriptLink, 'sockelbetrag', typText),
 									$elm$html$Html$text(
-									'Für den ' + (elternText + (' wird ' + (typText + (' von ' + ($author$project$Utils$Format$renderSelbstbehaltBetrag(selbstbehalt) + (' € berücksichtigt. (Jahr: ' + (jahr + ') ')))))))),
-									$author$project$View$Components$showTooltip('Der Selbstbehalt ist der Betrag, der dem unterhaltspflichtigen Elternteil mindestens verbleiben muss, um seinen eigenen Lebensunterhalt zu sichern.')
+									' von ' + ($author$project$Utils$Format$renderSelbstbehaltBetrag(selbstbehalt) + (' € berücksichtigt. (Jahr: ' + (jahr + ') ')))),
+									$author$project$View$Components$showTooltip('Der Selbstbehalt ist der Betrag, der den Eltern für den eigenen Lebensbedarf bleibt, bevor sie Unterhalt zahlen.')
+								])),
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-help')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Für die meisten Fälle ist die Voreinstellung passend. Ändern Sie sie nur, wenn Sie sicher sind.')
 								]))
 						])),
 					A2(
@@ -20860,7 +21969,7 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Ändern')
+											$elm$html$Html$text('Selbstbehalt ändern')
 										]))
 								]))
 						])),
@@ -21024,6 +22133,17 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 																			_List_Nil),
 																			$elm$html$Html$text(
 																			' ' + $author$project$Utils$Format$selbstbehaltToString(typOption))
+																		])),
+																	A2(
+																	$elm$html$Html$p,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$class('asgla-help')
+																		]),
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$text(
+																			$author$project$View$Eltern$selbstbehaltErklaerung(typOption))
 																		]))
 																]))
 														]));
@@ -21096,7 +22216,6 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 				}()
 				]));
 	});
-var $author$project$Types$WeitereEinkuenfte = {$: 'WeitereEinkuenfte'};
 var $author$project$View$Eltern$viewWeitereEinkuenfte = F2(
 	function (model, p) {
 		var modelPerson = function () {
@@ -21110,7 +22229,7 @@ var $author$project$View$Eltern$viewWeitereEinkuenfte = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('field')
+					$elm$html$Html$Attributes$class('field asgla-subcard')
 				]),
 			_List_fromArray(
 				[
@@ -21123,7 +22242,27 @@ var $author$project$View$Eltern$viewWeitereEinkuenfte = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Weitere Einkünfte (€) '),
-							$author$project$View$Components$showTooltip('Hierzu gehören z.B. Mieteinnahmen, Kapitalerträge, Steuererstattungen (1/12 je Monat), Elterngeld, etc. ' + 'Auch der Wohnvorteil durch mietfreies Wohnen im eigenen Heim ist hier zu berücksichtigen.')
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-optional')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('optional')
+								])),
+							$author$project$View$Components$showTooltip('Hierzu gehören z.B. Mieteinnahmen, Kapitalerträge, Steuererstattungen (1/12 je Monat), Elterngeld, etc. ' + 'Auch der Vorteil durch mietfreies Wohnen im eigenen Haus ist hier zu berücksichtigen.')
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Zum Beispiel Mieteinnahmen, Zinsen oder Elterngeld. Steuererstattungen tragen Sie anteilig je Monat ein (1/12).')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -21202,22 +22341,42 @@ var $author$project$View$Eltern$viewEltern = F2(
 									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('field'),
-											A2($elm$html$Html$Attributes$style, 'margin-top', '1.5rem')
+											$elm$html$Html$Attributes$class('field asgla-subsection asgla-subcard')
 										]),
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$label,
+											$elm$html$Html$h4,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('label')
+													$elm$html$Html$Attributes$class('asgla-subsection-title')
 												]),
 											_List_fromArray(
 												[
-													$elm$html$Html$text('Abzugsposten '),
-													$author$project$View$Components$showTooltip('Zu den Abzügen vom Nettoeinkommen gehören Schulden (soweit berücksichtigungsfähig) und Belastungen, insb. Altersvorsorge-Leistungen, berufsbedingte Fahrtkosten, etc.).' + ' Üblicherweise werden 5 % des Nettoeinkommens als pauschale berufsbedingte Aufwendungen abgezogen, soweit höhere Kosten nicht konkret nachgewiesen sind.')
+													$elm$html$Html$text('Abzüge vom Nettoeinkommen '),
+													A2(
+													$elm$html$Html$span,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('asgla-optional')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('optional')
+														])),
+													$author$project$View$Components$showTooltip('Abzüge sind zum Beispiel Schulden, Beiträge zur Altersvorsorge oder Fahrtkosten zur Arbeit.' + ' Je nach Fall werden berufsbedingte Kosten pauschal oder einzeln berücksichtigt. Tragen Sie hier die Beträge ein, die Sie kennen.')
 												])),
+											A2(
+											$elm$html$Html$p,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Nur ausfüllen, wenn es solche Posten gibt. Tragen Sie je Posten den Betrag in Euro und eine Bezeichnung ein, z. B. 120 € für Fahrtkosten.')
+												])),
+											A2($author$project$View$Eltern$viewAbzugsVorlagen, p, modelPerson.haupttaetigkeit),
 											A2(
 											$elm$html$Html$div,
 											_List_fromArray(
@@ -21315,108 +22474,132 @@ var $author$project$View$Kind$viewBedarf = F4(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('field has-addons entry-row'),
-					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
+					$elm$html$Html$Attributes$class('entry-row')
 				]),
-			_Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('control entry-cost'),
-								A2($elm$html$Html$Attributes$style, 'width', '20%')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$classList(
-										_List_fromArray(
-											[
-												_Utils_Tuple2('input', true),
-												_Utils_Tuple2('entry-input', true),
-												_Utils_Tuple2(
-												'is-danger',
-												!_Utils_eq(
-													$author$project$Utils$Validation$validateMoney(eingabe.kosten),
-													$elm$core$Maybe$Nothing))
-											])),
-										$elm$html$Html$Attributes$type_('text'),
-										$elm$html$Html$Attributes$placeholder('Kosten (€)'),
-										$elm$html$Html$Attributes$value(eingabe.kosten),
-										$elm$html$Html$Events$onInput(
-										function (newKosten) {
-											return $author$project$Types$UpdateKindDaten(
-												$author$project$Types$ChangeBedarf(
-													A3(
-														$author$project$Types$UpdateBedarf,
-														bedarfsTyp,
-														index,
-														_Utils_update(
-															eingabe,
-															{kosten: newKosten}))));
-										})
-									]),
-								_List_Nil)
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('control entry-label'),
-								A2($elm$html$Html$Attributes$style, 'width', '38%')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('input entry-input'),
-										$elm$html$Html$Attributes$type_('text'),
-										$elm$html$Html$Attributes$placeholder('z.B. Musikschule'),
-										$elm$html$Html$Attributes$value(eingabe.bezeichnung),
-										$elm$html$Html$Events$onInput(
-										function (newBezeichnung) {
-											return $author$project$Types$UpdateKindDaten(
-												$author$project$Types$ChangeBedarf(
-													A3(
-														$author$project$Types$UpdateBedarf,
-														bedarfsTyp,
-														index,
-														_Utils_update(
-															eingabe,
-															{bezeichnung: newBezeichnung}))));
-										})
-									]),
-								_List_Nil)
-							]))
-					]),
-				_Utils_ap(
-					$author$project$View$Components$viewEntryActionButtons(
-						{
-							isAtLimit: $elm$core$List$length(typeList) >= 5,
-							isRemovable: $elm$core$List$length(typeList) > 1,
-							onAdd: $author$project$Types$UpdateKindDaten(
-								$author$project$Types$ChangeBedarf(
-									$author$project$Types$AddBedarf(bedarfsTyp))),
-							onRemove: $author$project$Types$UpdateKindDaten(
-								$author$project$Types$ChangeBedarf(
-									A2($author$project$Types$RemoveBedarf, bedarfsTyp, index)))
-						}),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
+							$elm$html$Html$Attributes$class('field has-addons entry-controls')
+						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('control entry-cost')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$classList(
+												_List_fromArray(
+													[
+														_Utils_Tuple2('input', true),
+														_Utils_Tuple2('entry-input', true),
+														_Utils_Tuple2(
+														'is-danger',
+														!_Utils_eq(
+															$author$project$Utils$Validation$validateMoney(eingabe.kosten),
+															$elm$core$Maybe$Nothing))
+													])),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('z. B. 120'),
+												$elm$html$Html$Attributes$value(eingabe.kosten),
+												$elm$html$Html$Events$onInput(
+												function (newKosten) {
+													return $author$project$Types$UpdateKindDaten(
+														$author$project$Types$ChangeBedarf(
+															A3(
+																$author$project$Types$UpdateBedarf,
+																bedarfsTyp,
+																index,
+																_Utils_update(
+																	eingabe,
+																	{kosten: newKosten}))));
+												})
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('control entry-label')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('input entry-input'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('z. B. Musikschule'),
+												$elm$html$Html$Attributes$value(eingabe.bezeichnung),
+												$elm$html$Html$Events$onInput(
+												function (newBezeichnung) {
+													return $author$project$Types$UpdateKindDaten(
+														$author$project$Types$ChangeBedarf(
+															A3(
+																$author$project$Types$UpdateBedarf,
+																bedarfsTyp,
+																index,
+																_Utils_update(
+																	eingabe,
+																	{bezeichnung: newBezeichnung}))));
+												})
+											]),
+										_List_Nil)
+									]))
+							]),
+						$author$project$View$Components$viewEntryActionButtons(
+							{
+								isAtLimit: $elm$core$List$length(typeList) >= 5,
+								isRemovable: $elm$core$List$length(typeList) > 1,
+								onAdd: $author$project$Types$UpdateKindDaten(
+									$author$project$Types$ChangeBedarf(
+										$author$project$Types$AddBedarf(bedarfsTyp))),
+								onRemove: $author$project$Types$UpdateKindDaten(
+									$author$project$Types$ChangeBedarf(
+										A2($author$project$Types$RemoveBedarf, bedarfsTyp, index)))
+							}))),
+					($elm$core$String$trim(eingabe.kosten) === '') ? $elm$html$Html$text('') : A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('control asgla-bezahlt'),
+							A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+							A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
+							A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+							A2($elm$html$Html$Attributes$style, 'gap', '1rem'),
+							A2($elm$html$Html$Attributes$style, 'margin-top', '0.5rem')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$p,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-help'),
+									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%'),
+									A2($elm$html$Html$Attributes$style, 'margin-bottom', '0')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Wählen Sie, wer die Kosten schon getragen hat. Das beeinflusst das Ergebnis.')
+								])),
 							A2(
 							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('control'),
-									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%'),
 									A2($elm$html$Html$Attributes$style, 'display', 'flex'),
 									A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
 									A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
@@ -21425,32 +22608,29 @@ var $author$project$View$Kind$viewBedarf = F4(
 							_List_fromArray(
 								[
 									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('has-text-weight-light'),
+											A2($elm$html$Html$Attributes$style, 'white-space', 'nowrap')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Bereits bezahlt von:')
+										])),
+									A2(
 									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-											A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-											A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-											A2($elm$html$Html$Attributes$style, 'gap', '1rem')
+											$elm$html$Html$Attributes$class('field is-grouped')
 										]),
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$span,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('has-text-weight-light'),
-													A2($elm$html$Html$Attributes$style, 'white-space', 'nowrap')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Bereits bezahlt von:')
-												])),
-											A2(
 											$elm$html$Html$div,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('field is-grouped')
+													$elm$html$Html$Attributes$class('field is-narrow')
 												]),
 											_List_fromArray(
 												[
@@ -21458,7 +22638,7 @@ var $author$project$View$Kind$viewBedarf = F4(
 													$elm$html$Html$div,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$class('field is-narrow')
+															$elm$html$Html$Attributes$class('control')
 														]),
 													_List_fromArray(
 														[
@@ -21466,219 +22646,224 @@ var $author$project$View$Kind$viewBedarf = F4(
 															$elm$html$Html$div,
 															_List_fromArray(
 																[
-																	$elm$html$Html$Attributes$class('control')
+																	$elm$html$Html$Attributes$class('buttons has-addons is-flex-wrap-wrap')
 																]),
 															_List_fromArray(
 																[
 																	A2(
-																	$elm$html$Html$div,
+																	$elm$html$Html$label,
 																	_List_fromArray(
 																		[
-																			$elm$html$Html$Attributes$class('buttons has-addons is-flex-wrap-wrap')
+																			$elm$html$Html$Attributes$class('button'),
+																			$elm$html$Html$Attributes$classList(
+																			_List_fromArray(
+																				[
+																					_Utils_Tuple2(
+																					'is-primary is-selected',
+																					_Utils_eq(
+																						eingabe.bezahltVon,
+																						$elm$core$Maybe$Just($author$project$Types$Vater))),
+																					_Utils_Tuple2(
+																					'is-light',
+																					!_Utils_eq(
+																						eingabe.bezahltVon,
+																						$elm$core$Maybe$Just($author$project$Types$Vater)))
+																				])),
+																			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+																			A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
+																			A2(
+																			$elm$html$Html$Attributes$style,
+																			'border-bottom',
+																			_Utils_eq(
+																				eingabe.bezahltVon,
+																				$elm$core$Maybe$Just($author$project$Types$Vater)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
+																			$elm$html$Html$Events$onClick(
+																			$author$project$Types$UpdateKindDaten(
+																				$author$project$Types$ChangeBedarf(
+																					A3(
+																						$author$project$Types$UpdateBedarf,
+																						bedarfsTyp,
+																						index,
+																						_Utils_update(
+																							eingabe,
+																							{
+																								bezahltVon: $elm$core$Maybe$Just($author$project$Types$Vater)
+																							})))))
 																		]),
 																	_List_fromArray(
 																		[
 																			A2(
-																			$elm$html$Html$label,
+																			$elm$html$Html$input,
 																			_List_fromArray(
 																				[
-																					$elm$html$Html$Attributes$class('button'),
-																					$elm$html$Html$Attributes$classList(
-																					_List_fromArray(
-																						[
-																							_Utils_Tuple2(
-																							'is-primary is-selected',
-																							_Utils_eq(
-																								eingabe.bezahltVon,
-																								$elm$core$Maybe$Just($author$project$Types$Vater))),
-																							_Utils_Tuple2(
-																							'is-light',
-																							!_Utils_eq(
-																								eingabe.bezahltVon,
-																								$elm$core$Maybe$Just($author$project$Types$Vater)))
-																						])),
-																					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-																					A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
-																					A2(
-																					$elm$html$Html$Attributes$style,
-																					'border-bottom',
+																					$elm$html$Html$Attributes$type_('radio'),
+																					$elm$html$Html$Attributes$name(radioName),
+																					$elm$html$Html$Attributes$value('Vater'),
+																					$elm$html$Html$Attributes$checked(
 																					_Utils_eq(
 																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Vater)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
-																					$elm$html$Html$Events$onClick(
-																					$author$project$Types$UpdateKindDaten(
-																						$author$project$Types$ChangeBedarf(
-																							A3(
-																								$author$project$Types$UpdateBedarf,
-																								bedarfsTyp,
-																								index,
-																								_Utils_update(
-																									eingabe,
-																									{
-																										bezahltVon: $elm$core$Maybe$Just($author$project$Types$Vater)
-																									})))))
+																						$elm$core$Maybe$Just($author$project$Types$Vater))),
+																					A2($elm$html$Html$Attributes$style, 'display', 'none')
 																				]),
+																			_List_Nil),
+																			$elm$html$Html$text('Vater')
+																		])),
+																	A2(
+																	$elm$html$Html$label,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$class('button'),
+																			$elm$html$Html$Attributes$classList(
 																			_List_fromArray(
 																				[
-																					A2(
-																					$elm$html$Html$input,
-																					_List_fromArray(
-																						[
-																							$elm$html$Html$Attributes$type_('radio'),
-																							$elm$html$Html$Attributes$name(radioName),
-																							$elm$html$Html$Attributes$value('Vater'),
-																							$elm$html$Html$Attributes$checked(
-																							_Utils_eq(
-																								eingabe.bezahltVon,
-																								$elm$core$Maybe$Just($author$project$Types$Vater))),
-																							A2($elm$html$Html$Attributes$style, 'display', 'none')
-																						]),
-																					_List_Nil),
-																					$elm$html$Html$text('Vater')
-																				])),
-																			A2(
-																			$elm$html$Html$label,
-																			_List_fromArray(
-																				[
-																					$elm$html$Html$Attributes$class('button'),
-																					$elm$html$Html$Attributes$classList(
-																					_List_fromArray(
-																						[
-																							_Utils_Tuple2(
-																							'is-primary is-selected',
-																							_Utils_eq(
-																								eingabe.bezahltVon,
-																								$elm$core$Maybe$Just($author$project$Types$Mutter))),
-																							_Utils_Tuple2(
-																							'is-light',
-																							!_Utils_eq(
-																								eingabe.bezahltVon,
-																								$elm$core$Maybe$Just($author$project$Types$Mutter)))
-																						])),
-																					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-																					A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
-																					A2(
-																					$elm$html$Html$Attributes$style,
-																					'border-bottom',
+																					_Utils_Tuple2(
+																					'is-primary is-selected',
 																					_Utils_eq(
 																						eingabe.bezahltVon,
-																						$elm$core$Maybe$Just($author$project$Types$Mutter)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
-																					$elm$html$Html$Events$onClick(
-																					$author$project$Types$UpdateKindDaten(
-																						$author$project$Types$ChangeBedarf(
-																							A3(
-																								$author$project$Types$UpdateBedarf,
-																								bedarfsTyp,
-																								index,
-																								_Utils_update(
-																									eingabe,
-																									{
-																										bezahltVon: $elm$core$Maybe$Just($author$project$Types$Mutter)
-																									})))))
-																				]),
-																			_List_fromArray(
-																				[
-																					A2(
-																					$elm$html$Html$input,
-																					_List_fromArray(
-																						[
-																							$elm$html$Html$Attributes$type_('radio'),
-																							$elm$html$Html$Attributes$name(radioName),
-																							$elm$html$Html$Attributes$value('Mutter'),
-																							$elm$html$Html$Attributes$checked(
-																							_Utils_eq(
-																								eingabe.bezahltVon,
-																								$elm$core$Maybe$Just($author$project$Types$Mutter))),
-																							A2($elm$html$Html$Attributes$style, 'display', 'none')
-																						]),
-																					_List_Nil),
-																					$elm$html$Html$text('Mutter')
+																						$elm$core$Maybe$Just($author$project$Types$Mutter))),
+																					_Utils_Tuple2(
+																					'is-light',
+																					!_Utils_eq(
+																						eingabe.bezahltVon,
+																						$elm$core$Maybe$Just($author$project$Types$Mutter)))
 																				])),
+																			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+																			A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
 																			A2(
-																			$elm$html$Html$label,
+																			$elm$html$Html$Attributes$style,
+																			'border-bottom',
+																			_Utils_eq(
+																				eingabe.bezahltVon,
+																				$elm$core$Maybe$Just($author$project$Types$Mutter)) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
+																			$elm$html$Html$Events$onClick(
+																			$author$project$Types$UpdateKindDaten(
+																				$author$project$Types$ChangeBedarf(
+																					A3(
+																						$author$project$Types$UpdateBedarf,
+																						bedarfsTyp,
+																						index,
+																						_Utils_update(
+																							eingabe,
+																							{
+																								bezahltVon: $elm$core$Maybe$Just($author$project$Types$Mutter)
+																							})))))
+																		]),
+																	_List_fromArray(
+																		[
+																			A2(
+																			$elm$html$Html$input,
 																			_List_fromArray(
 																				[
-																					$elm$html$Html$Attributes$class('button'),
-																					$elm$html$Html$Attributes$classList(
-																					_List_fromArray(
-																						[
-																							_Utils_Tuple2(
-																							'is-primary is-selected',
-																							_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
-																							_Utils_Tuple2(
-																							'is-light',
-																							!_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing))
-																						])),
-																					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
-																					A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
-																					A2(
-																					$elm$html$Html$Attributes$style,
-																					'border-bottom',
-																					_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
-																					$elm$html$Html$Events$onClick(
-																					$author$project$Types$UpdateKindDaten(
-																						$author$project$Types$ChangeBedarf(
-																							A3(
-																								$author$project$Types$UpdateBedarf,
-																								bedarfsTyp,
-																								index,
-																								_Utils_update(
-																									eingabe,
-																									{bezahltVon: $elm$core$Maybe$Nothing})))))
+																					$elm$html$Html$Attributes$type_('radio'),
+																					$elm$html$Html$Attributes$name(radioName),
+																					$elm$html$Html$Attributes$value('Mutter'),
+																					$elm$html$Html$Attributes$checked(
+																					_Utils_eq(
+																						eingabe.bezahltVon,
+																						$elm$core$Maybe$Just($author$project$Types$Mutter))),
+																					A2($elm$html$Html$Attributes$style, 'display', 'none')
 																				]),
+																			_List_Nil),
+																			$elm$html$Html$text('Mutter')
+																		])),
+																	A2(
+																	$elm$html$Html$label,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$class('button'),
+																			$elm$html$Html$Attributes$classList(
 																			_List_fromArray(
 																				[
-																					A2(
-																					$elm$html$Html$input,
-																					_List_fromArray(
-																						[
-																							$elm$html$Html$Attributes$type_('radio'),
-																							$elm$html$Html$Attributes$name(radioName),
-																							$elm$html$Html$Attributes$value('Nicht angegeben'),
-																							$elm$html$Html$Attributes$checked(
-																							_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
-																							A2($elm$html$Html$Attributes$style, 'display', 'none')
-																						]),
-																					_List_Nil),
-																					$elm$html$Html$text('Wurde noch nicht bezahlt')
-																				]))
+																					_Utils_Tuple2(
+																					'is-primary is-selected',
+																					_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
+																					_Utils_Tuple2(
+																					'is-light',
+																					!_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing))
+																				])),
+																			A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+																			A2($elm$html$Html$Attributes$style, 'margin-bottom', '0'),
+																			A2(
+																			$elm$html$Html$Attributes$style,
+																			'border-bottom',
+																			_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing) ? '3px solid rgb(67, 67, 67)' : '3px solid transparent'),
+																			$elm$html$Html$Events$onClick(
+																			$author$project$Types$UpdateKindDaten(
+																				$author$project$Types$ChangeBedarf(
+																					A3(
+																						$author$project$Types$UpdateBedarf,
+																						bedarfsTyp,
+																						index,
+																						_Utils_update(
+																							eingabe,
+																							{bezahltVon: $elm$core$Maybe$Nothing})))))
+																		]),
+																	_List_fromArray(
+																		[
+																			A2(
+																			$elm$html$Html$input,
+																			_List_fromArray(
+																				[
+																					$elm$html$Html$Attributes$type_('radio'),
+																					$elm$html$Html$Attributes$name(radioName),
+																					$elm$html$Html$Attributes$value('Nicht angegeben'),
+																					$elm$html$Html$Attributes$checked(
+																					_Utils_eq(eingabe.bezahltVon, $elm$core$Maybe$Nothing)),
+																					A2($elm$html$Html$Attributes$style, 'display', 'none')
+																				]),
+																			_List_Nil),
+																			$elm$html$Html$text('Wurde noch nicht bezahlt')
 																		]))
 																]))
 														]))
 												]))
 										]))
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
-								]),
-							_List_fromArray(
-								[
-									$author$project$View$Kind$moneyHelp(eingabe.kosten)
 								]))
-						]))));
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
+						]),
+					_List_fromArray(
+						[
+							$author$project$View$Kind$moneyHelp(eingabe.kosten)
+						]))
+				]));
 	});
 var $author$project$Types$UpdateRegelbedarf = function (a) {
 	return {$: 'UpdateRegelbedarf', a: a};
 };
 var $author$project$View$Kind$requiredMoneyHelp = function (value) {
-	var _v0 = $author$project$Utils$Validation$validateRequiredMoney(value);
-	if (_v0.$ === 'Just') {
-		var message = _v0.a;
+	if ($elm$core$String$trim(value) === '') {
 		return A2(
 			$elm$html$Html$p,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('help is-danger')
+					$elm$html$Html$Attributes$class('help')
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(message)
+					$elm$html$Html$text('Tragen Sie hier den monatlichen Betrag in Euro ein, z. B. 900.')
 				]));
 	} else {
-		return $elm$html$Html$text('');
+		var _v0 = $author$project$Utils$Validation$validateRequiredMoney(value);
+		if (_v0.$ === 'Just') {
+			var message = _v0.a;
+			return A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('help is-danger')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(message)
+					]));
+		} else {
+			return $elm$html$Html$text('');
+		}
 	}
 };
 var $author$project$View$Kind$viewIndividuelleRegelbedarf = function (model) {
@@ -21721,11 +22906,11 @@ var $author$project$View$Kind$viewIndividuelleRegelbedarf = function (model) {
 										_Utils_Tuple2(
 										'is-danger',
 										!_Utils_eq(
-											$author$project$Utils$Validation$validateRequiredMoney(model.kind.regelbedarf),
+											$author$project$Utils$Validation$validateMoney(model.kind.regelbedarf),
 											$elm$core$Maybe$Nothing))
 									])),
 								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$placeholder('z.B. 1500'),
+								$elm$html$Html$Attributes$placeholder('z. B. 900'),
 								$elm$html$Html$Attributes$value(model.kind.regelbedarf),
 								$elm$html$Html$Events$onInput(
 								function (val) {
@@ -21745,7 +22930,7 @@ var $author$project$View$Kind$viewIndividuelleRegelbedarf = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Bitte nutzen Sie diese Funktion nur, wenn Sie einen ausnahmsweisen Sonderfall haben!')
+						$elm$html$Html$text('Bitte nutzen Sie diese Funktion nur, wenn bei Ihnen ein Sonderfall vorliegt.')
 					]))
 			]));
 };
@@ -21765,104 +22950,105 @@ var $author$project$View$Kind$viewKindEinkuenfte = F3(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('field has-addons entry-row'),
-					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'flex-start')
+					$elm$html$Html$Attributes$class('entry-row')
 				]),
-			_Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('control entry-cost'),
-								A2($elm$html$Html$Attributes$style, 'width', '20%')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$classList(
-										_List_fromArray(
-											[
-												_Utils_Tuple2('input', true),
-												_Utils_Tuple2('entry-input', true),
-												_Utils_Tuple2(
-												'is-danger',
-												!_Utils_eq(
-													$author$project$Utils$Validation$validateMoney(eingabe.kosten),
-													$elm$core$Maybe$Nothing))
-											])),
-										$elm$html$Html$Attributes$type_('text'),
-										$elm$html$Html$Attributes$placeholder('Kosten (€)'),
-										$elm$html$Html$Attributes$value(eingabe.kosten),
-										$elm$html$Html$Events$onInput(
-										function (newKosten) {
-											return $author$project$Types$UpdateKindDaten(
-												A2(
-													$author$project$Types$UpdateEinkuenfte,
-													index,
-													_Utils_update(
-														eingabe,
-														{kosten: newKosten})));
-										})
-									]),
-								_List_Nil)
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('control entry-label'),
-								A2($elm$html$Html$Attributes$style, 'width', '38%')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('input entry-input'),
-										$elm$html$Html$Attributes$type_('text'),
-										$elm$html$Html$Attributes$placeholder('Bezeichnung'),
-										$elm$html$Html$Attributes$value(eingabe.bezeichnung),
-										$elm$html$Html$Events$onInput(
-										function (newBezeichnung) {
-											return $author$project$Types$UpdateKindDaten(
-												A2(
-													$author$project$Types$UpdateEinkuenfte,
-													index,
-													{bezeichnung: newBezeichnung, kosten: eingabe.kosten}));
-										})
-									]),
-								_List_Nil)
-							]))
-					]),
-				_Utils_ap(
-					$author$project$View$Components$viewEntryActionButtons(
-						{
-							isAtLimit: $elm$core$List$length(typeList) >= 5,
-							isRemovable: $elm$core$List$length(typeList) > 1,
-							onAdd: $author$project$Types$UpdateKindDaten($author$project$Types$AddEinkuenfte),
-							onRemove: $author$project$Types$UpdateKindDaten(
-								$author$project$Types$RemoveEinkuenfte(index))
-						}),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
-								]),
-							_List_fromArray(
-								[
-									$author$project$View$Kind$moneyHelp(eingabe.kosten)
-								]))
-						]))));
+							$elm$html$Html$Attributes$class('field has-addons entry-controls')
+						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('control entry-cost')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$classList(
+												_List_fromArray(
+													[
+														_Utils_Tuple2('input', true),
+														_Utils_Tuple2('entry-input', true),
+														_Utils_Tuple2(
+														'is-danger',
+														!_Utils_eq(
+															$author$project$Utils$Validation$validateMoney(eingabe.kosten),
+															$elm$core$Maybe$Nothing))
+													])),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('z. B. 120'),
+												$elm$html$Html$Attributes$value(eingabe.kosten),
+												$elm$html$Html$Events$onInput(
+												function (newKosten) {
+													return $author$project$Types$UpdateKindDaten(
+														A2(
+															$author$project$Types$UpdateEinkuenfte,
+															index,
+															_Utils_update(
+																eingabe,
+																{kosten: newKosten})));
+												})
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('control entry-label')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('input entry-input'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Bezeichnung'),
+												$elm$html$Html$Attributes$value(eingabe.bezeichnung),
+												$elm$html$Html$Events$onInput(
+												function (newBezeichnung) {
+													return $author$project$Types$UpdateKindDaten(
+														A2(
+															$author$project$Types$UpdateEinkuenfte,
+															index,
+															{bezeichnung: newBezeichnung, kosten: eingabe.kosten}));
+												})
+											]),
+										_List_Nil)
+									]))
+							]),
+						$author$project$View$Components$viewEntryActionButtons(
+							{
+								isAtLimit: $elm$core$List$length(typeList) >= 5,
+								isRemovable: $elm$core$List$length(typeList) > 1,
+								onAdd: $author$project$Types$UpdateKindDaten($author$project$Types$AddEinkuenfte),
+								onRemove: $author$project$Types$UpdateKindDaten(
+									$author$project$Types$RemoveEinkuenfte(index))
+							}))),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'flex-basis', '100%')
+						]),
+					_List_fromArray(
+						[
+							$author$project$View$Kind$moneyHelp(eingabe.kosten)
+						]))
+				]));
 	});
 var $author$project$View$Kind$viewKind = function (model) {
 	var altersFehler = (($elm$core$String$trim(model.kind.alterInput) === '') && _Utils_eq(model.error, $elm$core$Maybe$Nothing)) ? $elm$core$Maybe$Nothing : $author$project$Utils$Validation$validateAgeOrBirthday(model.kind.alterInput);
@@ -21896,8 +23082,38 @@ var $author$project$View$Kind$viewKind = function (model) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Alter / Geburtsdatum des Kindes* '),
-										$author$project$View$Components$showTooltip('Geben Sie hier entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ ein.')
+										$elm$html$Html$text('Alter oder Geburtsdatum des Kindes'),
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('asgla-required'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(' *')
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('asgla-sr-only')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(' (Pflichtfeld)')
+											]))
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ.')
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -21967,8 +23183,19 @@ var $author$project$View$Kind$viewKind = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Kindergeld Empfänger '),
-								$author$project$View$Components$showTooltip('Elternteil, der das Kindergeld für das Kind erhält')
+								$elm$html$Html$text('Wer erhält das Kindergeld?')
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Bitte prüfen: Vorausgewählt ist die Mutter. Wählen Sie den Vater, falls er das '),
+								A2($author$project$View$Components$skriptLink, 'kindergeldverrechnung', 'Kindergeld'),
+								$elm$html$Html$text(' erhält.')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -22037,8 +23264,28 @@ var $author$project$View$Kind$viewKind = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Kind Einkünfte (€) '),
-								$author$project$View$Components$showTooltip('Hierzu gehören zum Beispiel Ausbildungsgeld oder BAföG-Zahlungen, allerdings sind eigene Einkünfte des Kindes nur soweit anzusetzen, wie es unter Berücksichtigung der wirtschaftlichen Verhältnisse der Billigkeit entspricht. Daher sind z.B. taschengeld-erhöhende Schülerjob-Zahlungen nicht anzusetzen und bei weiteren Einkünften ggfl. nicht der vollständige Betrag.')
+								$elm$html$Html$text('Eigene Einkünfte des Kindes (€) '),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-optional')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('optional')
+									])),
+								$author$project$View$Components$showTooltip('Hierzu gehören zum Beispiel Ausbildungsgeld oder BAföG-Zahlungen. Eigene Einkünfte des Kindes werden nur so weit angerechnet, wie es den Umständen angemessen ist. Zahlungen aus einem Schülerjob, die nur das Taschengeld erhöhen, werden zum Beispiel nicht angerechnet. Bei weiteren Einkünften wird unter Umständen nicht der volle Betrag angerechnet.')
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Zum Beispiel Ausbildungsvergütung oder BAföG. Taschengeld aus einem Schülerjob wird in der Regel nicht angesetzt.')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -22055,7 +23302,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('field'),
+						$elm$html$Html$Attributes$class('field asgla-subcard'),
 						A2($elm$html$Html$Attributes$style, 'margin-top', '1.5rem')
 					]),
 				_List_fromArray(
@@ -22068,8 +23315,30 @@ var $author$project$View$Kind$viewKind = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Kind Mehrbedarf (€) '),
-								$author$project$View$Components$showTooltip('Monatlicher Mehrbedarf des Kindes (z.B. für besondere Ausgaben wie Nachhilfe, medizinische Kosten)')
+								$elm$html$Html$text('Mehrbedarf des Kindes (€) '),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-optional')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('optional')
+									])),
+								$author$project$View$Components$showTooltip('Mehrbedarf: zusätzliche Kosten des Kindes, die regelmäßig pro Monat anfallen, z. B. Nachhilfe oder Zahnspange.')
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Regelmäßige zusätzliche Kosten pro Monat ('),
+								A2($author$project$View$Components$skriptLink, 'mehrbedarf', 'Mehrbedarf'),
+								$elm$html$Html$text('), z. B. für Nachhilfe oder medizinische Behandlungen.')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -22086,7 +23355,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('field')
+						$elm$html$Html$Attributes$class('field asgla-subcard')
 					]),
 				_List_fromArray(
 					[
@@ -22098,8 +23367,30 @@ var $author$project$View$Kind$viewKind = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Kind Sonderbedarf (€) '),
-								$author$project$View$Components$showTooltip('Einmaliger Sonderbedarf des Kindes (z.B. für größere Anschaffungen oder besondere Ereignisse)')
+								$elm$html$Html$text('Sonderbedarf des Kindes (€) '),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-optional')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('optional')
+									])),
+								$author$project$View$Components$showTooltip('Sonderbedarf: zusätzliche Kosten des Kindes, die einmalig anfallen, z. B. für eine größere Anschaffung.')
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Einmalige Kosten ('),
+								A2($author$project$View$Components$skriptLink, 'sonderbedarf', 'Sonderbedarf'),
+								$elm$html$Html$text('), z. B. für eine größere Anschaffung.')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -22116,7 +23407,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('field')
+						$elm$html$Html$Attributes$class('field asgla-subcard')
 					]),
 				_List_fromArray(
 					[
@@ -22128,8 +23419,28 @@ var $author$project$View$Kind$viewKind = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Weitere bereits erbrachte Leistungen der Eltern (€) '),
+								$elm$html$Html$text('Bereits erbrachte Leistungen der Eltern (€) '),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-optional')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('optional')
+									])),
 								$author$project$View$Components$showTooltip('Weitere bereits erbrachte Leistungen der Eltern (z.B. Kleidung, Essensgeld (Kita, Schule))')
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help asgla-help-top')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Was Sie bereits bezahlt haben, z. B. Kleidung oder Essensgeld in Kita oder Schule.')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -22146,7 +23457,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 				$elm$html$Html$label,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('checkbox label')
+						$elm$html$Html$Attributes$class('checkbox label asgla-checkbox-kind')
 					]),
 				_List_fromArray(
 					[
@@ -22158,196 +23469,80 @@ var $author$project$View$Kind$viewKind = function (model) {
 								$elm$html$Html$Attributes$checked(model.customRegelbedarf),
 								$elm$html$Html$Events$onClick(
 								$author$project$Types$ToggleView($author$project$Types$ToggleCustomRegelbedarf)),
-								A2($elm$html$Html$Attributes$style, 'transform', 'scale(1.75)'),
-								A2($elm$html$Html$Attributes$style, 'margin-right', '0.5rem'),
-								A2($elm$html$Html$Attributes$style, 'margin-top', '0.5rem')
+								A2($elm$html$Html$Attributes$style, 'margin-right', '0.5rem')
 							]),
 						_List_Nil),
-						$elm$html$Html$text('   Stattdessen individuellen Regelbedarf festsetzen'),
-						$author$project$View$Components$showTooltip('Der ASGLA-Rechner setzt automatisch den Regelbedarf nach der Düsseldorfer Tabelle an.\n\nDa die Tabelle nur ein Nettoeinkommen bis 11.200 EUR berücksichtigt, müssen Eltern mit einem höheren Nettoeinkommen einen individuellen Bedarf ansetzen, der die Tabelle denklogisch unter Berücksichtigung des jeweiligen Einzelfalles fortsetzt.\n\nZudem wird nach den Leitlinien des OLG Naumburg in Sachsen-Anhalt kein Bedarfskontrollbetrag angewendet. Für Eltern in deren OLG-Bezirk der Bedarfskontrollbetrag angewendet wird, kann dieser durch Ansetzen eines individuellen Regelbedarfs berücksichtigt werden.')
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(' Stattdessen einen individuellen Regelbedarf festsetzen')
+							])),
+						$author$project$View$Components$showTooltip('Der Regelbedarf ist der übliche monatliche Betrag, den ein Kind laut Düsseldorfer Tabelle braucht. Der Rechner setzt ihn automatisch an. Die Tabelle endet bei einem Nettoeinkommen von 11.200 EUR. Bei höherem Einkommen können Sie hier einen eigenen Betrag festlegen.')
 					])),
 				model.customRegelbedarf ? $author$project$View$Kind$viewIndividuelleRegelbedarf(model) : $elm$html$Html$text('')
 			]));
 };
 var $author$project$View$Layout$tabContent = F2(
 	function (tab, model) {
-		var content = function () {
-			switch (tab.$) {
-				case 'Left':
-					return A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '1.5rem')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$label,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('title is-5')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Vater - Einkünfte und Abzüge')
-									])),
-								A2($author$project$View$Eltern$viewEltern, model, $author$project$Types$Vater)
-							]));
-				case 'Middle':
-					return A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '1.5rem')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$label,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('title is-5')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Mutter - Einkünfte und Abzüge')
-									])),
-								A2($author$project$View$Eltern$viewEltern, model, $author$project$Types$Mutter)
-							]));
-				default:
-					return A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '1.5rem')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$label,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('title is-5')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Bedarf Kind')
-									])),
-								$author$project$View$Kind$viewKind(model)
-							]));
-			}
-		}();
-		var bgColor = function () {
-			var _v0 = model.activeTab;
-			switch (_v0.$) {
-				case 'Left':
-					return 'rgba(9, 170, 195, 0.5)';
-				case 'Middle':
-					return 'rgba(249, 163, 116, 0.5)';
-				default:
-					return 'rgba(187, 221, 193, 0.5)';
-			}
-		}();
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'background-color', bgColor),
-					A2($elm$html$Html$Attributes$style, 'border-radius', '0 0 8px 8px'),
-					A2($elm$html$Html$Attributes$style, 'overflow', 'visible'),
-					A2($elm$html$Html$Attributes$style, 'color', 'black')
+					$elm$html$Html$Attributes$class(
+					'asgla-panel ' + $author$project$View$Layout$accentKlasse(tab))
 				]),
 			_List_fromArray(
 				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('p-4')
-						]),
-					_List_fromArray(
-						[content]))
-				]));
-	});
-var $author$project$Types$Select = function (a) {
-	return {$: 'Select', a: a};
-};
-var $author$project$View$Layout$tabItem = F4(
-	function (tab, label, icon, active) {
-		var textColor = '#1a1a1a';
-		var tabColor = function () {
-			switch (tab.$) {
-				case 'Left':
-					return '#69a6b4';
-				case 'Middle':
-					return '#f9a374';
-				default:
-					return '#bbddc1';
-			}
-		}();
-		var liStyles = _List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'background-color', tabColor),
-				A2($elm$html$Html$Attributes$style, 'border-radius', '8px 8px 0 0'),
-				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
-			]);
-		var isActive = _Utils_eq(tab, active);
-		return A2(
-			$elm$html$Html$li,
-			_Utils_ap(
-				liStyles,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$classList(
-						_List_fromArray(
-							[
-								_Utils_Tuple2('tab-active', isActive)
-							])),
-						$elm$html$Html$Events$onClick(
-						$author$project$Types$ToggleView(
-							$author$project$Types$Select(tab)))
-					])),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$a,
-					_Utils_ap(
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'color', textColor)
-							]),
-						isActive ? _List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page')
-							]) : _List_Nil),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('icon')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$i,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class(icon),
-											A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$span,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(label)
-								]))
-						]))
+					function () {
+					switch (tab.$) {
+						case 'Left':
+							return A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$h3,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('asgla-panel-title')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Vater - Einkünfte und Abzüge')
+											])),
+										A2($author$project$View$Eltern$viewEltern, model, $author$project$Types$Vater)
+									]));
+						case 'Middle':
+							return A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$h3,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('asgla-panel-title')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Mutter - Einkünfte und Abzüge')
+											])),
+										A2($author$project$View$Eltern$viewEltern, model, $author$project$Types$Mutter)
+									]));
+						default:
+							return A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$author$project$View$Kind$viewKind(model)
+									]));
+					}
+				}()
 				]));
 	});
 var $author$project$View$Layout$viewTabs = function (model) {
@@ -22357,62 +23552,63 @@ var $author$project$View$Layout$viewTabs = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
+				$elm$html$Html$p,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('tabs-mobile'),
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '0')
+						$elm$html$Html$Attributes$class('asgla-tabs-hint')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$div,
+						$elm$html$Html$i,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('tabs m-0')
+								$elm$html$Html$Attributes$class('fas fa-circle-info'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
 							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$ul,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A4($author$project$View$Layout$tabItem, $author$project$Types$Left, 'Einkünfte Vater', 'fas fa-user', model.activeTab),
-										A4($author$project$View$Layout$tabItem, $author$project$Types$Middle, 'Einkünfte Mutter', 'fas fa-user', model.activeTab),
-										A4($author$project$View$Layout$tabItem, $author$project$Types$Right, 'Bedarf Kind', 'fas fa-child', model.activeTab)
-									]))
-							]))
+						_List_Nil),
+						$elm$html$Html$text(' Bitte füllen Sie alle drei Reiter aus: Vater und Mutter (Schritt 2) sowie das Kind (Schritt 3).')
 					])),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('tabs-desktop')
+						$elm$html$Html$Attributes$class('asgla-tabs'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'tablist'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Eingabebereiche')
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('tabs is-fullwidth m-0')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$ul,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A4($author$project$View$Layout$tabItem, $author$project$Types$Left, 'Einkünfte Vater', 'fas fa-user', model.activeTab),
-										A4($author$project$View$Layout$tabItem, $author$project$Types$Middle, 'Einkünfte Mutter', 'fas fa-user', model.activeTab),
-										A4($author$project$View$Layout$tabItem, $author$project$Types$Right, 'Bedarf Kind', 'fas fa-child', model.activeTab)
-									]))
-							]))
+						A4($author$project$View$Layout$tabButton, $author$project$Types$Left, 'Einkünfte Vater', 'fa-user', model.activeTab),
+						A4($author$project$View$Layout$tabButton, $author$project$Types$Middle, 'Einkünfte Mutter', 'fa-user', model.activeTab),
+						A4($author$project$View$Layout$tabButton, $author$project$Types$Right, 'Bedarf Kind', 'fa-child', model.activeTab)
 					])),
 				A2($author$project$View$Layout$tabContent, model.activeTab, model)
 			]));
+};
+var $author$project$View$Layout$viewSchrittFuerTab = function (model) {
+	var _v0 = model.activeTab;
+	if (_v0.$ === 'Right') {
+		return A4(
+			$author$project$View$Layout$viewSchritt,
+			'3',
+			'Bedarf des Kindes eintragen',
+			'Tragen Sie das Alter des Kindes ein. Zusätzliche Kosten sind optional.',
+			_List_fromArray(
+				[
+					$author$project$View$Layout$viewTabs(model)
+				]));
+	} else {
+		return A4(
+			$author$project$View$Layout$viewSchritt,
+			'2',
+			'Einkünfte der Eltern eintragen',
+			'Tragen Sie das monatliche Netto-Einkommen von Vater und Mutter ein. Ungefähre Beträge reichen aus.',
+			_List_fromArray(
+				[
+					$author$project$View$Layout$viewTabs(model)
+				]));
+	}
 };
 var $author$project$Types$UpdateJahr = function (a) {
 	return {$: 'UpdateJahr', a: a};
@@ -22433,12 +23629,33 @@ var $author$project$View$Components$viewYear = F2(
 					$elm$html$Html$label,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('label')
+							$elm$html$Html$Attributes$class('label'),
+							$elm$html$Html$Attributes$for('jahr')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Jahr * '),
-							$author$project$View$Components$showTooltip('Wählen Sie das Jahr aus, für das die Berechnung durchgeführt werden soll.')
+							$elm$html$Html$text('Jahr'),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-required'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' *')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-sr-only')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' (Pflichtfeld)')
+								]))
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -22460,6 +23677,7 @@ var $author$project$View$Components$viewYear = F2(
 									$elm$html$Html$select,
 									_List_fromArray(
 										[
+											$elm$html$Html$Attributes$id('jahr'),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeL, $author$project$Types$Update, $author$project$Types$UpdateJahr)),
 											$elm$html$Html$Attributes$value(model.jahr)
@@ -22471,7 +23689,9 @@ var $author$project$View$Components$viewYear = F2(
 												$elm$html$Html$option,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$value(j)
+														$elm$html$Html$Attributes$value(j),
+														$elm$html$Html$Attributes$selected(
+														_Utils_eq(j, model.jahr))
 													]),
 												_List_fromArray(
 													[
@@ -22480,6 +23700,16 @@ var $author$project$View$Components$viewYear = F2(
 										},
 										$author$project$View$Components$jahre))
 								]))
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-help')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Das Jahr, in dem die Berechnung gelten soll.')
 						]))
 				]));
 	});
@@ -22488,49 +23718,67 @@ var $author$project$View$Layout$viewForm = function (model) {
 		$elm$html$Html$form,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'margin-top', '2rem')
+				$elm$html$Html$Attributes$class('asgla-form')
 			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
+				$elm$html$Html$p,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('columns')
+						$elm$html$Html$Attributes$class('asgla-hinweis')
 					]),
-				model.durchschnittseinkommen ? _List_fromArray(
+				_List_fromArray(
 					[
-						A2($author$project$View$Components$viewYear, 'column is-12', model)
-					]) : _List_fromArray(
-					[
-						A2($author$project$View$Components$viewMonth, 'column is-half', model),
-						A2($author$project$View$Components$viewYear, 'column is-half', model)
+						$elm$html$Html$text('Felder mit * sind Pflichtfelder. Felder mit „optional“ dürfen leer bleiben.')
 					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('columns')
-					]),
+				A4(
+				$author$project$View$Layout$viewSchritt,
+				'1',
+				'Zeitraum wählen',
+				'Wählen Sie den Monat und das Jahr der Berechnung. Bei der Durchschnittsberechnung zählt nur das Jahr.',
 				_List_fromArray(
 					[
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('column is-half')
+								$elm$html$Html$Attributes$class('columns is-multiline')
+							]),
+						model.durchschnittseinkommen ? _List_fromArray(
+							[
+								A2($author$project$View$Components$viewYear, 'column is-12', model)
+							]) : _List_fromArray(
+							[
+								A2($author$project$View$Components$viewMonth, 'column is-half', model),
+								A2($author$project$View$Components$viewYear, 'column is-half', model)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('columns')
 							]),
 						_List_fromArray(
 							[
-								$author$project$View$Components$viewCheckboxDurchschnittseinkommen(model)
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('column is-full')
+									]),
+								_List_fromArray(
+									[
+										$author$project$View$Components$viewCheckboxDurchschnittseinkommen(model)
+									]))
 							]))
 					])),
-				$author$project$View$Layout$viewTabs(model),
+				$author$project$View$Layout$viewSchrittFuerTab(model),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('field')
+						$elm$html$Html$Attributes$class('asgla-freitext')
 					]),
 				_List_fromArray(
 					[
@@ -22539,170 +23787,245 @@ var $author$project$View$Layout$viewForm = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$class('label'),
-								A2($elm$html$Html$Attributes$style, 'margin-top', '2rem')
+								$elm$html$Html$Attributes$for('freitext')
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Zusätzliche Informationen')
+								$elm$html$Html$text('Zusätzliche Informationen'),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('asgla-optional')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('optional')
+									]))
 							])),
 						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('asgla-help')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Zum Beispiel Hinweise zu besonderen Umständen.')
+							])),
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('freitext'),
+								$elm$html$Html$Attributes$class('textarea'),
+								$elm$html$Html$Attributes$rows(3),
+								$elm$html$Html$Attributes$placeholder('Ihre Anmerkungen'),
+								$elm$html$Html$Events$onInput(
+								A2($elm$core$Basics$composeL, $author$project$Types$Update, $author$project$Types$UpdateFreitext)),
+								$elm$html$Html$Attributes$value(model.freitext)
+							]),
+						_List_Nil)
+					])),
+				model.modalExportOpen ? $author$project$View$Components$saveModal(model) : $elm$html$Html$text(''),
+				(model.durchschnittseinkommen && $author$project$View$Layout$hasStufensprungAlterAmJahresende(model)) ? A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('notification is-warning is-light asgla-stufensprung')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Hinweis: Das Kind ist zum 31.12. des zu berechnenden Jahres 6, 12 oder 18 Jahre alt. Dies bedeutet, im laufenden Jahr liegt ein Stufensprung beim Bedarf des Kindes vor. Aufgrund dessen sind 2 Berechnungen vorzunehmen!')
+					])) : $elm$html$Html$text(''),
+				function () {
+				var _v0 = model.error;
+				if (_v0.$ === 'Just') {
+					var errorMsg = _v0.a;
+					return A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('control')
+								$elm$html$Html$Attributes$class('notification form-error'),
+								A2($elm$html$Html$Attributes$attribute, 'role', 'alert')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$textarea,
+								$elm$html$Html$h4,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('textarea'),
-										$elm$html$Html$Attributes$placeholder('Geben Sie hier zusätzliche Informationen oder Anmerkungen ein...'),
-										$elm$html$Html$Events$onInput(
-										A2($elm$core$Basics$composeL, $author$project$Types$Update, $author$project$Types$UpdateFreitext)),
-										$elm$html$Html$Attributes$value(model.freitext)
+										$elm$html$Html$Attributes$class('title is-5')
 									]),
-								_List_Nil)
-							]))
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Bitte prüfen Sie Ihre Eingaben')
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(errorMsg)
+									]))
+							]));
+				} else {
+					return $elm$html$Html$text('');
+				}
+			}(),
+				$author$project$View$Layout$viewFortschritt(model),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('asgla-disclaimer')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Der Rechner liefert eine Einschätzung und ersetzt keine rechtliche Beratung.')
 					])),
-				model.modalExportOpen ? $author$project$View$Components$saveModal(model) : $elm$html$Html$text(''),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('field')
+						$elm$html$Html$Attributes$class('asgla-actions')
 					]),
 				_List_fromArray(
 					[
-						(model.durchschnittseinkommen && $author$project$View$Layout$hasStufensprungAlterAmJahresende(model)) ? A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('notification is-warning is-light')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Hinweis: Das Kind ist zum 31.12. des zu berechnenden Jahres 6, 12 oder 18 Jahre alt. Dies bedeutet, im laufenden Jahr liegt ein Stufensprung in der Düsseldorfer Tabelle vor. Aufgrund dessen sind 2 Berechnungen vorzunehmen!')
-							])) : $elm$html$Html$text(''),
 						A2(
-						$elm$html$Html$div,
+						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
-								A2($elm$html$Html$Attributes$style, 'margin-bottom', '1rem')
+								$elm$html$Html$Attributes$class('button calculate-button'),
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Events$onClick(
+								$author$project$Types$ToggleView($author$project$Types$ViewErgebnis))
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$span,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('buttons action-buttons')
+										$elm$html$Html$Attributes$class('icon')
 									]),
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$div,
+										$elm$html$Html$i,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('control')
+												$elm$html$Html$Attributes$class('fas fa-calculator'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
 											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('button is-medium calculate-button'),
-														$elm$html$Html$Attributes$type_('button'),
-														$elm$html$Html$Events$onClick(
-														$author$project$Types$ToggleView($author$project$Types$ViewErgebnis))
-													]),
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$span,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('icon')
-															]),
-														_List_fromArray(
-															[
-																A2(
-																$elm$html$Html$i,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$class('fas fa-calculator'),
-																		A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
-																	]),
-																_List_Nil)
-															])),
-														A2(
-														$elm$html$Html$span,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('Berechnen')
-															]))
-													]))
-											])),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Berechnen')
+									]))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button save-button'),
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Events$onClick(
+								$author$project$Types$ToggleView($author$project$Types$ToggleSaveModal)),
+								A2($elm$html$Html$Attributes$attribute, 'title', 'Speichert Ihre Eingaben als Datei oder QR-Code, damit Sie später weiterarbeiten können.')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('icon')
+									]),
+								_List_fromArray(
+									[
 										A2(
-										$elm$html$Html$div,
+										$elm$html$Html$i,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('control')
+												$elm$html$Html$Attributes$class('fas fa-floppy-disk'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
 											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('button save-button'),
-														$elm$html$Html$Attributes$type_('button'),
-														$elm$html$Html$Events$onClick(
-														$author$project$Types$ToggleView($author$project$Types$ToggleSaveModal))
-													]),
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$span,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('icon')
-															]),
-														_List_fromArray(
-															[
-																A2(
-																$elm$html$Html$i,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$class('fas fa-floppy-disk'),
-																		A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
-																	]),
-																_List_Nil)
-															])),
-														A2(
-														$elm$html$Html$span,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('Eingabe Zwischenspeichern')
-															]))
-													]))
-											]))
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Eingabe zwischenspeichern')
 									]))
 							]))
 					]))
 			]));
 };
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $author$project$View$Layout$viewHeader = A2(
-	$elm$html$Html$div,
+var $author$project$View$Layout$infoButton = A2(
+	$elm$html$Html$a,
 	_List_fromArray(
 		[
-			$elm$html$Html$Attributes$class('box mb-5')
+			$elm$html$Html$Attributes$class('button jtc-primary'),
+			$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/asgla-rechner/'),
+			$elm$html$Html$Attributes$target('_blank'),
+			$elm$html$Html$Attributes$rel('noopener noreferrer')
+		]),
+	_List_fromArray(
+		[
+			$elm$html$Html$text('Mehr Informationen'),
+			$author$project$View$Layout$externerHinweis
+		]));
+var $elm$html$Html$ol = _VirtualDom_node('ol');
+var $author$project$View$Layout$viewSchrittLeiste = F3(
+	function (nummer, icon, titel) {
+		return A2(
+			$elm$html$Html$li,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('asgla-step-chip')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-step-chip-nr')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(nummer)
+						])),
+					A2(
+					$elm$html$Html$i,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('fas ' + icon),
+							A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(titel)
+						]))
+				]));
+	});
+var $author$project$View$Layout$viewHeader = A2(
+	$elm$html$Html$header,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('box mb-5 asgla-header')
 		]),
 	_List_fromArray(
 		[
@@ -22837,8 +24160,7 @@ var $author$project$View$Layout$viewHeader = A2(
 									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('has-text-right'),
-											A2($elm$html$Html$Attributes$style, 'margin-top', '0rem')
+											$elm$html$Html$Attributes$class('has-text-right')
 										]),
 									_List_fromArray(
 										[
@@ -22847,7 +24169,7 @@ var $author$project$View$Layout$viewHeader = A2(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$src('assets/vignette.png'),
-													$elm$html$Html$Attributes$alt('ASGLA-Rechner'),
+													$elm$html$Html$Attributes$alt(''),
 													A2($elm$html$Html$Attributes$style, 'max-height', '120px')
 												]),
 											_List_Nil)
@@ -22899,29 +24221,8 @@ var $author$project$View$Layout$viewHeader = A2(
 									A2($elm$html$Html$Attributes$style, 'margin-top', '-2rem')
 								]),
 							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$a,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('button jtc-primary mt-2'),
-											$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/asgla-rechner/'),
-											$elm$html$Html$Attributes$target('_blank'),
-											$elm$html$Html$Attributes$rel('noopener noreferrer')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Mehr Informationen')
-										]))
-								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('has-text-centered')
-						]),
-					_List_Nil)
+								[$author$project$View$Layout$infoButton]))
+						]))
 				])),
 			A2(
 			$elm$html$Html$div,
@@ -23043,18 +24344,13 @@ var $author$project$View$Layout$viewHeader = A2(
 											$elm$html$Html$text('Zur Berechnung des Ausgleichsanspruchs für den Unterhalt im Wechselmodell')
 										])),
 									A2(
-									$elm$html$Html$a,
+									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('button jtc-primary mt-3'),
-											$elm$html$Html$Attributes$href('https://jtc.uni-halle.de/asgla-rechner/'),
-											$elm$html$Html$Attributes$target('_blank'),
-											$elm$html$Html$Attributes$rel('noopener noreferrer')
+											$elm$html$Html$Attributes$class('mt-3')
 										]),
 									_List_fromArray(
-										[
-											$elm$html$Html$text('Mehr Informationen')
-										]))
+										[$author$project$View$Layout$infoButton]))
 								])),
 							A2(
 							$elm$html$Html$div,
@@ -23069,11 +24365,43 @@ var $author$project$View$Layout$viewHeader = A2(
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$src('assets/vignette.png'),
-											$elm$html$Html$Attributes$alt('Illustration'),
+											$elm$html$Html$Attributes$alt(''),
 											A2($elm$html$Html$Attributes$style, 'max-height', '200px')
 										]),
 									_List_Nil)
 								]))
+						]))
+				])),
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('asgla-so-gehts')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-so-gehts-title')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('So geht’s:')
+						])),
+					A2(
+					$elm$html$Html$ol,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('asgla-steps')
+						]),
+					_List_fromArray(
+						[
+							A3($author$project$View$Layout$viewSchrittLeiste, '1', 'fa-calendar-days', 'Zeitraum wählen'),
+							A3($author$project$View$Layout$viewSchrittLeiste, '2', 'fa-euro-sign', 'Einkünfte der Eltern'),
+							A3($author$project$View$Layout$viewSchrittLeiste, '3', 'fa-child', 'Bedarf des Kindes'),
+							A3($author$project$View$Layout$viewSchrittLeiste, '', 'fa-calculator', 'Berechnen')
 						]))
 				]))
 		]));
@@ -23085,16 +24413,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$section,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('section  is-hidden-mobile'),
-						A2($elm$html$Html$Attributes$style, 'background-image', 'url(\'assets/background.png\')'),
-						A2($elm$html$Html$Attributes$style, 'background-size', 'cover'),
-						A2($elm$html$Html$Attributes$style, 'background-repeat', 'no-repeat'),
-						A2($elm$html$Html$Attributes$style, 'background-position', 'center'),
-						A2($elm$html$Html$Attributes$style, 'background-attachment', 'fixed'),
-						A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-						A2($elm$html$Html$Attributes$style, 'background-color', 'rgba(255, 255, 255)'),
-						A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
-						A2($elm$html$Html$Attributes$style, 'padding', '2rem')
+						$elm$html$Html$Attributes$class('section asgla-page')
 					]),
 				_List_fromArray(
 					[
@@ -23102,22 +24421,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'top', '0'),
-								A2($elm$html$Html$Attributes$style, 'left', '0'),
-								A2($elm$html$Html$Attributes$style, 'right', '0'),
-								A2($elm$html$Html$Attributes$style, 'bottom', '0'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'rgba(0, 0, 0, 0.4)'),
-								A2($elm$html$Html$Attributes$style, 'z-index', '1')
-							]),
-						_List_Nil),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('container'),
-								A2($elm$html$Html$Attributes$style, 'position', 'relative'),
-								A2($elm$html$Html$Attributes$style, 'z-index', '2')
+								$elm$html$Html$Attributes$class('container asgla-container')
 							]),
 						_List_fromArray(
 							[
@@ -23125,11 +24429,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('box'),
-										A2($elm$html$Html$Attributes$style, 'background-color', ' rgb(254, 234, 210)'),
-										A2($elm$html$Html$Attributes$style, 'padding', '1.5rem'),
-										A2($elm$html$Html$Attributes$style, 'margin-bottom', '1.5rem'),
-										A2($elm$html$Html$Attributes$style, 'border-radius', '18px')
+										$elm$html$Html$Attributes$class('box asgla-shell')
 									]),
 								_List_fromArray(
 									[
@@ -23137,99 +24437,11 @@ var $author$project$Main$view = function (model) {
 										$author$project$View$Components$ueberUnsSection(model),
 										$author$project$View$Components$importFileSection(model),
 										$author$project$View$Layout$viewForm(model),
-										function () {
-										var _v0 = model.error;
-										if (_v0.$ === 'Just') {
-											var msg = _v0.a;
-											return A2(
-												$elm$html$Html$div,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('notification is-danger '),
-														A2($elm$html$Html$Attributes$style, 'margin-top', '1rem')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(msg)
-													]));
-										} else {
-											return $elm$html$Html$text('');
-										}
-									}(),
 										model.showErgebnis ? A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('box'),
-												A2($elm$html$Html$Attributes$style, 'margin', '1rem')
-											]),
-										_List_fromArray(
-											[
-												$author$project$View$Components$showErgebnis(model)
-											])) : $elm$html$Html$text('')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$section,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('section is-hidden-tablet'),
-						A2($elm$html$Html$Attributes$style, 'background-color', 'rgb(254, 234, 210)'),
-						A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
-						A2($elm$html$Html$Attributes$style, 'padding', '0.5rem')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('container')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('box'),
-										A2($elm$html$Html$Attributes$style, 'background-color', 'rgb(254, 234, 210)'),
-										A2($elm$html$Html$Attributes$style, 'padding', '0.75rem'),
-										A2($elm$html$Html$Attributes$style, 'margin-bottom', '0.75rem'),
-										A2($elm$html$Html$Attributes$style, 'border-radius', '12px')
-									]),
-								_List_fromArray(
-									[
-										$author$project$View$Layout$viewHeader,
-										$author$project$View$Components$ueberUnsSection(model),
-										$author$project$View$Components$importFileSection(model),
-										$author$project$View$Layout$viewForm(model),
-										function () {
-										var _v1 = model.error;
-										if (_v1.$ === 'Just') {
-											var msg = _v1.a;
-											return A2(
-												$elm$html$Html$div,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('notification is-danger'),
-														A2($elm$html$Html$Attributes$style, 'margin-top', '1rem')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(msg)
-													]));
-										} else {
-											return $elm$html$Html$text('');
-										}
-									}(),
-										model.showErgebnis ? A2(
-										$elm$html$Html$div,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('box'),
-												A2($elm$html$Html$Attributes$style, 'margin', '1rem')
+												$elm$html$Html$Attributes$class('box asgla-result')
 											]),
 										_List_fromArray(
 											[
