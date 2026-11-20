@@ -18068,6 +18068,7 @@ var $author$project$View$Components$skriptLink = F2(
 					$elm$html$Html$text(label)
 				]));
 	});
+var $elm$html$Html$strong = _VirtualDom_node('strong');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$td = _VirtualDom_node('td');
@@ -18087,58 +18088,6 @@ var $author$project$View$Components$viewBegrenzungHinweis = F4(
 					$elm$html$Html$text(
 					'Der ursprünglich berechnete Haftungsbetrag ' + (elternteilGenitiv + (' von ' + ($author$project$Utils$Format$formatEuroRounded(urspruenglicherBetrag) + ('\u00A0€ übersteigt den verteilbaren Betrag von ' + ($author$project$Utils$Format$formatEuroRounded(verteilbarerBetrag) + '\u00A0€. Der Haftungsbetrag wurde entsprechend begrenzt.'))))))
 				])) : $elm$html$Html$text('');
-	});
-var $author$project$View$Components$viewErgebnisKachel = F3(
-	function (icon, labelInhalt, wert) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('ergebnis-kachel')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('ergebnis-kachel-icon')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$i,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('fas ' + icon),
-									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$p,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('ergebnis-kachel-label')
-								]),
-							labelInhalt),
-							A2(
-							$elm$html$Html$p,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('ergebnis-kachel-wert')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(wert)
-								]))
-						]))
-				]));
 	});
 var $author$project$View$Components$viewErgebnisPerson = F2(
 	function (rolle, person) {
@@ -18408,7 +18357,6 @@ var $author$project$View$Components$viewHHinweisAnteilEltern = F6(
 				]));
 	});
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$html$Html$strong = _VirtualDom_node('strong');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$View$Components$viewZusatzbedarfLeistungen = F2(
 	function (model, ergebnis) {
@@ -19207,10 +19155,11 @@ var $author$project$View$Components$showErgebnis = function (model) {
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$span,
+										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('ergebnis-pfeil')
+												$elm$html$Html$Attributes$class('chevron-wave'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
 											]),
 										_List_fromArray(
 											[
@@ -19218,8 +19167,21 @@ var $author$project$View$Components$showErgebnis = function (model) {
 												$elm$html$Html$i,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$class('fas fa-arrow-right'),
-														A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+														$elm$html$Html$Attributes$class('fas fa-chevron-right')
+													]),
+												_List_Nil),
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fas fa-chevron-right')
+													]),
+												_List_Nil),
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fas fa-chevron-right')
 													]),
 												_List_Nil)
 											])),
@@ -19280,36 +19242,128 @@ var $author$project$View$Components$showErgebnis = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('ergebnis-kacheln')
+								$elm$html$Html$Attributes$class('split-sektion')
 							]),
 						_List_fromArray(
 							[
-								A3(
-								$author$project$View$Components$viewErgebnisKachel,
-								'fa-percent',
+								A2(
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Haftungsanteil Vater'),
-										$author$project$View$Components$zusatzKachel
+										$elm$html$Html$Attributes$class('split-legende')
 									]),
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + ' %'),
-								A3(
-								$author$project$View$Components$viewErgebnisKachel,
-								'fa-percent',
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Haftungsanteil Mutter'),
-										$author$project$View$Components$zusatzKachel
-									]),
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + ' %'),
-								A3(
-								$author$project$View$Components$viewErgebnisKachel,
-								'fa-child',
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Haftungsanteil Vater'),
+														$author$project$View$Components$zusatzKachel,
+														$elm$html$Html$text(': ')
+													])),
+												$elm$html$Html$text(
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '\u00A0%')
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Haftungsanteil Mutter'),
+														$author$project$View$Components$zusatzKachel,
+														$elm$html$Html$text(': ')
+													])),
+												$elm$html$Html$text(
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '\u00A0%')
+											]))
+									])),
+								A2(
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Gesamtbedarf des Kindes')
+										$elm$html$Html$Attributes$class('split-bar'),
+										A2($elm$html$Html$Attributes$attribute, 'role', 'img'),
+										A2(
+										$elm$html$Html$Attributes$attribute,
+										'aria-label',
+										'Haftungsanteil Vater ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + (' Prozent, Mutter ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + ' Prozent'))))
 									]),
-								$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + '\u00A0€')
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('split-bar__vater'),
+												A2(
+												$elm$html$Html$Attributes$style,
+												'width',
+												$elm$core$String$fromFloat(ergebnis.haftungsanteilVater * 100) + '%')
+											]),
+										_List_Nil),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('split-bar__mutter'),
+												A2(
+												$elm$html$Html$Attributes$style,
+												'width',
+												$elm$core$String$fromFloat(ergebnis.haftungsanteilMutter * 100) + '%')
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('split-meta')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fas fa-child mr-1'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+													]),
+												_List_Nil),
+												$elm$html$Html$text('Gesamtbedarf des Kindes: '),
+												A2(
+												$elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + '\u00A0€')
+													]))
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Aufteilung nach bereinigtem Einkommen')
+											]))
+									]))
 							])),
 						A2(
 						$elm$html$Html$div,

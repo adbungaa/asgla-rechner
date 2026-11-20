@@ -1841,3 +1841,137 @@ html .ergebnis-details .notification.is-info.is-light { background-color: var(--
         align-items: flex-start;
     }
 }
+
+/* ---------- Ergebnis: Zahlungsfluss, Chevron-Welle & Anteils-Balken ---------- */
+.ergebnis-karte .ergebnis-flow {
+    grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr);
+    padding: 1.15rem;
+    background-color: #f8fbfc;
+    border: 1px solid #d5e7ec;
+    border-radius: 14px;
+}
+
+.ergebnis-karte .ergebnis-person {
+    border: 1px solid #dcebef;
+    border-top: 3px solid var(--person-accent);
+    border-radius: 12px;
+    background-color: #ffffff;
+    padding: 0.85rem 0.75rem;
+}
+
+.ergebnis-karte .ergebnis-person-rolle {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--asgla-muted);
+    margin-bottom: 0.2rem;
+}
+
+.ergebnis-karte .ergebnis-person-icon {
+    font-size: 1.35rem;
+    color: var(--asgla-ink);
+    margin-bottom: 0.2rem;
+}
+
+.ergebnis-karte .ergebnis-betrag {
+    font-size: 2.45rem;
+}
+
+.chevron-wave {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    margin-bottom: 0.25rem;
+    color: var(--asgla-teal-900);
+    font-size: 1rem;
+}
+
+.chevron-wave i {
+    opacity: 0.25;
+    animation: chevron-ripple 1.6s ease-in-out infinite;
+}
+
+.chevron-wave i:nth-child(2) {
+    animation-delay: 0.22s;
+}
+
+.chevron-wave i:nth-child(3) {
+    animation-delay: 0.44s;
+}
+
+@keyframes chevron-ripple {
+    0%, 100% {
+        opacity: 0.25;
+        transform: translateX(0);
+    }
+    45% {
+        opacity: 1;
+        transform: translateX(2px);
+    }
+}
+
+.split-sektion {
+    margin-top: 1.25rem;
+    padding: 1rem 1.15rem;
+    background-color: #ffffff;
+    border: 1px solid #e1edf0;
+    border-radius: 12px;
+}
+
+.split-legende {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+    margin-bottom: 0.5rem;
+}
+
+.split-bar {
+    display: flex;
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: #eef5f7;
+}
+
+.split-bar__vater {
+    background-color: var(--asgla-border);
+    transition: width 0.3s ease;
+}
+
+.split-bar__mutter {
+    background-color: #f9a374;
+    transition: width 0.3s ease;
+}
+
+.split-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--asgla-muted);
+}
+
+@media (max-width: 640px) {
+    .ergebnis-karte .ergebnis-flow {
+        grid-template-columns: 1fr;
+    }
+
+    .chevron-wave {
+        transform: rotate(90deg);
+        margin: 0.45rem 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chevron-wave i {
+        animation: none;
+        opacity: 0.85;
+    }
+}

@@ -763,8 +763,11 @@ showErgebnis model =
             , div [ class "ergebnis-flow" ]
                 [ viewErgebnisPerson "Zahlt" zahler
                 , div [ class "ergebnis-mitte" ]
-                    [ span [ class "ergebnis-pfeil" ]
-                        [ i [ class "fas fa-arrow-right", attribute "aria-hidden" "true" ] [] ]
+                    [ div [ class "chevron-wave", attribute "aria-hidden" "true" ]
+                        [ i [ class "fas fa-chevron-right" ] []
+                        , i [ class "fas fa-chevron-right" ] []
+                        , i [ class "fas fa-chevron-right" ] []
+                        ]
                     , p [ class "ergebnis-betrag" ] [ text (formatEuroRounded zahlbetrag ++ "\u{00A0}€") ]
                     , p [ class "ergebnis-betrag-label" ] [ text "Ausgleichszahlung pro Monat" ]
                     ]
@@ -779,10 +782,39 @@ showErgebnis model =
 
               else
                 text ""
-            , div [ class "ergebnis-kacheln" ]
-                [ viewErgebnisKachel "fa-percent" [ text "Haftungsanteil Vater", zusatzKachel ] (formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ " %")
-                , viewErgebnisKachel "fa-percent" [ text "Haftungsanteil Mutter", zusatzKachel ] (formatEuroRounded (ergebnis.haftungsanteilMutter * 100) ++ " %")
-                , viewErgebnisKachel "fa-child" [ text "Gesamtbedarf des Kindes" ] (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ "\u{00A0}€")
+            , div [ class "split-sektion" ]
+                [ div [ class "split-legende" ]
+                    [ span []
+                        [ strong [] [ text "Haftungsanteil Vater", zusatzKachel, text ": " ]
+                        , text (formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ "\u{00A0}%")
+                        ]
+                    , span []
+                        [ strong [] [ text "Haftungsanteil Mutter", zusatzKachel, text ": " ]
+                        , text (formatEuroRounded (ergebnis.haftungsanteilMutter * 100) ++ "\u{00A0}%")
+                        ]
+                    ]
+                , div
+                    [ class "split-bar"
+                    , attribute "role" "img"
+                    , attribute "aria-label"
+                        ("Haftungsanteil Vater "
+                            ++ formatEuroRounded (ergebnis.haftungsanteilVater * 100)
+                            ++ " Prozent, Mutter "
+                            ++ formatEuroRounded (ergebnis.haftungsanteilMutter * 100)
+                            ++ " Prozent"
+                        )
+                    ]
+                    [ div [ class "split-bar__vater", style "width" (String.fromFloat (ergebnis.haftungsanteilVater * 100) ++ "%") ] []
+                    , div [ class "split-bar__mutter", style "width" (String.fromFloat (ergebnis.haftungsanteilMutter * 100) ++ "%") ] []
+                    ]
+                , div [ class "split-meta" ]
+                    [ span []
+                        [ i [ class "fas fa-child mr-1", attribute "aria-hidden" "true" ] []
+                        , text "Gesamtbedarf des Kindes: "
+                        , strong [] [ text (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ "\u{00A0}€") ]
+                        ]
+                    , span [] [ text "Aufteilung nach bereinigtem Einkommen" ]
+                    ]
                 ]
             , div [ class "ergebnis-aktion" ]
                 [ button
