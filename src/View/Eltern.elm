@@ -1,8 +1,8 @@
 module View.Eltern exposing (viewEltern)
 
 import Constants exposing (getSelbstbehalt)
-import Html exposing (Html, button, div, input, label, option, p, select, text)
-import Html.Attributes exposing (checked, class, classList, disabled, id, name, placeholder, selected, style, type_, value)
+import Html exposing (Html, button, div, h4, input, label, option, p, select, span, text)
+import Html.Attributes exposing (attribute, checked, class, classList, disabled, id, name, placeholder, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
@@ -18,7 +18,7 @@ import Types
         )
 import Utils.Format exposing (formatEuroRounded, formatInputToFloat, renderSelbstbehaltBetrag, selbstbehaltToString)
 import Utils.Validation exposing (validateMoney)
-import View.Components exposing (showTooltip, viewEntryActionButtons)
+import View.Components exposing (showTooltip, skriptLink, viewEntryActionButtons)
 
 
 
@@ -54,11 +54,15 @@ viewEltern model p =
                             ]
                 ]
             , div [ class "column is-half" ]
-                [ div [ class "field", style "margin-top" "1.5rem" ]
-                    [ label [ class "label" ]
-                        [ text "Abzugsposten "
-                        , showTooltip ("Zu den Abzügen vom Nettoeinkommen gehören Schulden (soweit berücksichtigungsfähig) und Belastungen, insb. Altersvorsorge-Leistungen, berufsbedingte Fahrtkosten, etc.)." ++ " Üblicherweise werden 5 % des Nettoeinkommens als pauschale berufsbedingte Aufwendungen abgezogen, soweit höhere Kosten nicht konkret nachgewiesen sind.")
+                [ div [ class "field asgla-subsection asgla-subcard" ]
+                    [ h4 [ class "asgla-subsection-title" ]
+                        [ text "Abzüge vom Nettoeinkommen "
+                        , span [ class "asgla-optional" ] [ text "optional" ]
+                        , showTooltip ("Abzüge sind zum Beispiel Schulden, Beiträge zur Altersvorsorge oder Fahrtkosten zur Arbeit." ++ " Je nach Fall werden berufsbedingte Kosten pauschal oder einzeln berücksichtigt. Tragen Sie hier die Beträge ein, die Sie kennen.")
                         ]
+                    , Html.p [ class "asgla-help asgla-help-top" ]
+                        [ text "Nur ausfüllen, wenn es solche Posten gibt. Tragen Sie je Posten den Betrag in Euro und eine Bezeichnung ein, z. B. 120 € für Fahrtkosten." ]
+                    , viewAbzugsVorlagen p modelPerson.haupttaetigkeit
                     , div
                         [ class "control" ]
                         (List.indexedMap (viewElternPosten Abzugsposten model p) modelPerson.abzugsposten)
@@ -68,6 +72,62 @@ viewEltern model p =
         , div [ class "field" ]
             [ viewSelbstbehalt model p
             ]
+        ]
+
+
+-- Vorlagen für Abzüge (Werte laut Skript: 5 % Pauschale, Fahrtkosten 0,42 €/km)
+
+
+viewAbzugsVorlagen : Person -> String -> Html Msg
+viewAbzugsVorlagen p haupttaetigkeit =
+    let
+        netto =
+            formatInputToFloat haupttaetigkeit |> Maybe.withDefault 0
+
+        pauschale =
+            netto * 0.05
+
+        hatEinkommen =
+            netto > 0
+
+        pauschaleText =
+            if hatEinkommen then
+                "5\u{00A0}% Pauschale (" ++ formatEuroRounded pauschale ++ "\u{00A0}€)"
+
+            else
+                "5\u{00A0}% Pauschale"
+    in
+    div [ class "asgla-vorlagen" ]
+        [ span [ class "asgla-vorlagen-titel" ] [ text "Schnell hinzufügen:" ]
+        , div [ class "asgla-vorlagen-buttons" ]
+            [ button
+                [ class "button is-small is-light asgla-vorlage"
+                , type_ "button"
+                , disabled (not hatEinkommen)
+                , attribute "title"
+                    (if hatEinkommen then
+                        "Berufsbedingte Aufwendungen: im Allgemeinen 5 % des Nettoeinkommens"
+
+                     else
+                        "Bitte tragen Sie zuerst das Einkommen ein."
+                    )
+                , onClick (UpdateElternDaten p (ChangePosten (AddAbzugsVorlage "Berufskosten (5 % Pauschale)" (formatEuroRounded pauschale))))
+                ]
+                [ span [ class "icon is-small" ] [ Html.i [ class "fas fa-percent", attribute "aria-hidden" "true" ] [] ]
+                , span [] [ text pauschaleText ]
+                ]
+            , button
+                [ class "button is-small is-light asgla-vorlage"
+                , type_ "button"
+                , attribute "title" "Pro gefahrenem Kilometer 0,42 € (bei langen Strecken ab ca. 30 km einfach 0,28 €)"
+                , onClick (UpdateElternDaten p (ChangePosten (AddAbzugsVorlage "Fahrtkosten (0,42 € je km)" "")))
+                ]
+                [ span [ class "icon is-small" ] [ Html.i [ class "fas fa-car", attribute "aria-hidden" "true" ] [] ]
+                , span [] [ text "Fahrtkosten" ]
+                ]
+            ]
+        , Html.p [ class "asgla-help" ]
+            [ text "Fahrtkosten gehören zu den berufsbedingten Kosten. In der Regel setzen Sie entweder die 5\u{00A0}%-Pauschale oder die tatsächlichen Fahrtkosten an. Fahrtkosten: 0,42\u{00A0}€ je gefahrenem Kilometer, bei langen Strecken (ab ca. 30\u{00A0}km einfach) meist 0,28\u{00A0}€. Den Betrag tragen Sie selbst ein." ]
         ]
 
 
@@ -81,6 +141,17 @@ viewEinkommenMonat model textLabel p =
 
                 Mutter ->
                     model.mutter
+
+        -- Nach einem fehlgeschlagenen Berechnen (model.error gesetzt) werden leere Einkommensfelder
+        -- rot markiert, solange bei keinem Elternteil ein Einkommen steht.
+        einkommenFehlt =
+            model.error
+                /= Nothing
+                && (String.trim modelPerson.haupttaetigkeit == "")
+                && not
+                    (List.any (\v -> (formatInputToFloat v |> Maybe.withDefault 0) > 0)
+                        [ model.vater.haupttaetigkeit, model.mutter.haupttaetigkeit ]
+                    )
     in
     div [ class "field", style "margin-top" "1.5rem" ]
         [ label [ class "label" ]
@@ -91,10 +162,10 @@ viewEinkommenMonat model textLabel p =
             [ input
                 [ classList
                     [ ( "input", True )
-                    , ( "is-danger", validateMoney modelPerson.haupttaetigkeit /= Nothing )
+                    , ( "is-danger", validateMoney modelPerson.haupttaetigkeit /= Nothing || einkommenFehlt )
                     ]
                 , type_ "text"
-                , placeholder "z.B. 5000"
+                , placeholder "z. B. 2500"
                 , value modelPerson.haupttaetigkeit
                 , onInput
                     (\val ->
@@ -104,6 +175,8 @@ viewEinkommenMonat model textLabel p =
                     )
                 ]
                 []
+            , Html.p [ class "asgla-help" ]
+                [ text "Das monatliche Netto-Einkommen, also nach Abzug von Steuern und Sozialabgaben. Ungefähre Beträge reichen aus." ]
             , moneyHelp modelPerson.haupttaetigkeit
             ]
         ]
@@ -120,11 +193,14 @@ viewWeitereEinkuenfte model p =
                 Mutter ->
                     model.mutter
     in
-    div [ class "field" ]
+    div [ class "field asgla-subcard" ]
         [ label [ class "label" ]
             [ text "Weitere Einkünfte (€) "
-            , showTooltip ("Hierzu gehören z.B. Mieteinnahmen, Kapitalerträge, Steuererstattungen (1/12 je Monat), Elterngeld, etc. " ++ "Auch der Wohnvorteil durch mietfreies Wohnen im eigenen Heim ist hier zu berücksichtigen.")
+            , span [ class "asgla-optional" ] [ text "optional" ]
+            , showTooltip ("Hierzu gehören z.B. Mieteinnahmen, Kapitalerträge, Steuererstattungen (1/12 je Monat), Elterngeld, etc. " ++ "Auch der Vorteil durch mietfreies Wohnen im eigenen Haus ist hier zu berücksichtigen.")
             ]
+        , Html.p [ class "asgla-help asgla-help-top" ]
+            [ text "Zum Beispiel Mieteinnahmen, Zinsen oder Elterngeld. Steuererstattungen tragen Sie anteilig je Monat ein (1/12)." ]
         , div
             [ class "control" ]
             (List.indexedMap (viewElternPosten WeitereEinkuenfte model p) modelPerson.weitereEinkuenfte)
@@ -160,7 +236,7 @@ viewDurchschnittseinkommen model p =
     if model.durchschnittseinkommen then
         div [ class "field", style "margin-top" "1.5rem" ]
             [ div [ class "box", style "padding" "0.75rem" ]
-                [ label [ class "label" ] [ text "Einkommen zum Durchschnittsberechnung" ]
+                [ label [ class "label" ] [ text "Einkommen für die Durchschnittsberechnung" ]
                 , div [ class "control" ]
                     (List.indexedMap (viewElternPosten EinkommenzumDurchschnittsberechnung model p) modelPerson.einkommenZumDurchschnittsberechnung)
                 , Html.p [ class "help" ]
@@ -241,7 +317,8 @@ viewElternPosten postenType model p index eingabe =
                         , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
                         ]
                     , type_ "text"
-                    , placeholder "Kosten (€)"
+                    , placeholder "z. B. 150"
+                    , attribute "aria-label" "Betrag in Euro"
                     , value eingabe.kosten
                     , onInput (\newKosten -> UpdateElternDaten p (ChangePosten (UpdatePosten postenType index { eingabe | kosten = newKosten })))
                     ]
@@ -285,7 +362,7 @@ viewElternPosten postenType model p index eingabe =
                         input
                             [ class "input  entry-input"
                             , type_ "text"
-                            , placeholder "Bezeichnung z.B. Fahrtkosten"
+                            , placeholder "z. B. Fahrtkosten"
                             , value eingabe.bezeichnung
                             , onInput (\newBezeichnung -> UpdateElternDaten p (ChangePosten (UpdatePosten postenType index { kosten = eingabe.kosten, bezeichnung = newBezeichnung })))
                             ]
@@ -295,7 +372,7 @@ viewElternPosten postenType model p index eingabe =
                         input
                             [ class "input  entry-input"
                             , type_ "text"
-                            , placeholder "Bezeichnung z.B. Monat 1"
+                            , placeholder "z. B. Monat 1"
                             , value eingabe.bezeichnung
                             , onInput (\newBezeichnung -> UpdateElternDaten p (ChangePosten (UpdatePosten postenType index { kosten = eingabe.kosten, bezeichnung = newBezeichnung })))
                             ]
@@ -310,8 +387,34 @@ viewElternPosten postenType model p index eingabe =
                     }
             )
         , div []
-            [ moneyHelp eingabe.kosten ]
+            [ moneyHelp eingabe.kosten
+            , if postenType == WeitereEinkuenfte && String.isEmpty (String.trim eingabe.bezeichnung) && not (String.isEmpty (String.trim eingabe.kosten)) then
+                Html.p [ class "asgla-art-hinweis" ] [ text "Bitte wählen Sie die Art der Einkunft." ]
+
+              else
+                text ""
+            ]
         ]
+
+
+
+-- Klartext-Erklärung je Selbstbehalt-Option
+
+
+selbstbehaltErklaerung : Selbstbehalt -> String
+selbstbehaltErklaerung typOption =
+    case typOption of
+        Angemessen _ ->
+            "Standard: Dieser Betrag gilt, wenn Sie nichts anderes angeben."
+
+        NotwendigErwerbstaetig _ ->
+            "Ein niedrigerer Betrag, z. B. bei geringem Einkommen. Mit dem Häkchen darunter gilt er für nicht erwerbstätige Personen."
+
+        NotwendigNichtErwerbstaetig _ ->
+            "Ein niedrigerer Betrag, z. B. bei geringem Einkommen, für nicht erwerbstätige Personen."
+
+        Benutzerdefiniert _ ->
+            "Sie tragen einen eigenen Betrag ein."
 
 
 
@@ -338,10 +441,10 @@ viewSelbstbehalt model person =
         elternText =
             case person of
                 Vater ->
-                    "Kindsvater"
+                    "den Vater"
 
                 Mutter ->
-                    "Kindsmutter"
+                    "die Mutter"
 
         typText =
             case selbstbehalt of
@@ -374,19 +477,19 @@ viewSelbstbehalt model person =
                 [ class "is-size-6"
                 , style "color" "#1b3a57"
                 ]
-                [ text
-                    ("Für den "
-                        ++ elternText
-                        ++ " wird "
-                        ++ typText
-                        ++ " von "
+                [ text ("Für " ++ elternText ++ " wird ")
+                , skriptLink "sockelbetrag" typText
+                , text
+                    (" von "
                         ++ renderSelbstbehaltBetrag selbstbehalt
                         ++ " € berücksichtigt. (Jahr: "
                         ++ jahr
                         ++ ") "
                     )
-                , showTooltip "Der Selbstbehalt ist der Betrag, der dem unterhaltspflichtigen Elternteil mindestens verbleiben muss, um seinen eigenen Lebensunterhalt zu sichern."
+                , showTooltip "Der Selbstbehalt ist der Betrag, der den Eltern für den eigenen Lebensbedarf bleibt, bevor sie Unterhalt zahlen."
                 ]
+            , p [ class "asgla-help" ]
+                [ text "Für die meisten Fälle ist die Voreinstellung passend. Ändern Sie sie nur, wenn Sie sicher sind." ]
             ]
         , div [ class "field" ]
             [ div [ class "control" ]
@@ -395,7 +498,7 @@ viewSelbstbehalt model person =
                     , class "button is-primary is-small selbstbehalt-button"
                     , onClick (ToggleView (ToggleSelbstbehaltOptions person))
                     ]
-                    [ text "Ändern" ]
+                    [ text "Selbstbehalt ändern" ]
                 ]
             ]
         , if modelPerson.showSelbstbehaltOptions then
@@ -458,6 +561,7 @@ viewSelbstbehalt model person =
                                                 []
                                             , text (" " ++ selbstbehaltToString typOption)
                                             ]
+                                    , p [ class "asgla-help" ] [ text (selbstbehaltErklaerung typOption) ]
                                     ]
                                 ]
                         )

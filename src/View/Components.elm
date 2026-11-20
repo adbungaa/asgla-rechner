@@ -4,6 +4,7 @@ module View.Components exposing
     , saveModal
     , showErgebnis
     , showTooltip
+    , skriptLink
     , ueberUnsSection
     , viewCheckboxDurchschnittseinkommen
     , viewEntryActionButtons
@@ -13,8 +14,8 @@ module View.Components exposing
 
 import Calculation exposing (calculateAusgleichsanspruch)
 import Constants exposing (getHoechstbetrag, getKindergeld)
-import Html exposing (Html, br, button, div, h3, h4, header, hr, i, input, label, li, option, p, section, select, span, strong, table, tbody, td, text, textarea, th, thead, tr, ul)
-import Html.Attributes exposing (attribute, checked, class, classList, disabled, id, placeholder, readonly, rows, style, type_, value)
+import Html exposing (Html, a, br, button, details, div, h3, h4, header, hr, i, input, label, li, option, p, section, select, span, strong, summary, table, tbody, td, text, textarea, th, thead, tr, ul)
+import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, href, id, placeholder, readonly, rows, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import ImportExport exposing (createQRCodeImage, encodeModeltoQRCode)
 import Types
@@ -69,63 +70,81 @@ jahre =
 viewMonth : String -> Model -> Html Msg
 viewMonth columnClass model =
     div [ class columnClass ]
-        [ label [ class "label" ]
-            [ text "Monat * "
-            , showTooltip "Wählen Sie den Monat aus, für den die Berechnung durchgeführt werden soll."
+        [ label [ class "label", for "monat" ]
+            [ text "Monat"
+            , span [ class "asgla-required", attribute "aria-hidden" "true" ] [ text " *" ]
+            , span [ class "asgla-sr-only" ] [ text " (Pflichtfeld)" ]
             ]
         , div [ class "control" ]
             [ div [ class "select is-fullwidth" ]
                 [ select
-                    [ onInput (Update << UpdateMonat)
+                    [ id "monat"
+                    , onInput (Update << UpdateMonat)
                     , value model.monat
                     ]
-                    (List.map (\m -> option [ value m ] [ text m ]) monate)
+                    (List.map (\m -> option [ value m, selected (m == model.monat) ] [ text m ]) monate)
                 ]
             ]
+        , p [ class "asgla-help" ]
+            [ text "Der Monat, für den die Berechnung gelten soll." ]
         ]
 
 
 viewYear : String -> Model -> Html Msg
 viewYear columnClass model =
     div [ class columnClass ]
-        [ label [ class "label" ]
-            [ text "Jahr * "
-            , showTooltip "Wählen Sie das Jahr aus, für das die Berechnung durchgeführt werden soll."
+        [ label [ class "label", for "jahr" ]
+            [ text "Jahr"
+            , span [ class "asgla-required", attribute "aria-hidden" "true" ] [ text " *" ]
+            , span [ class "asgla-sr-only" ] [ text " (Pflichtfeld)" ]
             ]
         , div [ class "control" ]
             [ div [ class "select is-fullwidth" ]
                 [ select
-                    [ onInput (Update << UpdateJahr)
+                    [ id "jahr"
+                    , onInput (Update << UpdateJahr)
                     , value model.jahr
                     ]
-                    (List.map (\j -> option [ value j ] [ text j ]) jahre)
+                    (List.map (\j -> option [ value j, selected (j == model.jahr) ] [ text j ]) jahre)
                 ]
             ]
+        , p [ class "asgla-help" ]
+            [ text "Das Jahr, in dem die Berechnung gelten soll." ]
         ]
 
 
 viewCheckboxDurchschnittseinkommen : Model -> Html Msg
 viewCheckboxDurchschnittseinkommen model =
-    div [ class "field", style "margin-top" "1rem" ]
+    div [ class "field asgla-checkbox-block" ]
         [ div [ class "control" ]
-            [ label [ class "checkbox" ]
+            [ label [ class "checkbox asgla-checkbox" ]
                 [ input
                     [ type_ "checkbox"
                     , checked model.durchschnittseinkommen
                     , onClick (ToggleView ToggleDurchschnittseinkommen)
                     ]
                     []
-                , span [ class "ml-2" ] [ text "Statt Monatsberechnung Durchschnittsberechnung durchführen" ]
-                , showTooltip "Aktivieren Sie diese Option, um die durchschnittliche Monatszahlung zu berechnen."
+                , span [ class "ml-2" ] [ text "Durchschnitt aus mehreren Monaten berechnen" ]
                 ]
+            , p [ class "asgla-help" ]
+                [ text "Nutzen Sie diese Option, wenn das Einkommen schwankt. Sie tragen dann bei den Einkünften mehrere Monate ein und der Rechner bildet den Durchschnitt." ]
             ]
         ]
 
 
+skriptLink : String -> String -> Html msg
+skriptLink anker label =
+    a [ href "#", attribute "data-skript" anker, class "skript-link", attribute "title" "Im Skript nachlesen" ] [ text label ]
+
+
 showTooltip : String -> Html msg
 showTooltip tooltipText =
-    span [ class "tooltip-container" ]
-        [ i [ class "fas fa-question-circle" ] []
+    span
+        [ class "tooltip-container"
+        , attribute "tabindex" "0"
+        , attribute "aria-label" "Hilfe anzeigen"
+        ]
+        [ i [ class "fas fa-question-circle", attribute "aria-hidden" "true" ] []
         , span [ class "tooltip-text" ]
             [ text tooltipText ]
         ]
@@ -133,22 +152,30 @@ showTooltip tooltipText =
 
 ueberUnsSection : Model -> Html Msg
 ueberUnsSection model =
-    div [ class "card", style "margin-top" "-1rem" ]
-        [ header [ class "card-header", onClick (ToggleView ToggleUeberUns) ]
-            [ p [ class "card-header-title" ] [ text "Über uns" ]
-            , span [ class "card-header-icon" ]
-                [ i
-                    [ class
-                        ("fas "
-                            ++ (if model.showUeberUns then
-                                    "fa-angle-up"
+    div [ class "card asgla-ueberuns" ]
+        [ header [ class "card-header asgla-ueberuns-header" ]
+            [ button
+                [ class "asgla-ueberuns-toggle"
+                , type_ "button"
+                , attribute "aria-expanded" (if model.showUeberUns then "true" else "false")
+                , onClick (ToggleView ToggleUeberUns)
+                ]
+                [ span [ class "asgla-ueberuns-title" ] [ text "Über uns" ]
+                , span [ class "asgla-ueberuns-icon" ]
+                    [ i
+                        [ class
+                            ("fas "
+                                ++ (if model.showUeberUns then
+                                        "fa-angle-up"
 
-                                else
-                                    "fa-angle-down"
-                               )
-                        )
+                                    else
+                                        "fa-angle-down"
+                                   )
+                            )
+                        , attribute "aria-hidden" "true"
+                        ]
+                        []
                     ]
-                    []
                 ]
             ]
         , if model.showUeberUns then
@@ -166,20 +193,16 @@ ueberUns =
         , p []
             [ text "Wir entwickeln einen Rechner, der die Berechnung von Unterhaltsansprüchen für Kinder im Wechselmodell transparent und nachvollziehbar macht und gleichzeitig den Berechnungsaufwand erheblich reduziert." ]
         , p []
-            [ text "Jährlich werden in Deutschland zahlreiche Unterhaltsberechnungen für das Wechselmodell erstellt, und fast jede davon ist eine Herausforderung. Warum? Weil die Berechnung nach aktuellen Gerichtsleitlinien so komplex ist, dass selbst erfahrene Jurist:innen regelmäßig zum Taschenrechner greifen müssen." ]
+            [ text "Jährlich werden in Deutschland zahlreiche Unterhaltsberechnungen für das Wechselmodell erstellt, und fast jede davon ist eine Herausforderung. Warum? Weil die Berechnung nach den üblichen Berechnungsgrundlagen der Gerichte so komplex ist, dass selbst erfahrene Jurist:innen regelmäßig zum Taschenrechner greifen müssen." ]
         , p []
-            [ text "Unser digitaler Rechner löst dieses Problem für alle Beteiligten: In wenigen Klicks erhalten Eltern eine verlässliche erste Einschätzung ihrer finanziellen Situation, während Richter:innen und Jugendämter ihre Berechnungen standardisiert und effizient durchführen können." ]
+            [ text "Der digitale Rechner soll Eltern eine erste Einschätzung ihrer finanziellen Situation ermöglichen und Richter:innen sowie Jugendämtern helfen, Berechnungen einheitlich durchzuführen." ]
         , p []
-            [ text "Ihre Daten bleiben dabei vollständig geschützt: Das integrierte QR-Code-System ermöglicht die sichere lokale Speicherung direkt auf Ihrem Gerät – ohne zentrale Server, ohne Datenweitergabe." ]
-        , p []
-            [ text "Ein Tool, zwei Perspektiven, eine gemeinsame Basis für faire Entscheidungen." ]
+            [ text "Eingaben können über das Menü „Eingabe zwischenspeichern“ als QR-Code oder als Datei gespeichert und später wieder importiert werden." ]
         , h3 [ class "title is-4 mt-5" ] [ text "Hintergrund" ]
         , p []
             [ text "Das Projekt wurde von Steuerrechtler:in Viselle Wöhlert initiiert, die im Januar 2025 einen ersten Python-Prototyp entwickelte." ]
         , p []
-            [ text "Seit März 2025 wird sie dabei professionell unterstützt: Adelia Arvinta, Entwickler:in, übernimmt die moderne Webentwicklung in Elm und implementiert nutzerfreundliche Funktionen. Luis Bartsch, Student der Rechtswissenschaften an der Uni Halle und ehemalige wissenschaftliche Hilfskraft des JTC Legal Tech Labs, gewährleistet die rechtliche Korrektheit sowie kommunikative Zusammenarbeit mit wichtigen Praxispartner:innen." ]
-        , p []
-            [ text "Diese interdisziplinäre Zusammenarbeit zwischen Recht, Technik und Praxis stellt sicher, dass das Tool sowohl juristisch fundiert als auch intuitiv bedienbar ist." ]
+            [ text "Seit März 2025 wird sie dabei professionell unterstützt: Adelia Arvinta, Entwickler:in, übernimmt die moderne Webentwicklung in Elm und implementiert nutzerfreundliche Funktionen. Luis Bartsch, Student der Rechtswissenschaften an der Uni Halle und ehemalige wissenschaftliche Hilfskraft des JTC Legal Tech Labs, begleitet die rechtlichen Fragen und die Zusammenarbeit mit Praxispartner:innen." ]
         , h3 [ class "title is-4 mt-5" ] [ text "Aktueller Stand" ]
         , p []
             [ text "Der Rechner wird in enger Zusammenarbeit mit Jugendämtern, Richter:innen, Eltern sowie Fachanwält:innen für Familienrecht getestet und optimiert." ]
@@ -210,112 +233,78 @@ ueberUns =
 
 importFileSection : Model -> Html Msg
 importFileSection model =
-    div [ class "mx-5" ]
-        [ div
-            [ class "is-flex is-justify-content-space-between is-align-items-flex-start"
-            , style "gap" "2rem"
-            , style "flex-wrap" "wrap"
-            , style "margin-bottom" "1.5rem"
-            ]
+    div [ class "asgla-import" ]
+        [ div [ class "asgla-import-top" ]
             [ button
-                [ class "button is-text"
-                , style "background-color" "#bbddc1"
+                [ class "button asgla-link-button"
                 , type_ "button"
                 , onClick OpenSkriptPdf
                 ]
-                [ text "Skript/Anleitung" ]
-            , div [ class "buttons is-flex is-justify-content-flex-end" ]
-                [ button
-                    [ class "button is-primary tooltip-container"
-                    , onClick (ImportFile (OpenFile JsonFile))
-                    ]
-                    [ span [ class "icon" ]
-                        [ i [ class "fas fa-file-upload" ] [] ]
-                    , text "Import JSON File"
-                    , span [ class "tooltip-text" ]
-                        [ text "Importiert Eingabedaten aus einer zuvor gespeicherten JSON-Datei (lokal, ohne Datenweitergabe)."
-                        ]
-                    ]
-                , button
-                    [ class "button is-primary tooltip-container"
-                    , classList [ ( "is-loading", model.qrIsProcessing ) ]
-                    , onClick (ImportFile (OpenFile ImageFile))
-                    , disabled model.qrIsProcessing
-                    ]
-                    [ span [ class "icon" ]
-                        [ i [ class "fas fa-qrcode" ] [] ]
-                    , span [ class "ml-2" ]
-                        [ text
-                            (if model.qrIsProcessing then
-                                "Processing... "
-
-                             else
-                                "QR-Code importieren "
-                            )
-                        , span [ class "tooltip-text" ]
-                            [ text "Importiert Eingabedaten aus einem zuvor gespeicherten QR-Code (lokal, ohne Datenweitergabe)."
-                            ]
-                        ]
-                    ]
-                , button
-                    [ class "button is-primary tooltip-container"
-                    , classList [ ( "is-loading", model.qrIsProcessing ) ]
-                    , onClick (CameraScanner OpenCameraContainer)
-                    , disabled model.qrIsProcessing
-                    ]
-                    [ span [ class "icon" ]
-                        [ i [ class "fas fa-camera" ] [] ]
-                    , span [ class "ml-2" ]
-                        [ text
-                            (if model.qrIsProcessing then
-                                "Processing..."
-
-                             else
-                                "QR-Code Scannen"
-                            )
-                        , span [ class "tooltip-text" ]
-                            [ text "Öffnet die Kamera, um einen QR-Code mit Eingabedaten zu scannen (lokal, ohne Datenweitergabe)."
-                            ]
-                        ]
+                [ span [ class "icon" ] [ i [ class "fas fa-book-open", attribute "aria-hidden" "true" ] [] ]
+                , span [] [ text "Skript/Anleitung", span [ class "is-sr-only" ] [ text " (öffnet Seitenleiste)" ] ]
+                ]
+            , details [ class "asgla-import-details" ]
+                [ summary [ class "asgla-import-summary" ]
+                    [ span [ class "icon" ] [ i [ class "fas fa-file-import", attribute "aria-hidden" "true" ] [] ]
+                    , span [] [ text "Gespeicherte Berechnung importieren" ]
                     ]
                 ]
             ]
-        , div [ class "card" ]
-            [ div [ class "field" ]
-                [ textarea
-                    [ class "textarea"
-                    , placeholder "JSON-String hier einfügen"
-                    , rows 1
-                    , onInput (\input -> ImportFile (QRDecoded input))
+        , div [ class "asgla-import-collapse" ]
+            [ div [ class "asgla-import-body" ]
+                    [ p [ class "asgla-import-intro" ]
+                        [ text "Haben Sie eine Berechnung früher gespeichert (als Datei, QR-Code oder Text)? Dann können Sie sie hier wieder laden, ohne alles neu einzutippen." ]
+                    , div [ class "asgla-import-buttons" ]
+                        [ button
+                            [ class "button is-primary"
+                            , type_ "button"
+                            , onClick (ImportFile (OpenFile JsonFile))
+                            ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-file-upload", attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "Gespeicherte Datei öffnen" ]
+                            ]
+                        , button
+                            [ class "button is-primary"
+                            , classList [ ( "is-loading", model.qrIsProcessing ) ]
+                            , type_ "button"
+                            , onClick (ImportFile (OpenFile ImageFile))
+                            , disabled model.qrIsProcessing
+                            ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-qrcode", attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "Foto/Bild vom QR-Code öffnen" ]
+                            ]
+                        , button
+                            [ class "button is-primary"
+                            , classList [ ( "is-loading", model.qrIsProcessing ) ]
+                            , type_ "button"
+                            , onClick (CameraScanner OpenCameraContainer)
+                            , disabled model.qrIsProcessing
+                            ]
+                            [ span [ class "icon" ] [ i [ class "fas fa-camera", attribute "aria-hidden" "true" ] [] ]
+                            , span [] [ text "QR-Code mit Kamera lesen" ]
+                            ]
+                        ]
+                    , p [ class "asgla-help" ]
+                        [ text "Die Datei oder den QR-Code erhalten Sie über „Eingabe zwischenspeichern“." ]
+                    , label [ class "label", for "json-import" ] [ text "Gespeicherten Text hier einfügen" ]
+                    , textarea
+                        [ id "json-import"
+                        , class "textarea"
+                        , placeholder "Gespeicherten Text hier einfügen"
+                        , rows 3
+                        , onInput (\input -> ImportFile (QRDecoded input))
+                        ]
+                        []
                     ]
-                    []
-                ]
             ]
         , case model.qrResult of
-            Just result ->
-                div
-                    [ class "notification is-success mt-4" ]
-                    [ div [ class "content" ]
-                        [ h4 [ class "title is-5" ] [ text "Datenimport erfolgreich!" ]
-                        ]
-                    ]
-
-            Nothing ->
-                text ""
-        , case model.error of
-            Just errorMsg ->
-                div
-                    [ class "notification is-danger mt-4" ]
-                    [ div [ class "content" ]
-                        [ h4 [ class "title is-5" ] [ text "Error:" ]
-                        , p [] [ text errorMsg ]
-                        ]
-                    ]
+            Just _ ->
+                div [ class "notification is-success asgla-msg" ]
+                    [ h4 [ class "title is-5" ] [ text "Datenimport erfolgreich!" ] ]
 
             Nothing ->
                 text ""
         ]
-
 
 
 -- Camera Scanner Modal Container
@@ -382,16 +371,22 @@ saveModal model =
                 , button [ class "delete", type_ "button", onClick (ToggleView ToggleSaveModal) ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ div [ class "field" ]
+                [ p [ class "mb-4" ]
+                    [ text "Speichern Sie Ihre Eingaben, um später weiterzuarbeiten. Sie können sie danach über „Gespeicherte Berechnung importieren“ wieder laden." ]
+                , div [ class "field" ]
                     [ p [] [ text "QR Code:" ]
                     , showQRCode model
-                    , button [ class "button is-small mr-2", type_ "button", onClick (Export DownloadQrCode) ] [ text "QR Code speichern" ]
+                    , button [ class "button is-small mr-2", type_ "button", onClick (Export DownloadQrCode) ] [ text "QR-Code als Bild speichern" ]
                     ]
                 , div [ class "field", style "margin-top" "1rem" ]
-                    [ p [] [ text "JSON String:" ]
-                    , textarea [ class "textarea is-family-monospace", readonly True, value (encodeModeltoQRCode model) ] []
-                    , button [ class "button is-small mt-2", type_ "button", onClick (Export CopyJsonToClipboard) ] [ text "Copy" ]
-                    , button [ class "button is-small mt-2", style "margin-left" "0.5rem", type_ "button", onClick (Export DownloadJson) ] [ text "JSON speichern" ]
+                    [ details []
+                        [ summary [ style "cursor" "pointer" ] [ text "Gespeicherten Text anzeigen (zum Kopieren)" ]
+                        , textarea [ class "textarea is-family-monospace mt-2", readonly True, value (encodeModeltoQRCode model) ] []
+                        , button [ class "button is-small mt-2", type_ "button", onClick (Export CopyJsonToClipboard) ] [ text "Text kopieren" ]
+                        ]
+                    ]
+                , div [ class "field", style "margin-top" "1rem" ]
+                    [ button [ class "button is-small", type_ "button", onClick (Export DownloadJson) ] [ text "Als Datei speichern" ]
                     ]
                 ]
             ]
@@ -471,10 +466,10 @@ showErgebnis model =
                 textPerson =
                     case person of
                         Vater ->
-                            "den Kindsvater"
+                            "den Vater"
 
                         Mutter ->
-                            "die Kindsmutter"
+                            "die Mutter"
 
                 selbstbehaltText =
                     case modelPerson.selbstbehalt of
@@ -511,9 +506,9 @@ showErgebnis model =
                         [ header "Bezeichnung" "Betrag"
                         ]
                     , tbody []
-                        ([ row "Einkommen" (formatEuroRounded einkommen ++ " €")
-                         , row "\u{00A0}\u{00A0}Einkünfte aus Haupttätigkeit" (formatEuroRounded (Maybe.withDefault 0 (formatInputToFloat modelPerson.haupttaetigkeit)) ++ " €")
-                         , row "\u{00A0}\u{00A0}Weitere Einkünfte Gesamt" (formatEuroRounded weitereEinkuenfte ++ " €")
+                        ([ row "Einkommen" (formatEuroRounded einkommen ++ "\u{00A0}€")
+                         , row "\u{00A0}\u{00A0}Einkünfte aus Haupttätigkeit" (formatEuroRounded (Maybe.withDefault 0 (formatInputToFloat modelPerson.haupttaetigkeit)) ++ "\u{00A0}€")
+                         , row "\u{00A0}\u{00A0}Weitere Einkünfte Gesamt" (formatEuroRounded weitereEinkuenfte ++ "\u{00A0}€")
                          ]
                             ++ (modelPerson.weitereEinkuenfte
                                     |> List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00")
@@ -521,27 +516,27 @@ showErgebnis model =
                                         (\item ->
                                             row
                                                 ("\u{00A0}\u{00A0}\u{00A0}\u{00A0}" ++ item.bezeichnung)
-                                                (formatEuroRounded (Maybe.withDefault 0.0 (formatInputToFloat item.kosten)) ++ " €")
+                                                (formatEuroRounded (Maybe.withDefault 0.0 (formatInputToFloat item.kosten)) ++ "\u{00A0}€")
                                         )
                                )
-                            ++ (row "Abzug Gesamt" (formatEuroRounded gesamtAbzug ++ " €")
+                            ++ (row "Abzug Gesamt" (formatEuroRounded gesamtAbzug ++ "\u{00A0}€")
                                     :: (modelPerson.abzugsposten
                                             |> List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00")
                                             |> List.map
                                                 (\item ->
                                                     row
                                                         ("\u{00A0}\u{00A0}Abzug " ++ item.bezeichnung)
-                                                        (formatEuroRounded (Maybe.withDefault 0.0 (formatInputToFloat item.kosten)) ++ " €")
+                                                        (formatEuroRounded (Maybe.withDefault 0.0 (formatInputToFloat item.kosten)) ++ "\u{00A0}€")
                                                 )
                                        )
                                )
-                            ++ [ row "Bereinigtes Einkommen" (formatEuroRounded bereinigtesEinkommen ++ " €")
-                               , row ("Selbstbehalt (" ++ selbstbehaltText ++ ")") (formatEuroRounded (Maybe.withDefault 0.0 (formatInputToFloat (renderSelbstbehaltBetrag modelPerson.selbstbehalt))) ++ " €")
-                               , row "= verteilbarer Betrag " (formatEuroRounded verteilbarerBetrag ++ " €")
+                            ++ [ row "Bereinigtes Einkommen" (formatEuroRounded bereinigtesEinkommen ++ "\u{00A0}€")
+                               , row ("Selbstbehalt (" ++ selbstbehaltText ++ ")") (formatEuroRounded (Maybe.withDefault 0.0 (formatInputToFloat (renderSelbstbehaltBetrag modelPerson.selbstbehalt))) ++ "\u{00A0}€")
+                               , row "= verteilbarer Betrag " (formatEuroRounded verteilbarerBetrag ++ "\u{00A0}€")
                                ]
                         )
                     ]
-                , p [ class "mt-4" ] [ text ("Für " ++ textPerson ++ " wurde der " ++ selbstbehaltTextMitArtikel ++ " berücksichtigt.") ]
+                , p [ class "mt-4" ] [ text ("Für " ++ textPerson ++ " wurde der "), skriptLink "sockelbetrag" selbstbehaltTextMitArtikel, text " berücksichtigt." ]
                 ]
 
         header label1 label2 =
@@ -590,7 +585,7 @@ showErgebnis model =
                    )
                 ++ " Einkünfte des Kindes iHv. "
                 ++ formatEuroRounded kindEinkuenfteSum
-                ++ " €"
+                ++ "\u{00A0}€"
 
         kindEinkuenfteZeilen =
             kindEinkuenfteUeberschrift
@@ -605,7 +600,7 @@ showErgebnis model =
                                )
                             ++ " ("
                             ++ formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0)
-                            ++ " €)"
+                            ++ "\u{00A0}€)"
                     )
                     kindEinkuenftePositionen
 
@@ -689,43 +684,107 @@ showErgebnis model =
 
         ausgleichsanspruchZwischenschritt =
             formatEuroRounded auszugleichenderBetragNachAnrechnung
-                ++ " € "
+                ++ "\u{00A0}€ "
                 ++ ausgleichsanspruchRechenzeichen
                 ++ " "
                 ++ formatEuroRounded kindergeldBetreuungsanteil
-                ++ " € = "
+                ++ "\u{00A0}€ = "
                 ++ formatEuroRounded ausgleichsanspruchNachAnrechnung
-                ++ " €"
+                ++ "\u{00A0}€"
+
+        zahler =
+            if ausgleichsanspruchNachAnrechnung < 0 then
+                anspruchsberechtigtNachAnrechnung
+
+            else
+                nichtAnspruchsberechtigtNachAnrechnung
+
+        empfaenger =
+            if ausgleichsanspruchNachAnrechnung < 0 then
+                nichtAnspruchsberechtigtNachAnrechnung
+
+            else
+                anspruchsberechtigtNachAnrechnung
+
+        zahlbetrag =
+            if ausgleichsanspruchNachAnrechnung < 0 then
+                toFloat (ceiling (abs ausgleichsanspruchNachAnrechnung))
+
+            else
+                toFloat (ceiling ausgleichsanspruchNachAnrechnung)
+
+        hinweisNoetig =
+            ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt > 0
+                || ergebnis.haftungsbetragVaterVorBegrenzung > ergebnis.haftungsbetragVater
+                || ergebnis.haftungsbetragMutterVorBegrenzung > ergebnis.haftungsbetragMutter
+                || (model.haftungsbetragVaterSpiegel |> Maybe.withDefault 0) > hoechstbetragVater
+                || (model.haftungsbetragMutterSpiegel |> Maybe.withDefault 0) > hoechstbetragMutter
+
     in
     div
         [ class "mt-5", style "margin" "1rem" ]
-        [ div [ class "is-flex is-justify-content-space-between is-align-items-center" ]
-            [ Html.h2 [ class "title is-4 mb-0" ] [ text "Ausgleichsanspruch Berechnung" ]
-            , Html.button
-                [ class "button is-primary"
-                , Html.Attributes.type_ "button"
-                , Html.Attributes.attribute "aria-label" "Export PDF"
-                , Html.Attributes.title "Export PDF"
-                , onClick (Export ExportPdf)
+        [ div [ class "ergebnis-karte" ]
+            [ Html.h2 [ class "title is-4 ergebnis-titel" ] [ text "Wer zahlt an wen?" ]
+            , div [ class "ergebnis-flow" ]
+                [ viewErgebnisPerson "Zahlt" zahler
+                , div [ class "ergebnis-mitte" ]
+                    [ span [ class "ergebnis-pfeil" ]
+                        [ i [ class "fas fa-arrow-right", attribute "aria-hidden" "true" ] [] ]
+                    , p [ class "ergebnis-betrag" ] [ text (formatEuroRounded zahlbetrag ++ "\u{00A0}€") ]
+                    , p [ class "ergebnis-betrag-label" ] [ text "Ausgleichszahlung pro Monat" ]
+                    ]
+                , viewErgebnisPerson "Erhält" empfaenger
                 ]
-                [ span [ class "icon" ]
-                    [ i [ class "fas fa-file-export" ] [] ]
+            , p [ class "ergebnis-satz" ]
+                [ text (nominativMitArtikel zahler ++ " zahlt " ++ dativMitArtikel empfaenger ++ " " ++ formatEuroRounded zahlbetrag ++ "\u{00A0}€ pro Monat.") ]
+            , if hinweisNoetig then
+                div [ class "notification is-warning is-light ergebnis-hinweis" ]
+                    [ p [] [ text "Hinweis: Das Ergebnis oben beruht auf den berechneten Kostenanteilen. Im Rechenweg können Sie prüfen, ob für einen Elternteil eine ", skriptLink "haftungsanteile" "Begrenzung", text " des Anteils in Betracht kommt, und sie bei Bedarf übernehmen." ]
+                    ]
+
+              else
+                text ""
+            , div [ class "ergebnis-kacheln" ]
+                [ viewErgebnisKachel "fa-percent" [ text "Haftungsanteil Vater", zusatzKachel ] (formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ " %")
+                , viewErgebnisKachel "fa-percent" [ text "Haftungsanteil Mutter", zusatzKachel ] (formatEuroRounded (ergebnis.haftungsanteilMutter * 100) ++ " %")
+                , viewErgebnisKachel "fa-child" [ text "Gesamtbedarf des Kindes" ] (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ "\u{00A0}€")
+                ]
+            , div [ class "ergebnis-aktion" ]
+                [ button
+                    [ class "button is-primary"
+                    , type_ "button"
+                    , onClick (Export ExportPdf)
+                    ]
+                    [ span [ class "icon" ] [ i [ class "fas fa-download", attribute "aria-hidden" "true" ] [] ]
+                    , span [] [ text "PDF exportieren" ]
+                    ]
                 ]
             ]
-        , div [ class "columns is-variable is-3" ]
-            [ div [ class "column" ] [ renderPersonSection "Vater" Vater ]
-            , div [ class "column" ] [ renderPersonSection "Mutter" Mutter ]
-            ]
-        , p [ class "mt-4" ] [ text ("Relevantes Gesamteinkommen für den Regelbedarf: " ++ formatEuroRounded ergebnis.gesamtEinkommen ++ " €") ]
-        , p [ class "mt-4" ] [ text ("Verteilbarer Betrag Gesamt: " ++ formatEuroRounded ergebnis.verteilbarerBetragGesamt ++ " €") ]
+        , p [ class "ergebnis-disclaimer" ] [ text "Der Rechner liefert eine Einschätzung und ersetzt keine rechtliche Beratung." ]
+        , details
+            (class "ergebnis-details" :: (if hinweisNoetig then [ attribute "open" "" ] else []))
+            [ summary [ class "button is-primary is-outlined ergebnis-details-summary" ]
+                [ span [ class "icon" ] [ i [ class "fas fa-list-ol", attribute "aria-hidden" "true" ] [] ]
+                , span [] [ text "Rechenweg im Detail" ]
+                , span [ class "icon ergebnis-chevron" ]
+                    [ i [ class "fas fa-chevron-down", attribute "aria-hidden" "true" ] [] ]
+                ]
+            , div [ class "ergebnis-details-inhalt" ]
+                [ Html.h2 [ class "title is-4 mb-0" ] [ text "Rechenweg" ]
+                , div [ class "columns is-variable is-3" ]
+                    [ div [ class "column" ] [ renderPersonSection "Vater" Vater ]
+                    , div [ class "column" ] [ renderPersonSection "Mutter" Mutter ]
+                    ]
+        , p [ class "mt-4" ] [ text ("Relevantes Gesamteinkommen für den Regelbedarf: " ++ formatEuroRounded ergebnis.gesamtEinkommen ++ "\u{00A0}€") ]
+        , p [ class "mt-4" ] [ text ("Verteilbarer Betrag Gesamt: " ++ formatEuroRounded ergebnis.verteilbarerBetragGesamt ++ "\u{00A0}€") ]
         , div [ class "columns is-variable is-3" ]
             [ div [ class "column" ]
                 [ p [ class "mt-4" ] [ text ("Haftungsanteil Vater: " ++ formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ "%") ]
                 , if ergebnis.haftungsanteilVater == 0 then
-                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der Regelbedarf des Kindes allein aufgrund des Einkommens der Mutter." ]
+                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens der Mutter." ]
 
                   else if ergebnis.haftungsanteilMutter == 0 then
-                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der Regelbedarf des Kindes allein aufgrund des Einkommens des Vaters." ]
+                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens des Vaters." ]
 
                   else
                     text ""
@@ -750,27 +809,27 @@ showErgebnis model =
                                 ""
                            )
                     )
-                    (formatEuroRounded (Maybe.withDefault 0 ergebnis.regelbedarf) ++ " €")
-                 , row "Zusatzbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf) + List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ " €")
-                 , row "davon Mehrbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf)) ++ " €")
+                    (formatEuroRounded (Maybe.withDefault 0 ergebnis.regelbedarf) ++ "\u{00A0}€")
+                 , row "Zusätzliche Kosten des Kindes" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf) + List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ "\u{00A0}€")
+                 , row "davon Mehrbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf)) ++ "\u{00A0}€")
                  ]
                     -- mehrbedarf list rows
                     ++ List.map
-                        (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ " \u{00A0}\u{00A0} (Bereits bezahlt von: " ++ (item.bezahltVon |> Maybe.map personToString |> Maybe.withDefault "Nicht angegeben") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ " €"))
+                        (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ " \u{00A0}\u{00A0} (" ++ (item.bezahltVon |> Maybe.map (\bezahler -> "bezahlt von " ++ personToString bezahler) |> Maybe.withDefault "noch nicht bezahlt") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ "\u{00A0}€"))
                         (List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00") model.kind.mehrbedarf)
-                    ++ [ row "davon Sonderbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ " €") ]
+                    ++ [ row "davon Sonderbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ "\u{00A0}€") ]
                     -- sonderbedarf list rows
                     ++ List.map
-                        (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ "\u{00A0}\u{00A0} (Bereits bezahlt von: " ++ (item.bezahltVon |> Maybe.map personToString |> Maybe.withDefault "Nicht angegeben") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ " €"))
+                        (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ "\u{00A0}\u{00A0} (" ++ (item.bezahltVon |> Maybe.map (\bezahler -> "bezahlt von " ++ personToString bezahler) |> Maybe.withDefault "noch nicht bezahlt") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ "\u{00A0}€"))
                         (List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00") model.kind.sonderbedarf)
                     ++ (if not (List.isEmpty kindEinkuenftePositionen) then
-                            [ rowWithLines kindEinkuenfteZeilen (formatEuroRounded anzurechnendeKindEinkuenfte ++ " €") ]
+                            [ rowWithLines kindEinkuenfteZeilen (formatEuroRounded anzurechnendeKindEinkuenfte ++ "\u{00A0}€") ]
 
                         else
                             []
                        )
-                    ++ [ row "Abzug hälftiges Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr) / 2) ++ " €")
-                       , row "Gesamtbedarf" (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ " €")
+                    ++ [ row "Abzug hälftiges Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr) / 2) ++ "\u{00A0}€")
+                       , row "Gesamtbedarf" (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ "\u{00A0}€")
                        ]
                 )
             ]
@@ -779,7 +838,7 @@ showErgebnis model =
         -- , h4 [ class "title is-5 mt-5" ] [ text "Anteile ohne getragene Zusatzbedarfe" ]
         , div [ class "columns is-variable is-3 mt-4" ]
             [ div [ class "column" ]
-                [ p [] [ text ("Anteil Vater am Gesamtbedarf: " ++ formatEuroRounded ergebnis.haftungsbetragVater ++ " €") ]
+                [ p [] [ text ("Anteil Vater am Gesamtbedarf: " ++ formatEuroRounded ergebnis.haftungsbetragVater ++ "\u{00A0}€") ]
                 , viewBegrenzungHinweis
                     "Vaters"
                     ergebnis.haftungsbetragVaterVorBegrenzung
@@ -792,7 +851,7 @@ showErgebnis model =
                     text ""
                 ]
             , div [ class "column" ]
-                [ p [] [ text ("Anteil Mutter am Gesamtbedarf: " ++ formatEuroRounded ergebnis.haftungsbetragMutter ++ " €") ]
+                [ p [] [ text ("Anteil Mutter am Gesamtbedarf: " ++ formatEuroRounded ergebnis.haftungsbetragMutter ++ "\u{00A0}€") ]
                 , viewBegrenzungHinweis
                     "Mutters"
                     ergebnis.haftungsbetragMutterVorBegrenzung
@@ -807,13 +866,17 @@ showErgebnis model =
             ]
         , if ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt > 0 then
             div []
-                [ p [ style "color" "#ff0000", class "has-text-centered" ] [ text ("Ungedeckter Kindsbedarf: " ++ formatEuroRounded (ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) ++ " €") ]
+                [ p [ style "color" "#ff0000", class "has-text-centered" ] [ text ("Ungedeckter Kindsbedarf: " ++ formatEuroRounded (ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) ++ "\u{00A0}€") ]
                 , div [ class "notification mt-4" ]
                     [ p []
                         [ text "Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag."
                         , case model.vater.selbstbehalt of
                             Angemessen _ ->
-                                text " Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen Selbstbehalts den notwendigen Selbstbehalt anzusetzen."
+                                span []
+                                    [ text " Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen "
+                                    , skriptLink "sockelbetrag" "Selbstbehalts"
+                                    , text " den notwendigen Selbstbehalt anzusetzen."
+                                    ]
 
                             _ ->
                                 text " Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen."
@@ -824,30 +887,30 @@ showErgebnis model =
           else
             text ""
         , viewZusatzbedarfLeistungen model ergebnis
-        , p [ class "mt-4" ] [ text ("Differenz: " ++ formatEuroRounded differenzNachAnrechnung ++ " €") ]
-        , p [ class "mt-4" ] [ text ("Auszugleichender Betrag (1/2) von " ++ personToString nichtAnspruchsberechtigtNachAnrechnung ++ " zu leisten an " ++ personToString anspruchsberechtigtNachAnrechnung ++ ": " ++ formatEuroRounded auszugleichenderBetragNachAnrechnung ++ " €") ]
+        , p [ class "mt-4" ] [ text ("Differenz: " ++ formatEuroRounded differenzNachAnrechnung ++ "\u{00A0}€") ]
+        , p [ class "mt-4" ] [ text ("Auszugleichender Betrag (1/2) von " ++ personToString nichtAnspruchsberechtigtNachAnrechnung ++ " zu leisten an " ++ personToString anspruchsberechtigtNachAnrechnung ++ ": " ++ formatEuroRounded auszugleichenderBetragNachAnrechnung ++ "\u{00A0}€") ]
         , h4 [ class "title is-5 mt-5" ] [ text "Kindergeldverrechnung " ]
         , table [ class "table is-striped is-bordered is-hoverable is-fullwidth" ]
             [ thead []
                 [ header "Bezeichnung" "Betrag"
                 ]
             , tbody []
-                [ row "Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr)) ++ " €")
+                [ row "Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr)) ++ "\u{00A0}€")
                 , row "Kindergeldempfänger" (personToString model.kindergeldEmpfaenger)
-                , row "Betreuungsanteil Mutter" (formatEuroRounded ergebnis.betreuungsanteil ++ " €")
-                , row "Baranteil Mutter" (formatEuroRounded ergebnis.baranteilMutter ++ " €")
-                , row "Betreuungsanteil Vater" (formatEuroRounded ergebnis.betreuungsanteil ++ " €")
-                , row "Baranteil Vater" (formatEuroRounded ergebnis.baranteilVater ++ " €")
+                , row "Betreuungsanteil Mutter" (formatEuroRounded ergebnis.betreuungsanteil ++ "\u{00A0}€")
+                , row "Baranteil Mutter" (formatEuroRounded ergebnis.baranteilMutter ++ "\u{00A0}€")
+                , row "Betreuungsanteil Vater" (formatEuroRounded ergebnis.betreuungsanteil ++ "\u{00A0}€")
+                , row "Baranteil Vater" (formatEuroRounded ergebnis.baranteilVater ++ "\u{00A0}€")
                 ]
             ]
-        , p [ class "mt-4" ] [ text ("Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des Betreuungsanteils in Höhe von " ++ formatEuroRounded kindergeldBetreuungsanteil ++ " € von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger ++ ": ") ]
+        , p [ class "mt-4" ] [ text "Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des ", skriptLink "kindergeldverrechnung" "Betreuungsanteils", text (" in Höhe von " ++ formatEuroRounded kindergeldBetreuungsanteil ++ "\u{00A0}€ von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger ++ ": ") ]
         , table [ class "table is-striped is-bordered is-hoverable is-fullwidth mt-4" ]
             [ thead []
                 [ header "Zwischenschritt" "Betrag"
                 ]
             , tbody []
-                [ row "Auszugleichender Betrag (1/2)" (formatEuroRounded auszugleichenderBetragNachAnrechnung ++ " €")
-                , row ("Betreuungsanteil Kindergeld von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger) (ausgleichsanspruchRechenzeichen ++ " " ++ formatEuroRounded kindergeldBetreuungsanteil ++ " €")
+                [ row "Auszugleichender Betrag (1/2)" (formatEuroRounded auszugleichenderBetragNachAnrechnung ++ "\u{00A0}€")
+                , row ("Betreuungsanteil Kindergeld von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger) (ausgleichsanspruchRechenzeichen ++ " " ++ formatEuroRounded kindergeldBetreuungsanteil ++ "\u{00A0}€")
                 , row "Rechnung Ausgleichsanspruch" ausgleichsanspruchZwischenschritt
                 ]
             ]
@@ -859,11 +922,30 @@ showErgebnis model =
             , style "border-radius" "8px"
             , style "padding" "1rem"
             ]
-            [ if ausgleichsanspruchNachAnrechnung < 0 then
-                text ("Daher insgesamt von " ++ personToString anspruchsberechtigtNachAnrechnung ++ " an " ++ personToString nichtAnspruchsberechtigtNachAnrechnung ++ " zu leistende Ausgleichszahlung: " ++ formatEuroRounded (toFloat (ceiling (abs ausgleichsanspruchNachAnrechnung))) ++ " €")
-
-              else
-                text ("Daher insgesamt von " ++ personToString nichtAnspruchsberechtigtNachAnrechnung ++ " an " ++ personToString anspruchsberechtigtNachAnrechnung ++ " zu leistende Ausgleichszahlung: " ++ formatEuroRounded (toFloat (ceiling ausgleichsanspruchNachAnrechnung)) ++ " €")
+            [ text ("Daher insgesamt von " ++ personToString zahler ++ " an " ++ personToString empfaenger ++ " zu leistende Ausgleichszahlung: " ++ formatEuroRounded zahlbetrag ++ "\u{00A0}€")
+            ]
+                , details [ class "ergebnis-glossar" ]
+                    [ summary [] [ text "Begriffe kurz erklärt" ]
+                    , Html.dl []
+                        [ Html.dt [] [ text "Ausgleichszahlung" ]
+                        , Html.dd [] [ text "Betrag, den ein Elternteil dem anderen monatlich zahlt, damit die Kosten des Kindes fair verteilt sind." ]
+                        , Html.dt [] [ text "Bedarf des Kindes" ]
+                        , Html.dd [] [ text "Die monatlichen Kosten des Kindes." ]
+                        , Html.dt [] [ skriptLink "sockelbetrag" "Selbstbehalt" ]
+                        , Html.dd [] [ text "Betrag, der einem Elternteil für den eigenen Lebensunterhalt bleibt." ]
+                        , Html.dt [] [ skriptLink "bereinigtes-einkommen" "Bereinigtes Einkommen" ]
+                        , Html.dd [] [ text "Einkommen nach Abzügen." ]
+                        , Html.dt [] [ skriptLink "haftungsanteile" "Haftungsanteil" ]
+                        , Html.dd [] [ text "Anteil an den Kosten des Kindes, den ein Elternteil nach seinem Einkommen trägt." ]
+                        , Html.dt [] [ skriptLink "kindergeldverrechnung" "Betreuungsanteil / Baranteil" ]
+                        , Html.dd [] [ text "Betreuungsanteil: der Anteil, den ein Elternteil durch Zeit mit dem Kind leistet. Baranteil: der Anteil, den er mit Geld leistet." ]
+                        , Html.dt [] [ skriptLink "kindergeldverrechnung" "Kindergeldverrechnung" ]
+                        , Html.dd [] [ text "Das Kindergeld wird zwischen den Eltern angerechnet, weil es nur an eine Person gezahlt wird." ]
+                        , Html.dt [] [ skriptLink "haftungsanteile" "Begrenzung" ]
+                        , Html.dd [] [ text "Der Anteil wird auf einen Höchstbetrag beschränkt." ]
+                        ]
+                    ]
+                ]
             ]
         , div [ class "title is-5 mt-5" ]
             [ text "Erläuterungen und Anmerkungen:"
@@ -883,13 +965,61 @@ showErgebnis model =
              else
                 []
             )
-        , Html.button
-            [ class "button is-primary"
-            , Html.Attributes.type_ "button"
-            , style "margin-top" "1rem"
-            , onClick (Export ExportPdf)
+        ]
+
+
+viewErgebnisPerson : String -> Person -> Html msg
+viewErgebnisPerson rolle person =
+    let
+        klasse =
+            case person of
+                Vater ->
+                    "vater"
+
+                Mutter ->
+                    "mutter"
+    in
+    div [ class ("ergebnis-person ergebnis-person--" ++ klasse) ]
+        [ p [ class "ergebnis-person-rolle" ] [ text rolle ]
+        , span [ class "ergebnis-person-icon" ] [ i [ class "fas fa-user", attribute "aria-hidden" "true" ] [] ]
+        , p [ class "ergebnis-person-name" ] [ text (personToString person) ]
+        ]
+
+
+nominativMitArtikel : Person -> String
+nominativMitArtikel person =
+    case person of
+        Vater ->
+            "Der Vater"
+
+        Mutter ->
+            "Die Mutter"
+
+
+dativMitArtikel : Person -> String
+dativMitArtikel person =
+    case person of
+        Vater ->
+            "dem Vater"
+
+        Mutter ->
+            "der Mutter"
+
+
+zusatzKachel : Html msg
+zusatzKachel =
+    span [ style "display" "block", style "font-size" "0.8em", style "font-weight" "400" ]
+        [ text "Anteil an den Kosten des Kindes" ]
+
+
+viewErgebnisKachel : String -> List (Html msg) -> String -> Html msg
+viewErgebnisKachel icon labelInhalt wert =
+    div [ class "ergebnis-kachel" ]
+        [ span [ class "ergebnis-kachel-icon" ] [ i [ class ("fas " ++ icon), attribute "aria-hidden" "true" ] [] ]
+        , div []
+            [ p [ class "ergebnis-kachel-label" ] labelInhalt
+            , p [ class "ergebnis-kachel-wert" ] [ text wert ]
             ]
-            [ text "Export PDF" ]
         ]
 
 
@@ -902,9 +1032,9 @@ viewBegrenzungHinweis elternteilGenitiv urspruenglicherBetrag begrenzterBetrag v
                     ++ elternteilGenitiv
                     ++ " von "
                     ++ formatEuroRounded urspruenglicherBetrag
-                    ++ " € übersteigt den verteilbaren Betrag von "
+                    ++ "\u{00A0}€ übersteigt den verteilbaren Betrag von "
                     ++ formatEuroRounded verteilbarerBetrag
-                    ++ " €. Der Haftungsbetrag wurde entsprechend begrenzt."
+                    ++ "\u{00A0}€. Der Haftungsbetrag wurde entsprechend begrenzt."
                 )
             ]
 
@@ -918,10 +1048,10 @@ viewHHinweisAnteilEltern model ergebnis elterenteil einkommen anteilVater anteil
         elternText =
             case elterenteil of
                 Vater ->
-                    "Kindsvater"
+                    "Vater"
 
                 Mutter ->
-                    "Kindsmutter"
+                    "Mutter"
 
         hoechstbetrag =
             getHoechstbetrag model.jahr einkommen model.kind.alter
@@ -952,8 +1082,10 @@ viewHHinweisAnteilEltern model ergebnis elterenteil einkommen anteilVater anteil
             [ class "notification is-info"
             , style "background-color" "#ddddeb"
             ]
-            [ text ("Der Haftungsbetrag von " ++ elternText ++ " (" ++ formatEuroRounded spiegelWert ++ " €) ist höher als der Zahlungsbetrag, der im Residenzmodell zu leisten wäre. Daher wird der Haftungsanteil auf diesen Zahlungsbetrag gedeckelt.")
-            , p [ class "mt-2" ] [ text ("Daher der Haftungsanteil von " ++ elternText ++ ": " ++ formatEuroRounded (Maybe.withDefault 0 hoechstbetrag) ++ " €") ]
+            [ text ("Der Haftungsbetrag von " ++ elternText ++ " (" ++ formatEuroRounded spiegelWert ++ "\u{00A0}€) ist höher als der Zahlungsbetrag, der im ")
+            , skriptLink "haftungsanteile" "Residenzmodell"
+            , text (" (Kind lebt überwiegend bei einem Elternteil) zu leisten wäre. Eine Begrenzung des Haftungsanteils auf diesen Zahlungsbetrag kommt daher in Betracht. (Haftungsanteil = der Teil der Kosten des Kindes, den ein Elternteil nach seinem Einkommen trägt)")
+            , p [ class "mt-2" ] [ text ("Möglicher Anteil von " ++ elternText ++ " bei Begrenzung: " ++ formatEuroRounded (Maybe.withDefault 0 hoechstbetrag) ++ "\u{00A0}€ (noch nicht angewendet)") ]
             ]
         , button [ class "button is-small mt-2", type_ "button", onClick (ApplyHaftungsbetraege vaterWert mutterWert Vorschlag) ] [ text "Vorgeschlagenen Haftungsanteil übernehmen" ]
         , button [ class "button is-small mt-2", type_ "button", onClick (ToggleView ToggleVorschlagHft) ] [ text "Stattdessen Haftungsanteile für Eltern individuell festsetzen" ]
@@ -1022,7 +1154,7 @@ viewZusatzbedarfLeistungen model ergebnis =
                      )
                         ++ " - "
                         ++ formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0)
-                        ++ " €"
+                        ++ "\u{00A0}€"
                     )
                 ]
 
@@ -1049,10 +1181,10 @@ viewZusatzbedarfLeistungen model ergebnis =
                     ]
                 , tr []
                     [ td []
-                        [ strong [] [ text ("Summe: " ++ formatEuroRounded paidByVater ++ " €") ]
+                        [ strong [] [ text ("Summe: " ++ formatEuroRounded paidByVater ++ "\u{00A0}€") ]
                         ]
                     , td []
-                        [ strong [] [ text ("Summe: " ++ formatEuroRounded paidByMutter ++ " €") ]
+                        [ strong [] [ text ("Summe: " ++ formatEuroRounded paidByMutter ++ "\u{00A0}€") ]
                         ]
                     ]
                 , tr []
@@ -1060,12 +1192,12 @@ viewZusatzbedarfLeistungen model ergebnis =
                     , td [] [ text "Anrechnung hälftiges Kindergeld beim Kindergeldempfänger: " ]
                     ]
                 , tr []
-                    [ td [] [ text ("" ++ formatEuroRounded ergebnis.haftungsbetragVater ++ " - " ++ formatEuroRounded paidByVater ++ " + " ++ formatEuroRounded abzugVater ++ " = " ++ formatEuroRounded ergebnis.anteilVaterGesamtbedarf ++ " €") ]
-                    , td [] [ text ("" ++ formatEuroRounded ergebnis.haftungsbetragMutter ++ " - " ++ formatEuroRounded paidByMutter ++ " + " ++ formatEuroRounded abzugMutter ++ " = " ++ formatEuroRounded ergebnis.anteilMutterGesamtbedarf ++ " €") ]
+                    [ td [] [ text ("" ++ formatEuroRounded ergebnis.haftungsbetragVater ++ " - " ++ formatEuroRounded paidByVater ++ " + " ++ formatEuroRounded abzugVater ++ " = " ++ formatEuroRounded ergebnis.anteilVaterGesamtbedarf ++ "\u{00A0}€") ]
+                    , td [] [ text ("" ++ formatEuroRounded ergebnis.haftungsbetragMutter ++ " - " ++ formatEuroRounded paidByMutter ++ " + " ++ formatEuroRounded abzugMutter ++ " = " ++ formatEuroRounded ergebnis.anteilMutterGesamtbedarf ++ "\u{00A0}€") ]
                     ]
                 , tr []
-                    [ td [] [ text ("Haftungsbetrag nach Anrechnung " ++ personToString Vater ++ ": " ++ formatEuroRounded ergebnis.anteilVaterGesamtbedarf ++ " €") ]
-                    , td [] [ text ("Haftungsbetrag nach Anrechnung " ++ personToString Mutter ++ ": " ++ formatEuroRounded ergebnis.anteilMutterGesamtbedarf ++ " €") ]
+                    [ td [] [ text ("Haftungsbetrag nach Anrechnung " ++ personToString Vater ++ ": " ++ formatEuroRounded ergebnis.anteilVaterGesamtbedarf ++ "\u{00A0}€") ]
+                    , td [] [ text ("Haftungsbetrag nach Anrechnung " ++ personToString Mutter ++ ": " ++ formatEuroRounded ergebnis.anteilMutterGesamtbedarf ++ "\u{00A0}€") ]
                     ]
                 ]
             ]
@@ -1128,31 +1260,32 @@ viewVorschlagHaftungsanteil model ergebnis elterenteil vorschlag =
             , onClick (ApplyHaftungsbetraege vaterWert mutterWert Individuell)
             ]
             [ text "Werte Übernehmen" ]
-        , p [] [ text "Bitte nutzen Sie diese Funktion nur, wenn Sie einem ausnahmsweisen Sonderfall haben." ]
+        , p [] [ text "Bitte nutzen Sie diese Funktion nur, wenn bei Ihnen ein Sonderfall vorliegt." ]
         ]
 
 
 viewEntryActionButtons : { isRemovable : Bool, isAtLimit : Bool, onRemove : msg, onAdd : msg } -> List (Html msg)
 viewEntryActionButtons { isRemovable, isAtLimit, onRemove, onAdd } =
     [ if isRemovable then
-        div [ class "control" ]
+        div [ class "control entry-remove-control" ]
             [ button
                 [ class "button is-light entry-action entry-remove"
                 , onClick onRemove
                 , type_ "button"
-                , attribute "aria-label" "Eintrag entfernen"
+                , attribute "aria-label" "Zeile entfernen"
                 ]
                 [ text "-" ]
             ]
 
       else
         text ""
-    , div [ class "control" ]
+    , div [ class "control entry-add-control" ]
         [ button
             [ class "button is-primary entry-action entry-add"
             , type_ "button"
             , disabled isAtLimit
             , onClick onAdd
+            , attribute "aria-label" "Zeile hinzufügen"
             ]
             [ text "+" ]
         ]

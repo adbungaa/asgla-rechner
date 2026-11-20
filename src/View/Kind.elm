@@ -1,7 +1,7 @@
 module View.Kind exposing (viewKind)
 
 import Html exposing (Html, button, div, input, label, option, p, select, span, text)
-import Html.Attributes exposing (checked, class, classList, name, placeholder, selected, style, type_, value)
+import Html.Attributes exposing (attribute, checked, class, classList, name, placeholder, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
@@ -18,7 +18,7 @@ import Types
         )
 import Utils.Format exposing (personToString, stringToPerson)
 import Utils.Validation exposing (validateAgeOrBirthday, validateMoney, validateRequiredMoney)
-import View.Components exposing (showTooltip, viewEntryActionButtons)
+import View.Components exposing (showTooltip, skriptLink, viewEntryActionButtons)
 
 
 
@@ -41,9 +41,12 @@ viewKind model =
         [ div []
             [ div [ class "field", style "margin-top" "1.5rem" ]
                 [ label [ class "label" ]
-                    [ text "Alter / Geburtsdatum des Kindes* "
-                    , showTooltip "Geben Sie hier entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ ein."
+                    [ text "Alter oder Geburtsdatum des Kindes"
+                    , span [ class "asgla-required", attribute "aria-hidden" "true" ] [ text " *" ]
+                    , span [ class "asgla-sr-only" ] [ text " (Pflichtfeld)" ]
                     ]
+                , p [ class "asgla-help asgla-help-top" ]
+                    [ text "Entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ." ]
                 , div [ class "control half-width-control" ]
                     [ input
                         [ classList
@@ -68,9 +71,9 @@ viewKind model =
             ]
         , div [ class "field", style "margin-top" "1.5rem" ]
             [ label [ class "label" ]
-                [ text "Kindergeld Empfänger "
-                , showTooltip "Elternteil, der das Kindergeld für das Kind erhält"
-                ]
+                [ text "Wer erhält das Kindergeld?" ]
+            , p [ class "asgla-help asgla-help-top" ]
+                [ text "Bitte prüfen: Vorausgewählt ist die Mutter. Wählen Sie den Vater, falls er das ", skriptLink "kindergeldverrechnung" "Kindergeld", text " erhält." ]
             , div [ class "control half-width-control" ]
                 [ div [ class "select is-fullwidth" ]
                     [ select
@@ -90,49 +93,59 @@ viewKind model =
             ]
         , div [ class "field", style "margin-top" "1.5rem" ]
             [ label [ class "label" ]
-                [ text "Kind Einkünfte (€) "
-                , showTooltip "Hierzu gehören zum Beispiel Ausbildungsgeld oder BAföG-Zahlungen, allerdings sind eigene Einkünfte des Kindes nur soweit anzusetzen, wie es unter Berücksichtigung der wirtschaftlichen Verhältnisse der Billigkeit entspricht. Daher sind z.B. taschengeld-erhöhende Schülerjob-Zahlungen nicht anzusetzen und bei weiteren Einkünften ggfl. nicht der vollständige Betrag."
+                [ text "Eigene Einkünfte des Kindes (€) "
+                , span [ class "asgla-optional" ] [ text "optional" ]
+                , showTooltip "Hierzu gehören zum Beispiel Ausbildungsgeld oder BAföG-Zahlungen. Eigene Einkünfte des Kindes werden nur so weit angerechnet, wie es den Umständen angemessen ist. Zahlungen aus einem Schülerjob, die nur das Taschengeld erhöhen, werden zum Beispiel nicht angerechnet. Bei weiteren Einkünften wird unter Umständen nicht der volle Betrag angerechnet."
                 ]
+            , p [ class "asgla-help asgla-help-top" ]
+                [ text "Zum Beispiel Ausbildungsvergütung oder BAföG. Taschengeld aus einem Schülerjob wird in der Regel nicht angesetzt." ]
             , div [ class "control" ]
                 (List.indexedMap (viewKindEinkuenfte model) model.kind.einkuenfte)
             ]
         , div
-            [ class "field", style "margin-top" "1.5rem" ]
+            [ class "field asgla-subcard", style "margin-top" "1.5rem" ]
             [ label [ class "label" ]
-                [ text "Kind Mehrbedarf (€) "
-                , showTooltip "Monatlicher Mehrbedarf des Kindes (z.B. für besondere Ausgaben wie Nachhilfe, medizinische Kosten)"
+                [ text "Mehrbedarf des Kindes (€) "
+                , span [ class "asgla-optional" ] [ text "optional" ]
+                , showTooltip "Mehrbedarf: zusätzliche Kosten des Kindes, die regelmäßig pro Monat anfallen, z. B. Nachhilfe oder Zahnspange."
                 ]
+            , p [ class "asgla-help asgla-help-top" ]
+                [ text "Regelmäßige zusätzliche Kosten pro Monat (", skriptLink "mehrbedarf" "Mehrbedarf", text "), z. B. für Nachhilfe oder medizinische Behandlungen." ]
             , div [ class "control" ]
                 (List.indexedMap (viewBedarf Mehrbedarf model) model.kind.mehrbedarf)
             ]
-        , div [ class "field" ]
+        , div [ class "field asgla-subcard" ]
             [ label [ class "label" ]
-                [ text "Kind Sonderbedarf (€) "
-                , showTooltip "Einmaliger Sonderbedarf des Kindes (z.B. für größere Anschaffungen oder besondere Ereignisse)"
+                [ text "Sonderbedarf des Kindes (€) "
+                , span [ class "asgla-optional" ] [ text "optional" ]
+                , showTooltip "Sonderbedarf: zusätzliche Kosten des Kindes, die einmalig anfallen, z. B. für eine größere Anschaffung."
                 ]
+            , p [ class "asgla-help asgla-help-top" ]
+                [ text "Einmalige Kosten (", skriptLink "sonderbedarf" "Sonderbedarf", text "), z. B. für eine größere Anschaffung." ]
             , div [ class "control" ]
                 (List.indexedMap (viewBedarf Sonderbedarf model) model.kind.sonderbedarf)
             ]
-        , div [ class "field" ]
+        , div [ class "field asgla-subcard" ]
             [ label [ class "label" ]
-                [ text "Weitere bereits erbrachte Leistungen der Eltern (€) "
+                [ text "Bereits erbrachte Leistungen der Eltern (€) "
+                , span [ class "asgla-optional" ] [ text "optional" ]
                 , showTooltip "Weitere bereits erbrachte Leistungen der Eltern (z.B. Kleidung, Essensgeld (Kita, Schule))"
                 ]
+            , p [ class "asgla-help asgla-help-top" ]
+                [ text "Was Sie bereits bezahlt haben, z. B. Kleidung oder Essensgeld in Kita oder Schule." ]
             , div [ class "control" ]
                 (List.indexedMap (viewBedarf ErbrachteLeistungen model) model.kind.erbrachteLeistungen)
             ]
-        , label [ class "checkbox label" ]
+        , label [ class "checkbox label asgla-checkbox-kind" ]
             [ input
                 [ type_ "checkbox"
                 , checked model.customRegelbedarf
                 , onClick (ToggleView ToggleCustomRegelbedarf)
-                , style "transform" "scale(1.75)"
                 , style "margin-right" "0.5rem"
-                , style "margin-top" "0.5rem"
                 ]
                 []
-            , text "   Stattdessen individuellen Regelbedarf festsetzen"
-            , showTooltip "Der ASGLA-Rechner setzt automatisch den Regelbedarf nach der Düsseldorfer Tabelle an.\n\nDa die Tabelle nur ein Nettoeinkommen bis 11.200 EUR berücksichtigt, müssen Eltern mit einem höheren Nettoeinkommen einen individuellen Bedarf ansetzen, der die Tabelle denklogisch unter Berücksichtigung des jeweiligen Einzelfalles fortsetzt.\n\nZudem wird nach den Leitlinien des OLG Naumburg in Sachsen-Anhalt kein Bedarfskontrollbetrag angewendet. Für Eltern in deren OLG-Bezirk der Bedarfskontrollbetrag angewendet wird, kann dieser durch Ansetzen eines individuellen Regelbedarfs berücksichtigt werden."
+            , span [] [ text " Stattdessen einen individuellen Regelbedarf festsetzen" ]
+            , showTooltip "Der Regelbedarf ist der übliche monatliche Betrag, den ein Kind laut Düsseldorfer Tabelle braucht. Der Rechner setzt ihn automatisch an. Die Tabelle endet bei einem Nettoeinkommen von 11.200 EUR. Bei höherem Einkommen können Sie hier einen eigenen Betrag festlegen."
             ]
         , if model.customRegelbedarf then
             viewIndividuelleRegelbedarf model
@@ -154,12 +167,16 @@ moneyHelp value =
 
 requiredMoneyHelp : String -> Html Msg
 requiredMoneyHelp value =
-    case validateRequiredMoney value of
-        Just message ->
-            p [ class "help is-danger" ] [ text message ]
+    if String.trim value == "" then
+        p [ class "help" ] [ text "Tragen Sie hier den monatlichen Betrag in Euro ein, z. B. 900." ]
 
-        Nothing ->
-            text ""
+    else
+        case validateRequiredMoney value of
+            Just message ->
+                p [ class "help is-danger" ] [ text message ]
+
+            Nothing ->
+                text ""
 
 
 
@@ -194,40 +211,48 @@ viewBedarf bedarfsTyp model index eingabe =
                 ErbrachteLeistungen ->
                     "erbrachteLeistungenBezahltVon" ++ String.fromInt index
     in
-    div [ class "field has-addons entry-row", style "flex-wrap" "wrap", style "align-items" "flex-start" ]
-        ([ div [ class "control entry-cost", style "width" "20%" ]
-            [ input
-                [ classList
-                    [ ( "input", True )
-                    , ( "entry-input", True )
-                    , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
+    div [ class "entry-row" ]
+        [ div [ class "field has-addons entry-controls" ]
+            ([ div [ class "control entry-cost" ]
+                [ input
+                    [ classList
+                        [ ( "input", True )
+                        , ( "entry-input", True )
+                        , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
+                        ]
+                    , type_ "text"
+                    , placeholder "z. B. 120"
+                    , value eingabe.kosten
+                    , onInput (\newKosten -> UpdateKindDaten (ChangeBedarf (UpdateBedarf bedarfsTyp index { eingabe | kosten = newKosten })))
                     ]
-                , type_ "text"
-                , placeholder "Kosten (€)"
-                , value eingabe.kosten
-                , onInput (\newKosten -> UpdateKindDaten (ChangeBedarf (UpdateBedarf bedarfsTyp index { eingabe | kosten = newKosten })))
+                    []
                 ]
-                []
-            ]
-        , div [ class "control entry-label", style "width" "38%" ]
-            [ input
-                [ class "input entry-input"
-                , type_ "text"
-                , placeholder "z.B. Musikschule"
-                , value eingabe.bezeichnung
-                , onInput (\newBezeichnung -> UpdateKindDaten (ChangeBedarf (UpdateBedarf bedarfsTyp index { eingabe | bezeichnung = newBezeichnung })))
+            , div [ class "control entry-label" ]
+                [ input
+                    [ class "input entry-input"
+                    , type_ "text"
+                    , placeholder "z. B. Musikschule"
+                    , value eingabe.bezeichnung
+                    , onInput (\newBezeichnung -> UpdateKindDaten (ChangeBedarf (UpdateBedarf bedarfsTyp index { eingabe | bezeichnung = newBezeichnung })))
+                    ]
+                    []
                 ]
-                []
             ]
-        ]
-            ++ viewEntryActionButtons
-                { isRemovable = List.length typeList > 1
-                , isAtLimit = List.length typeList >= 5
-                , onRemove = UpdateKindDaten (ChangeBedarf (RemoveBedarf bedarfsTyp index))
-                , onAdd = UpdateKindDaten (ChangeBedarf (AddBedarf bedarfsTyp))
-                }
-            ++ [ div [ class "control", style "flex-basis" "100%", style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
-            [ div [ style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
+                ++ viewEntryActionButtons
+                    { isRemovable = List.length typeList > 1
+                    , isAtLimit = List.length typeList >= 5
+                    , onRemove = UpdateKindDaten (ChangeBedarf (RemoveBedarf bedarfsTyp index))
+                    , onAdd = UpdateKindDaten (ChangeBedarf (AddBedarf bedarfsTyp))
+                    }
+            )
+        , if String.trim eingabe.kosten == "" then
+            text ""
+
+          else
+            div [ class "control asgla-bezahlt", style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem", style "margin-top" "0.5rem" ]
+            [ p [ class "asgla-help", style "flex-basis" "100%", style "margin-bottom" "0" ]
+                [ text "Wählen Sie, wer die Kosten schon getragen hat. Das beeinflusst das Ergebnis." ]
+            , div [ style "display" "flex", style "flex-wrap" "wrap", style "align-items" "center", style "gap" "1rem" ]
                 [ span [ class "has-text-weight-light", style "white-space" "nowrap" ]
                     [ text "Bereits bezahlt von:" ]
                 , div [ class "field is-grouped" ]
@@ -324,7 +349,6 @@ viewBedarf bedarfsTyp model index eingabe =
         , div [ style "flex-basis" "100%" ]
             [ moneyHelp eingabe.kosten ]
         ]
-        )
 
 
 viewKindEinkuenfte : Model -> Int -> StringFieldType -> Html Msg
@@ -336,42 +360,43 @@ viewKindEinkuenfte model index eingabe =
         typeList =
             modelPerson.einkuenfte
     in
-    div [ class "field has-addons entry-row", style "flex-wrap" "wrap", style "align-items" "flex-start" ]
-        ([ div [ class "control entry-cost", style "width" "20%" ]
-            [ input
-                [ classList
-                    [ ( "input", True )
-                    , ( "entry-input", True )
-                    , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
+    div [ class "entry-row" ]
+        [ div [ class "field has-addons entry-controls" ]
+            ([ div [ class "control entry-cost" ]
+                [ input
+                    [ classList
+                        [ ( "input", True )
+                        , ( "entry-input", True )
+                        , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
+                        ]
+                    , type_ "text"
+                    , placeholder "z. B. 120"
+                    , value eingabe.kosten
+                    , onInput (\newKosten -> UpdateKindDaten (UpdateEinkuenfte index { eingabe | kosten = newKosten }))
                     ]
-                , type_ "text"
-                , placeholder "Kosten (€)"
-                , value eingabe.kosten
-                , onInput (\newKosten -> UpdateKindDaten (UpdateEinkuenfte index { eingabe | kosten = newKosten }))
+                    []
                 ]
-                []
-            ]
-        , div [ class "control entry-label", style "width" "38%" ]
-            [ input
-                [ class "input entry-input"
-                , type_ "text"
-                , placeholder "Bezeichnung"
-                , value eingabe.bezeichnung
-                , onInput (\newBezeichnung -> UpdateKindDaten (UpdateEinkuenfte index { kosten = eingabe.kosten, bezeichnung = newBezeichnung }))
+            , div [ class "control entry-label" ]
+                [ input
+                    [ class "input entry-input"
+                    , type_ "text"
+                    , placeholder "Bezeichnung"
+                    , value eingabe.bezeichnung
+                    , onInput (\newBezeichnung -> UpdateKindDaten (UpdateEinkuenfte index { kosten = eingabe.kosten, bezeichnung = newBezeichnung }))
+                    ]
+                    []
                 ]
-                []
             ]
+                ++ viewEntryActionButtons
+                    { isRemovable = List.length typeList > 1
+                    , isAtLimit = List.length typeList >= 5
+                    , onRemove = UpdateKindDaten (RemoveEinkuenfte index)
+                    , onAdd = UpdateKindDaten AddEinkuenfte
+                    }
+            )
+        , div [ style "flex-basis" "100%" ]
+            [ moneyHelp eingabe.kosten ]
         ]
-            ++ viewEntryActionButtons
-                { isRemovable = List.length typeList > 1
-                , isAtLimit = List.length typeList >= 5
-                , onRemove = UpdateKindDaten (RemoveEinkuenfte index)
-                , onAdd = UpdateKindDaten AddEinkuenfte
-                }
-            ++ [ div [ style "flex-basis" "100%" ]
-                    [ moneyHelp eingabe.kosten ]
-               ]
-        )
 
 
 viewIndividuelleRegelbedarf : Model -> Html Msg
@@ -385,10 +410,10 @@ viewIndividuelleRegelbedarf model =
                 [ classList
                     [ ( "input", True )
                     , ( "is-fullwidth", True )
-                    , ( "is-danger", validateRequiredMoney model.kind.regelbedarf /= Nothing )
+                    , ( "is-danger", validateMoney model.kind.regelbedarf /= Nothing )
                     ]
                 , type_ "text"
-                , placeholder "z.B. 1500"
+                , placeholder "z. B. 900"
                 , value model.kind.regelbedarf
                 , onInput (\val -> UpdateKindDaten (UpdateRegelbedarf val))
                 ]
@@ -396,5 +421,5 @@ viewIndividuelleRegelbedarf model =
             , requiredMoneyHelp model.kind.regelbedarf
             ]
         , div [ style "color" "red", style "margin-top" "0.5rem" ]
-            [ text "Bitte nutzen Sie diese Funktion nur, wenn Sie einen ausnahmsweisen Sonderfall haben!" ]
+            [ text "Bitte nutzen Sie diese Funktion nur, wenn bei Ihnen ein Sonderfall vorliegt." ]
         ]

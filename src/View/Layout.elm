@@ -1,10 +1,11 @@
 module View.Layout exposing (tabContent, viewFooter, viewForm, viewHeader)
 
-import Html exposing (Html, a, div, form, h1, h2, i, img, label, li, span, text, textarea, ul)
-import Html.Attributes exposing (alt, class, classList, href, placeholder, rel, src, style, target, type_, value)
+import Html exposing (Html, a, button, div, form, h1, h2, h3, h4, header, i, img, label, li, ol, p, section, span, text, textarea)
+import Html.Attributes exposing (alt, attribute, class, classList, for, href, id, placeholder, rel, rows, src, style, target, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types exposing (AktionToggleViewComponent(..), AktionUpdate(..), Model, Msg(..), Person(..), Tab(..))
-import Utils.Validation exposing (inputAgeOrBirthdayToAge)
+import Utils.Format exposing (formatInputToFloat)
+import Utils.Validation exposing (inputAgeOrBirthdayToAge, validateAgeOrBirthday)
 import View.Components exposing (saveModal, viewCheckboxDurchschnittseinkommen, viewMonth, viewYear)
 import View.Eltern exposing (viewEltern)
 import View.Kind exposing (viewKind)
@@ -12,80 +13,171 @@ import View.Kind exposing (viewKind)
 
 
 -- View Module für Layout Komponente
--- Hauptansicht des Formulars
+-- Hauptansicht des Formulars: Zeitraum (Schritt 1), Einkünfte der Eltern (Schritt 2),
+-- Bedarf des Kindes (Schritt 3), danach Berechnen / Zwischenspeichern
 
 
 viewForm : Model -> Html Msg
 viewForm model =
-    form
-        [ style "margin-top" "2rem" ]
-        [ div [ class "columns" ]
-            (if model.durchschnittseinkommen then
-                [ viewYear "column is-12" model ]
+    form [ class "asgla-form" ]
+        [ p [ class "asgla-hinweis" ]
+            [ text "Felder mit * sind Pflichtfelder. Felder mit „optional“ dürfen leer bleiben." ]
+        , viewSchritt "1"
+            "Zeitraum wählen"
+            "Wählen Sie den Monat und das Jahr der Berechnung. Bei der Durchschnittsberechnung zählt nur das Jahr."
+            [ div [ class "columns is-multiline" ]
+                (if model.durchschnittseinkommen then
+                    [ viewYear "column is-12" model ]
 
-             else
-                [ viewMonth "column is-half" model
-                , viewYear "column is-half" model
-                ]
-            )
-        , div [ class "columns" ]
-            [ div [ class "column is-half" ]
-                [ viewCheckboxDurchschnittseinkommen model ]
-            ]
-        , viewTabs model
-        , div [ class "field" ]
-            [ label [ class "label", style "margin-top" "2rem" ] [ text "Zusätzliche Informationen" ]
-            , div [ class "control" ]
-                [ textarea
-                    [ class "textarea"
-                    , placeholder "Geben Sie hier zusätzliche Informationen oder Anmerkungen ein..."
-                    , onInput (Update << UpdateFreitext)
-                    , value model.freitext
+                 else
+                    [ viewMonth "column is-half" model
+                    , viewYear "column is-half" model
                     ]
-                    []
+                )
+            , div [ class "columns" ]
+                [ div [ class "column is-full" ]
+                    [ viewCheckboxDurchschnittseinkommen model ]
                 ]
+            ]
+        , viewSchrittFuerTab model
+        , div [ class "asgla-freitext" ]
+            [ label [ class "label", for "freitext" ]
+                [ text "Zusätzliche Informationen"
+                , span [ class "asgla-optional" ] [ text "optional" ]
+                ]
+            , p [ class "asgla-help" ]
+                [ text "Zum Beispiel Hinweise zu besonderen Umständen." ]
+            , textarea
+                [ id "freitext"
+                , class "textarea"
+                , rows 3
+                , placeholder "Ihre Anmerkungen"
+                , onInput (Update << UpdateFreitext)
+                , value model.freitext
+                ]
+                []
             ]
         , if model.modalExportOpen then
             saveModal model
 
           else
             text ""
-        , div [ class "field" ]
-            [ if model.durchschnittseinkommen && hasStufensprungAlterAmJahresende model then
-                div [ class "notification is-warning is-light" ]
-                    [ text "Hinweis: Das Kind ist zum 31.12. des zu berechnenden Jahres 6, 12 oder 18 Jahre alt. Dies bedeutet, im laufenden Jahr liegt ein Stufensprung in der Düsseldorfer Tabelle vor. Aufgrund dessen sind 2 Berechnungen vorzunehmen!" ]
+        , if model.durchschnittseinkommen && hasStufensprungAlterAmJahresende model then
+            div [ class "notification is-warning is-light asgla-stufensprung" ]
+                [ text "Hinweis: Das Kind ist zum 31.12. des zu berechnenden Jahres 6, 12 oder 18 Jahre alt. Dies bedeutet, im laufenden Jahr liegt ein Stufensprung beim Bedarf des Kindes vor. Aufgrund dessen sind 2 Berechnungen vorzunehmen!" ]
 
-              else
-                text ""
-            , div
-                [ class "is-flex is-justify-content-space-between is-align-items-center"
-                , style "margin-bottom" "1rem"
-                ]
-                [ -- LEFT SIDE
-                  div [ class "buttons action-buttons" ]
-                    [ div [ class "control" ]
-                        [ Html.button
-                            [ class "button is-medium calculate-button"
-                            , type_ "button"
-                            , onClick (ToggleView ViewErgebnis)
-                            ]
-                            [ span [ class "icon" ] [ i [ class "fas fa-calculator", Html.Attributes.attribute "aria-hidden" "true" ] [] ]
-                            , span [] [ text "Berechnen" ]
-                            ]
-                        ]
-                    , div [ class "control" ]
-                        [ Html.button
-                            [ class "button save-button"
-                            , type_ "button"
-                            , onClick (ToggleView ToggleSaveModal)
-                            ]
-                            [ span [ class "icon" ] [ i [ class "fas fa-floppy-disk", Html.Attributes.attribute "aria-hidden" "true" ] [] ]
-                            , span [] [ text "Eingabe Zwischenspeichern" ]
-                            ]
-                        ]
+          else
+            text ""
+        , case model.error of
+            Just errorMsg ->
+                div [ class "notification form-error", attribute "role" "alert" ]
+                    [ h4 [ class "title is-5" ] [ text "Bitte prüfen Sie Ihre Eingaben" ]
+                    , p [] [ text errorMsg ]
                     ]
+
+            Nothing ->
+                text ""
+        , viewFortschritt model
+        , p [ class "asgla-disclaimer" ] [ text "Der Rechner liefert eine Einschätzung und ersetzt keine rechtliche Beratung." ]
+        , div [ class "asgla-actions" ]
+            [ button
+                [ class "button calculate-button"
+                , type_ "button"
+                , onClick (ToggleView ViewErgebnis)
+                ]
+                [ span [ class "icon" ] [ i [ class "fas fa-calculator", attribute "aria-hidden" "true" ] [] ]
+                , span [] [ text "Berechnen" ]
+                ]
+            , button
+                [ class "button save-button"
+                , type_ "button"
+                , onClick (ToggleView ToggleSaveModal)
+                , attribute "title" "Speichert Ihre Eingaben als Datei oder QR-Code, damit Sie später weiterarbeiten können."
+                ]
+                [ span [ class "icon" ] [ i [ class "fas fa-floppy-disk", attribute "aria-hidden" "true" ] [] ]
+                , span [] [ text "Eingabe zwischenspeichern" ]
                 ]
             ]
+        ]
+
+
+{-| Fortschrittsanzeige vor dem Berechnen-Button: zeigt, was noch fehlt.
+-}
+viewFortschritt : Model -> Html Msg
+viewFortschritt model =
+    let
+        hatEinkommen =
+            [ model.vater.haupttaetigkeit, model.mutter.haupttaetigkeit ]
+                |> List.filterMap formatInputToFloat
+                |> List.any (\v -> v > 0)
+
+        hatAlter =
+            validateAgeOrBirthday model.kind.alterInput == Nothing
+
+        punkte =
+            [ ( True, "Zeitraum gewählt", "" )
+            , ( hatEinkommen, "Einkommen eingetragen", "Einkommen von Vater oder Mutter eintragen (Reiter „Vater“ oder „Mutter“)" )
+            , ( hatAlter, "Alter des Kindes eingetragen", "Alter des Kindes eintragen (Reiter „Kind“)" )
+            ]
+
+        fehlend =
+            List.filter (\( ok, _, _ ) -> not ok) punkte
+    in
+    div [ class "asgla-fortschritt", attribute "aria-live" "polite" ]
+        [ p [ class "asgla-fortschritt-titel" ]
+            [ text
+                (if List.isEmpty fehlend then
+                    "Alles ausgefüllt. Sie können jetzt berechnen."
+
+                 else
+                    "Vor dem Berechnen fehlt noch:"
+                )
+            ]
+        , Html.ul [ class "asgla-fortschritt-liste" ]
+            (List.map
+                (\( ok, erledigt, offen ) ->
+                    li [ classList [ ( "is-done", ok ), ( "is-open", not ok ) ] ]
+                        [ span [ class "asgla-fortschritt-icon", attribute "aria-hidden" "true" ]
+                            [ i [ class (if ok then "fas fa-circle-check" else "far fa-circle") ] [] ]
+                        , text (if ok then erledigt else offen)
+                        ]
+                )
+                punkte
+            )
+        ]
+
+
+{-| Schrittkarte für die Reiter: Vater/Mutter = Schritt 2, Kind = Schritt 3.
+-}
+viewSchrittFuerTab : Model -> Html Msg
+viewSchrittFuerTab model =
+    case model.activeTab of
+        Right ->
+            viewSchritt "3"
+                "Bedarf des Kindes eintragen"
+                "Tragen Sie das Alter des Kindes ein. Zusätzliche Kosten sind optional."
+                [ viewTabs model ]
+
+        _ ->
+            viewSchritt "2"
+                "Einkünfte der Eltern eintragen"
+                "Tragen Sie das monatliche Netto-Einkommen von Vater und Mutter ein. Ungefähre Beträge reichen aus."
+                [ viewTabs model ]
+
+
+{-| Ein nummerierter Abschnitt mit Überschrift und Hilfesatz in einfacher Sprache.
+-}
+viewSchritt : String -> String -> String -> List (Html Msg) -> Html Msg
+viewSchritt nummer titel hilfe inhalt =
+    section [ class "asgla-step" ]
+        [ div [ class "asgla-step-header" ]
+            [ span [ class "asgla-step-number", attribute "aria-hidden" "true" ] [ text nummer ]
+            , div []
+                [ h2 [ class "asgla-step-title" ] [ text titel ]
+                , p [ class "asgla-step-help" ] [ text hilfe ]
+                ]
+            ]
+        , div [] inhalt
         ]
 
 
@@ -97,25 +189,20 @@ hasStufensprungAlterAmJahresende model =
 
 
 
--- Header mit Logo und Titel
+-- Kopfbereich: Logos, Titel, Untertitel, Link, Schrittleiste
 
 
 viewHeader : Html Msg
 viewHeader =
-    div [ class "box mb-5" ]
-        [ -- DEVELOPMENT WARNING
-          -- Comment the following line to remove the development warning before deploying to production (https://asgla-rechner.jtc.uni-halle.de)
-          --developmentWarning
-          -- MOBILE VERSION
-          --,
+    header [ class "box mb-5 asgla-header" ]
+        [ -- MOBILE VERSION
           div [ class "is-hidden-tablet" ]
             [ div [ class "columns is-mobile is-vcentered" ]
                 [ div [ class "column" ]
                     [ img [ src "assets/JTCLogo_klein.png", alt "JTC Logo", style "max-height" "50px" ] [] ]
                 , div [ class "column" ]
                     [ div [ class "has-text-right" ]
-                        [ img [ src "assets/MLULogo_klein.png", alt "MLU Logo", style "max-height" "25px" ] []
-                        ]
+                        [ img [ src "assets/MLULogo_klein.png", alt "MLU Logo", style "max-height" "25px" ] [] ]
                     ]
                 ]
             , div [ class "columns is-mobile has-text-right", style "margin-top" "-3rem" ]
@@ -126,13 +213,10 @@ viewHeader =
                 ]
             , div [ class "columns is-mobile is-vcentered" ]
                 [ div [ class "column is-8" ]
-                    [ h1 [ class "title is-4 mb-3" ]
-                        [ text "ASGLA-Rechner" ]
-                    ]
+                    [ h1 [ class "title is-4 mb-3" ] [ text "ASGLA-Rechner" ] ]
                 , div [ class "column" ]
-                    [ div [ class "has-text-right", style "margin-top" "0rem" ]
-                        [ img [ src "assets/vignette.png", alt "ASGLA-Rechner", style "max-height" "120px" ] []
-                        ]
+                    [ div [ class "has-text-right" ]
+                        [ img [ src "assets/vignette.png", alt "", style "max-height" "120px" ] [] ]
                     ]
                 ]
             , div [ class "columns is-mobile" ]
@@ -143,17 +227,8 @@ viewHeader =
                 ]
             , div [ class "columns is-mobile" ]
                 [ div [ class "column", style "margin-top" "-2rem" ]
-                    [ a
-                        [ class "button jtc-primary mt-2"
-                        , href "https://jtc.uni-halle.de/asgla-rechner/"
-                        , target "_blank"
-                        , rel "noopener noreferrer"
-                        ]
-                        [ text "Mehr Informationen" ]
-                    ]
+                    [ infoButton ]
                 ]
-            , div [ class "has-text-centered" ]
-                []
             ]
 
         -- DESKTOP VERSION
@@ -172,44 +247,68 @@ viewHeader =
                 ]
             , div [ class "columns is-vcentered", style "padding" "1rem" ]
                 [ div [ class "column" ]
-                    [ h1 [ class "title is-3 mb-4" ]
-                        [ text "ASGLA-Rechner" ]
+                    [ h1 [ class "title is-3 mb-4" ] [ text "ASGLA-Rechner" ]
                     , h2 [ class "subtitle is-5 mb-3" ]
                         [ text "Zur Berechnung des Ausgleichsanspruchs für den Unterhalt im Wechselmodell" ]
-                    , a
-                        [ class "button jtc-primary mt-3"
-                        , href "https://jtc.uni-halle.de/asgla-rechner/"
-                        , target "_blank"
-                        , rel "noopener noreferrer"
-                        ]
-                        [ text "Mehr Informationen" ]
+                    , div [ class "mt-3" ] [ infoButton ]
                     ]
                 , div [ class "column is-narrow" ]
-                    [ img [ src "assets/vignette.png", alt "Illustration", style "max-height" "200px" ] [] ]
+                    [ img [ src "assets/vignette.png", alt "", style "max-height" "200px" ] [] ]
+                ]
+            ]
+
+        -- Schrittleiste (einmalig, gilt für beide Ansichten)
+        , div [ class "asgla-so-gehts" ]
+            [ p [ class "asgla-so-gehts-title" ] [ text "So geht’s:" ]
+            , ol [ class "asgla-steps" ]
+                [ viewSchrittLeiste "1" "fa-calendar-days" "Zeitraum wählen"
+                , viewSchrittLeiste "2" "fa-euro-sign" "Einkünfte der Eltern"
+                , viewSchrittLeiste "3" "fa-child" "Bedarf des Kindes"
+                , viewSchrittLeiste "" "fa-calculator" "Berechnen"
                 ]
             ]
         ]
 
 
-developmentWarning : Html Msg
-developmentWarning =
-    div [ class "notification is-danger is-light mb-4" ]
-        [ div
-            [ class "is-flex is-align-items-center is-justify-content-space-between"
-            , style "gap" "0.75rem"
-            , style "flex-wrap" "wrap"
-            ]
-            [ span []
-                [ text "Dies ist eine Entwicklungsseite. Bitte nutzen Sie den offiziellen ASGLA-Rechner." ]
-            , a
-                [ class "button is-danger is-small"
-                , href "https://asgla-rechner.jtc.uni-halle.de"
-                , target "_blank"
-                , rel "noopener noreferrer"
-                ]
-                [ text "Zum Rechner" ]
-            ]
+infoButton : Html Msg
+infoButton =
+    a
+        [ class "button jtc-primary"
+        , href "https://jtc.uni-halle.de/asgla-rechner/"
+        , target "_blank"
+        , rel "noopener noreferrer"
         ]
+        [ text "Mehr Informationen", externerHinweis ]
+
+
+viewSchrittLeiste : String -> String -> String -> Html Msg
+viewSchrittLeiste nummer icon titel =
+    li [ class "asgla-step-chip" ]
+        [ span [ class "asgla-step-chip-nr" ] [ text nummer ]
+        , i [ class ("fas " ++ icon), attribute "aria-hidden" "true" ] []
+        , span [] [ text titel ]
+        ]
+
+
+
+-- Kennzeichnung externer Links (nur für Screenreader)
+
+
+externerHinweis : Html msg
+externerHinweis =
+    span [ class "is-sr-only" ] [ text " (öffnet in neuem Tab)" ]
+
+
+footerLink : String -> String -> Html Msg
+footerLink url titel =
+    a
+        [ class "button is-text footer-link"
+        , style "font-size" "14px"
+        , href url
+        , target "_blank"
+        , rel "noopener noreferrer"
+        ]
+        [ text titel, externerHinweis ]
 
 
 viewFooter : Html Msg
@@ -233,38 +332,10 @@ viewFooter =
                 , -- Right side: Footer Links
                   div [ class "column" ]
                     [ div [ class "buttons is-pulled-right", style "font-size" "0rem" ]
-                        [ a
-                            [ class "button is-text footer-link"
-                            , style "font-size" "14px"
-                            , Html.Attributes.href "https://jtc.uni-halle.de/impressum/"
-                            , Html.Attributes.target "_blank"
-                            , Html.Attributes.rel "noopener noreferrer"
-                            ]
-                            [ text "Impressum" ]
-                        , a
-                            [ class "button is-text footer-link"
-                            , style "font-size" "14px"
-                            , Html.Attributes.href "https://jtc.uni-halle.de/datenschutz/"
-                            , Html.Attributes.target "_blank"
-                            , Html.Attributes.rel "noopener noreferrer"
-                            ]
-                            [ text "Datenschutz" ]
-                        , a
-                            [ class "button is-text footer-link"
-                            , style "font-size" "14px"
-                            , Html.Attributes.href "https://jtc.uni-halle.de/kontakt/"
-                            , Html.Attributes.target "_blank"
-                            , Html.Attributes.rel "noopener noreferrer"
-                            ]
-                            [ text "Kontakt" ]
-                        , a
-                            [ class "button is-text footer-link"
-                            , style "font-size" "14px"
-                            , Html.Attributes.href "https://jtc.uni-halle.de/asgla-rechner/"
-                            , Html.Attributes.target "_blank"
-                            , Html.Attributes.rel "noopener noreferrer"
-                            ]
-                            [ text "Link zum Projekt" ]
+                        [ footerLink "https://jtc.uni-halle.de/impressum/" "Impressum"
+                        , footerLink "https://jtc.uni-halle.de/datenschutz/" "Datenschutz"
+                        , footerLink "https://jtc.uni-halle.de/kontakt/" "Kontakt"
+                        , footerLink "https://jtc.uni-halle.de/asgla-rechner/" "Link zum Projekt"
                         ]
                     ]
                 ]
@@ -273,124 +344,85 @@ viewFooter =
 
 
 
--- Tab-Ansicht für verschiedene Eingabebereiche
--- main view function for tabs
+-- Tabs für Vater, Mutter und Kind (alle drei müssen ausgefüllt werden)
 
 
 viewTabs : Model -> Html Msg
 viewTabs model =
     div []
-        [ -- MOBILE (scrollable) - visible only on small screens
-          div [ class "tabs-mobile", style "margin-bottom" "0" ]
-            [ div [ class "tabs m-0" ]
-                [ ul []
-                    [ tabItem Left "Einkünfte Vater" "fas fa-user" model.activeTab
-                    , tabItem Middle "Einkünfte Mutter" "fas fa-user" model.activeTab
-                    , tabItem Right "Bedarf Kind" "fas fa-child" model.activeTab
-                    ]
-                ]
+        [ p [ class "asgla-tabs-hint" ]
+            [ i [ class "fas fa-circle-info", attribute "aria-hidden" "true" ] []
+            , text " Bitte füllen Sie alle drei Reiter aus: Vater und Mutter (Schritt 2) sowie das Kind (Schritt 3)."
             ]
-
-        -- DESKTOP/TABLET (fullwidth)
-        , div [ class "tabs-desktop" ]
-            [ div [ class "tabs is-fullwidth m-0" ]
-                [ ul []
-                    [ tabItem Left "Einkünfte Vater" "fas fa-user" model.activeTab
-                    , tabItem Middle "Einkünfte Mutter" "fas fa-user" model.activeTab
-                    , tabItem Right "Bedarf Kind" "fas fa-child" model.activeTab
-                    ]
-                ]
+        , div
+            [ class "asgla-tabs"
+            , attribute "role" "tablist"
+            , attribute "aria-label" "Eingabebereiche"
             ]
-
-        -- shared tab content
+            [ tabButton Left "Einkünfte Vater" "fa-user" model.activeTab
+            , tabButton Middle "Einkünfte Mutter" "fa-user" model.activeTab
+            , tabButton Right "Bedarf Kind" "fa-child" model.activeTab
+            ]
         , tabContent model.activeTab model
         ]
 
 
-
--- Einzelnes Tab-Item styling
-
-
-tabItem : Tab -> String -> String -> Tab -> Html Msg
-tabItem tab label icon active =
+tabButton : Tab -> String -> String -> Tab -> Html Msg
+tabButton tab titel icon aktiv =
     let
-        tabColor =
-            case tab of
-                Left ->
-                    "#69a6b4"
-
-                Middle ->
-                    "#f9a374"
-
-                Right ->
-                    "#bbddc1"
-
-        textColor =
-            "#1a1a1a"
-
-        isActive =
-            tab == active
-
-        liStyles =
-            [ style "background-color" tabColor
-            , style "border-radius" "8px 8px 0 0"
-            , style "cursor" "pointer"
-            ]
+        istAktiv =
+            tab == aktiv
     in
-    li (liStyles ++ [ classList [ ( "tab-active", isActive ) ], onClick (ToggleView (Select tab)) ])
-        [ a
-            ([ style "color" textColor ]
-                ++ (if isActive then
-                        [ Html.Attributes.attribute "aria-current" "page" ]
+    button
+        [ type_ "button"
+        , class ("asgla-tab " ++ accentKlasse tab)
+        , classList [ ( "is-active", istAktiv ) ]
+        , attribute "role" "tab"
+        , attribute "aria-selected"
+            (if istAktiv then
+                "true"
 
-                    else
-                        []
-                   )
+             else
+                "false"
             )
-            [ span [ class "icon" ] [ i [ class icon, Html.Attributes.attribute "aria-hidden" "true" ] [] ]
-            , span [] [ text label ]
-            ]
+        , onClick (ToggleView (Select tab))
         ]
+        [ span [ class "icon" ] [ i [ class ("fas " ++ icon), attribute "aria-hidden" "true" ] [] ]
+        , span [] [ text titel ]
+        ]
+
+
+accentKlasse : Tab -> String
+accentKlasse tab =
+    case tab of
+        Left ->
+            "asgla-accent-vater"
+
+        Middle ->
+            "asgla-accent-mutter"
+
+        Right ->
+            "asgla-accent-kind"
 
 
 tabContent : Tab -> Model -> Html Msg
 tabContent tab model =
-    let
-        bgColor =
-            case model.activeTab of
-                Left ->
-                    "rgba(9, 170, 195, 0.5)"
+    div [ class ("asgla-panel " ++ accentKlasse tab) ]
+        [ case tab of
+            Left ->
+                div []
+                    [ h3 [ class "asgla-panel-title" ] [ text "Vater - Einkünfte und Abzüge" ]
+                    , viewEltern model Vater
+                    ]
 
-                Middle ->
-                    "rgba(249, 163, 116, 0.5)"
+            Middle ->
+                div []
+                    [ h3 [ class "asgla-panel-title" ] [ text "Mutter - Einkünfte und Abzüge" ]
+                    , viewEltern model Mutter
+                    ]
 
-                Right ->
-                    "rgba(187, 221, 193, 0.5)"
-
-        content =
-            case tab of
-                Left ->
-                    div [ style "padding" "1.5rem" ]
-                        [ label [ class "title is-5" ] [ text "Vater - Einkünfte und Abzüge" ]
-                        , viewEltern model Vater
-                        ]
-
-                Middle ->
-                    div [ style "padding" "1.5rem" ]
-                        [ label [ class "title is-5" ] [ text "Mutter - Einkünfte und Abzüge" ]
-                        , viewEltern model Mutter
-                        ]
-
-                Right ->
-                    div [ style "padding" "1.5rem" ]
-                        [ label [ class "title is-5" ] [ text "Bedarf Kind" ]
-                        , viewKind model
-                        ]
-    in
-    div
-        [ style "background-color" bgColor
-        , style "border-radius" "0 0 8px 8px"
-        , style "overflow" "visible"
-        , style "color" "black"
+            Right ->
+                div []
+                    [ viewKind model
+                    ]
         ]
-        [ div [ class "p-4" ] [ content ] ]

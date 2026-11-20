@@ -421,7 +421,7 @@ update msg model =
                     in
                     if not (areInputsValid neuesBerechnungsModel) then
                         ( { neuesBerechnungsModel
-                            | error = Just "Bitte geben Sie mindestens ein Einkommen ein oder korrigieren Sie rot markierte Felder."
+                            | error = Just "Bitte tragen Sie im Reiter „Vater“ oder „Mutter“ mindestens ein Einkommen ein und füllen Sie im Reiter „Kind“ das Alter aus. Falls Felder rot markiert sind, korrigieren Sie bitte diese."
                             , showErgebnis = False
                           }
                         , Cmd.none
@@ -448,7 +448,7 @@ update msg model =
                         in
                         case regelbedarf of
                             Nothing ->
-                                ( { neuesBerechnungsModel | error = Just "Das Einkommen der Eltern übersteigt die Beträge für die Regelbedarfssätze aus der Düsseldorfer Tabelle. Bitte tragen Sie unter dem Reiter Kind einen individuellen Regelbedarf ein!", showErgebnis = False }, Cmd.none )
+                                ( { neuesBerechnungsModel | error = Just "Das Einkommen ist höher als die Werte, die der Rechner kennt. Bitte öffnen Sie den Reiter „Kind“ und tragen Sie dort unter „Stattdessen einen individuellen Regelbedarf festsetzen“ einen Betrag ein.", showErgebnis = False }, Cmd.none )
 
                             Just _ ->
                                 let
@@ -588,87 +588,15 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "ASGLA-Rechner"
     , body =
-        [ -- Desktop Version
-          section
-            [ class "section  is-hidden-mobile"
-            , style "background-image" "url('assets/background.png')"
-            , style "background-size" "cover"
-            , style "background-repeat" "no-repeat"
-            , style "background-position" "center"
-            , style "background-attachment" "fixed"
-            , style "position" "relative"
-            , style "background-color" "rgba(255, 255, 255)"
-            , style "min-height" "100vh"
-            , style "padding" "2rem"
-            ]
-            [ div
-                [ style "position" "absolute"
-                , style "top" "0"
-                , style "left" "0"
-                , style "right" "0"
-                , style "bottom" "0"
-                , style "background-color" "rgba(0, 0, 0, 0.4)"
-                , style "z-index" "1"
-                ]
-                []
-            , div
-                [ class "container"
-                , style "position" "relative"
-                , style "z-index" "2"
-                ]
-                [ div
-                    [ class "box"
-                    , style "background-color" " rgb(254, 234, 210)"
-                    , style "padding" "1.5rem"
-                    , style "margin-bottom" "1.5rem"
-                    , style "border-radius" "18px"
-                    ]
+        [ section [ class "section asgla-page" ]
+            [ div [ class "container asgla-container" ]
+                [ div [ class "box asgla-shell" ]
                     [ viewHeader
                     , ueberUnsSection model
                     , importFileSection model
                     , viewForm model
-                    , case model.error of
-                        Just msg ->
-                            div [ class "notification is-danger ", style "margin-top" "1rem" ] [ text msg ]
-
-                        Nothing ->
-                            text ""
                     , if model.showErgebnis then
-                        div [ class "box", style "margin" "1rem" ] [ showErgebnis model ]
-
-                      else
-                        text ""
-                    ]
-                ]
-            ]
-
-        -- Mobile Version
-        , section
-            [ class "section is-hidden-tablet"
-            , style "background-color" "rgb(254, 234, 210)"
-            , style "min-height" "100vh"
-            , style "padding" "0.5rem"
-            ]
-            [ div [ class "container" ]
-                [ div
-                    [ class "box"
-                    , style "background-color" "rgb(254, 234, 210)"
-                    , style "padding" "0.75rem"
-                    , style "margin-bottom" "0.75rem"
-                    , style "border-radius" "12px"
-                    ]
-                    [ viewHeader
-                    , ueberUnsSection model
-                    , importFileSection model
-                    , viewForm model
-                    , case model.error of
-                        Just msg ->
-                            div [ class "notification is-danger", style "margin-top" "1rem" ] [ text msg ]
-
-                        Nothing ->
-                            text ""
-                    , if model.showErgebnis then
-                        div [ class "box", style "margin" "1rem" ] [ showErgebnis model ]
+                        div [ class "box asgla-result" ] [ showErgebnis model ]
 
                       else
                         text ""
