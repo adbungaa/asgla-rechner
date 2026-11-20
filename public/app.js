@@ -1734,7 +1734,7 @@ app.ports.copyToClipboard.subscribe(function (text) {
 });
 
 // Open a static PDF as a temporary Blob URL in the browser PDF viewer.
-app.ports.openPdfBlob.subscribe(async function (pdfPath) {
+async function openPdfInTab(pdfPath) {
     const previewWindow = window.open("", "_blank");
 
     if (previewWindow) {
@@ -1767,6 +1767,194 @@ app.ports.openPdfBlob.subscribe(async function (pdfPath) {
         }
         //console.error("Error opening PDF:", error);
     }
+}
+
+// Skript als Slider von rechts (Markdown aus skript.md, gerendert mit marked).
+(function () {
+    var panel = null;
+    var lastFocus = null;
+
+    function loadMarked() {
+        if (window.marked) return Promise.resolve();
+        return new Promise(function (resolve, reject) {
+            var s = document.createElement("script");
+            s.src = "vendor/marked.min.js";
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    var WIDTH_KEY = "asgla-skript-breite";
+
+    function slug(text) {
+        return text.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+            .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function scrollToAnchor(id) {
+        if (!panel) return;
+        var el = panel.querySelector("#skript-" + id);
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.classList.add("skript-flash");
+            setTimeout(function () { el.classList.remove("skript-flash"); }, 1800);
+        }
+    }
+
+    function buildToc(body, nav) {
+        var list = document.createElement("ul");
+        var links = [];
+        var seen = {};
+        var heads = body.querySelectorAll("h2, h3, h4");
+        heads.forEach(function (h) {
+            var id = slug(h.textContent);
+            if (seen[id]) { seen[id] += 1; id = id + "-" + seen[id]; } else { seen[id] = 1; }
+            h.id = "skript-" + id;
+            if (h.tagName === "H4") return; // nur Anker, nicht im Inhaltsverzeichnis
+            var li = document.createElement("li");
+            li.className = h.tagName === "H3" ? "skript-toc-sub" : "";
+            var a = document.createElement("a");
+            a.href = "#" + h.id;
+            a.textContent = h.textContent;
+            a.addEventListener("click", function (e) {
+                e.preventDefault();
+                var det = a.closest("details");
+                if (det) det.removeAttribute("open");
+                h.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            li.appendChild(a);
+            list.appendChild(li);
+            links.push({ head: h, link: a });
+        });
+        nav.appendChild(list);
+
+        // Scrollspy: aktuelle Überschrift im Inhaltsverzeichnis markieren
+        function update() {
+            var top = body.getBoundingClientRect().top + 24;
+            var current = links[0];
+            links.forEach(function (l) { if (l.head.getBoundingClientRect().top <= top) current = l; });
+            links.forEach(function (l) {
+                var active = l === current;
+                l.link.classList.toggle("is-active", active);
+                if (active) l.link.setAttribute("aria-current", "location"); else l.link.removeAttribute("aria-current");
+            });
+            var summary = panel && panel.querySelector(".skript-toc-aktuell");
+            if (summary && current) summary.textContent = current.link.textContent;
+        }
+        body.addEventListener("scroll", update, { passive: true });
+        update();
+    }
+
+    function setupResize(handle, aside) {
+        var saved = null;
+        try { saved = parseInt(localStorage.getItem(WIDTH_KEY), 10); } catch (e) {}
+        if (saved) aside.style.width = Math.min(Math.max(saved, 320), window.innerWidth * 0.95) + "px";
+        function move(e) {
+            var w = Math.min(Math.max(window.innerWidth - e.clientX, 320), window.innerWidth * 0.95);
+            aside.style.width = w + "px";
+        }
+        function stop(e) {
+            handle.releasePointerCapture(e.pointerId);
+            handle.removeEventListener("pointermove", move);
+            handle.removeEventListener("pointerup", stop);
+            aside.classList.remove("is-resizing");
+            try { localStorage.setItem(WIDTH_KEY, String(parseInt(aside.style.width, 10))); } catch (err) {}
+        }
+        handle.addEventListener("pointerdown", function (e) {
+            e.preventDefault();
+            handle.setPointerCapture(e.pointerId);
+            aside.classList.add("is-resizing");
+            handle.addEventListener("pointermove", move);
+            handle.addEventListener("pointerup", stop);
+        });
+        handle.addEventListener("keydown", function (e) {
+            var cur = aside.getBoundingClientRect().width, step = 40;
+            if (e.key === "ArrowLeft") { aside.style.width = Math.min(cur + step, window.innerWidth * 0.95) + "px"; e.preventDefault(); }
+            if (e.key === "ArrowRight") { aside.style.width = Math.max(cur - step, 320) + "px"; e.preventDefault(); }
+        });
+    }
+
+    function close() {
+        if (!panel) return;
+        panel.classList.remove("is-open");
+        document.removeEventListener("keydown", onKey, true);
+        var p = panel;
+        panel = null;
+        setTimeout(function () { p.remove(); }, 250);
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    function onKey(e) {
+        if (!panel) return;
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); return; }
+        if (e.key === "Tab") {
+            var f = panel.querySelectorAll("a[href], button, summary, [tabindex]:not([tabindex='-1'])");
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            else if (!panel.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+        }
+    }
+
+    async function open(pdfPath, anchor) {
+        if (panel) { if (anchor) scrollToAnchor(anchor); return; }
+        lastFocus = document.activeElement;
+        try {
+            var res = await fetch("skript.md");
+            if (!res.ok) throw new Error("skript.md " + res.status);
+            var md = await res.text();
+            await loadMarked();
+            panel = document.createElement("div");
+            panel.className = "skript-overlay";
+            panel.innerHTML =
+                '<div class="skript-backdrop"></div>' +
+                '<aside class="skript-panel" role="dialog" aria-modal="true" aria-labelledby="skript-titel">' +
+                '<div class="skript-resize" role="separator" aria-orientation="vertical" aria-label="Breite der Seitenleiste ändern (Pfeiltasten links/rechts)" tabindex="0" title="Zum Vergrößern nach links ziehen"></div>' +
+                '<header class="skript-head"><h2 id="skript-titel">Skript/Anleitung</h2>' +
+                '<a class="skript-pdf" href="' + pdfPath + '" download><i class="fas fa-download" aria-hidden="true"></i> PDF herunterladen</a>' +
+                '<button type="button" class="skript-close" aria-label="Skript schließen">&times;</button></header>' +
+                '<details class="skript-toc"><summary>Inhaltsverzeichnis<span class="skript-toc-aktuell"></span></summary><nav aria-label="Inhaltsverzeichnis"></nav></details>' +
+                '<div class="skript-body content"></div></aside>';
+            var body = panel.querySelector(".skript-body");
+            body.innerHTML = window.marked.parse(md);
+            body.querySelectorAll("a[href^='http']").forEach(function (a) { a.target = "_blank"; a.rel = "noopener noreferrer"; });
+            buildToc(body, panel.querySelector(".skript-toc nav"));
+            panel.querySelector(".skript-backdrop").addEventListener("click", close);
+            panel.querySelector(".skript-close").addEventListener("click", close);
+            document.body.appendChild(panel);
+            setupResize(panel.querySelector(".skript-resize"), panel.querySelector(".skript-panel"));
+            document.addEventListener("keydown", onKey, true);
+            requestAnimationFrame(function () {
+                panel.classList.add("is-open");
+                panel.querySelector(".skript-close").focus();
+                if (anchor) setTimeout(function () { scrollToAnchor(anchor); }, 300);
+            });
+        } catch (error) {
+            panel = null;
+            openPdfInTab(pdfPath);
+        }
+    }
+
+    app.ports.openPdfBlob.subscribe(function (pdfPath) { open(pdfPath); });
+
+    // Begriffe im Rechner können das Skript an einer Stelle öffnen: <a data-skript="sockelbetrag">
+    document.addEventListener("click", function (e) {
+        var t = e.target.closest && e.target.closest("[data-skript]");
+        if (!t) return;
+        e.preventDefault();
+        open("Skript_ASGLA.pdf", t.getAttribute("data-skript"));
+    });
+})();
+
+// Escape schließt das Zwischenspeichern-Fenster (ohne den Skript-Slider zu stören)
+document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || document.querySelector(".skript-overlay")) return;
+    var modal = document.querySelector(".modal.is-active");
+    if (!modal) return;
+    var closeBtn = modal.querySelector(".delete, .modal-close, [aria-label*='chließen']");
+    if (closeBtn) { e.preventDefault(); closeBtn.click(); }
 });
 
 // Download file handler
@@ -1825,3 +2013,23 @@ window.addEventListener('beforeunload', function () {
         stopQRCameraScanner();
     }
 });
+
+// Darstellung: Nach „Berechnen“ bzw. bei einer Fehlermeldung zur Ergebniskarte oder Meldung scrollen.
+// Elm (Browser.document) rendert in document.body, daher wird dort beobachtet.
+(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const ziele = ".ergebnis-karte, .form-error";
+
+    new MutationObserver((eintraege) => {
+        for (const eintrag of eintraege) {
+            for (const knoten of eintrag.addedNodes) {
+                if (!(knoten instanceof Element)) continue;
+                const ziel = knoten.matches(ziele) ? knoten : knoten.querySelector(ziele);
+                if (ziel) {
+                    ziel.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+                    return;
+                }
+            }
+        }
+    }).observe(document.body, { childList: true, subtree: true });
+})();
