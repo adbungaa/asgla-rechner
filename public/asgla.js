@@ -21792,8 +21792,7 @@ var $author$project$View$Eltern$viewEinkommenMonat = F3(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('field'),
-					A2($elm$html$Html$Attributes$style, 'margin-top', '1.5rem')
+					$elm$html$Html$Attributes$class('field asgla-subcard')
 				]),
 			_List_fromArray(
 				[
@@ -22353,7 +22352,7 @@ var $author$project$View$Eltern$viewEltern = F2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('columns')
+							$elm$html$Html$Attributes$class('columns asgla-eltern-columns')
 						]),
 					_List_fromArray(
 						[
