@@ -1,4 +1,4 @@
-module Utils.Validation exposing (areInputsValid, inputAgeOrBirthdayToAge, isAgeOrBirthdayFormatValid, isInputAgeorBirthday, validateAgeOrBirthday, validateMoney, validateRequiredMoney)
+module Utils.Validation exposing (areInputsValid, inputAgeOrBirthdayToAge, isAgeOrBirthdayFormatValid, validateAgeOrBirthday, validateMoney, validateRequiredMoney)
 
 import Types exposing (Model)
 import Utils.Format exposing (formatInputToFloat, renderSelbstbehaltBetrag)
@@ -119,11 +119,6 @@ validateRequiredMoney value =
 
     else
         validateMoney value
-
-
-isInputAgeorBirthday : String -> Bool
-isInputAgeorBirthday =
-    isAgeOrBirthdayFormatValid
 
 
 isAgeOrBirthdayFormatValid : String -> Bool

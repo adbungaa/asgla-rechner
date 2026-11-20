@@ -1,6 +1,7 @@
 module Elternteil exposing
     ( addAbzugsVorlage
     , addPosten
+    , calculateDurchschnittseinkommen
     , calculateEinkommen
     , calculateGesamtEinkommen
     , calculateWeitereEinkuenfte
@@ -9,11 +10,13 @@ module Elternteil exposing
     , removePosten
     , sumAbzugsposten
     , toggleSelbstbehaltOption
+    , updatePauschaleInAbzuege
     , updatePosten
     , updateSelbstbehalt
     )
 
 import Constants exposing (getSelbstbehalt)
+import Kind exposing (removeAt)
 import Types
     exposing
         ( Elternteil
@@ -23,12 +26,26 @@ import Types
         , Selbstbehalt(..)
         , StringFieldType
         )
-import Utils.Format exposing (formatInputToFloat)
+import Utils.Format exposing (formatEuroRounded, formatInputToFloat)
 
 
 
 -- Module Logic Eltern
 -- Einkommen berechnen
+
+
+calculateDurchschnittseinkommen : List StringFieldType -> Maybe Float
+calculateDurchschnittseinkommen einkommen =
+    let
+        werte =
+            einkommen
+                |> List.filterMap (.kosten >> formatInputToFloat)
+    in
+    if List.isEmpty werte then
+        Nothing
+
+    else
+        Just (List.sum werte / toFloat (List.length werte))
 
 
 calculateWeitereEinkuenfte : List StringFieldType -> Float
@@ -75,16 +92,6 @@ calculateGesamtEinkommen model =
 
 
 -- Hilfsfunktionen für Posten (Weitere Einkünfte / Abzugsposten)
-
-
-removeAt : Int -> List a -> List a
-removeAt index list =
-    List.indexedMap Tuple.pair list
-        |> List.filter (\( i, _ ) -> i /= index)
-        |> List.map Tuple.second
-
-
-
 -- add new empty posten too the list if the list has less than 5 items
 
 
@@ -151,8 +158,8 @@ addPosten person postenType model =
         { model | error = Just ("Zu viele Posten (Max. " ++ String.fromInt (maxPostenCount postenType) ++ ")") }
 
 
--- Trägt eine Vorlage (Bezeichnung + Betrag) in die erste leere Abzugszeile ein,
--- sonst in eine neue Zeile (max. 5).
+-- Trägt eine Vorlage (Bezeichnung + Betrag) in eine bestehende Zeile gleicher Bezeichnung
+-- oder in die erste leere Abzugszeile ein, sonst in eine neue Zeile (max. 5).
 
 
 addAbzugsVorlage : Person -> String -> String -> Model -> Model
@@ -169,11 +176,27 @@ addAbzugsVorlage person bezeichnung kosten model =
         isEmpty field =
             String.isEmpty (String.trim field.kosten) && String.isEmpty (String.trim field.bezeichnung)
 
+        hasSameBezeichnung field =
+            String.trim field.bezeichnung == String.trim bezeichnung
+
         vorlage =
             { kosten = kosten, bezeichnung = bezeichnung }
 
         maybeNewList =
-            if List.any isEmpty modelPerson.abzugsposten then
+            if List.any hasSameBezeichnung modelPerson.abzugsposten then
+                Just
+                    (List.map
+                        (\f ->
+                            if hasSameBezeichnung f then
+                                { f | kosten = if String.isEmpty kosten then f.kosten else kosten }
+
+                            else
+                                f
+                        )
+                        modelPerson.abzugsposten
+                    )
+
+            else if List.any isEmpty modelPerson.abzugsposten then
                 Just
                     (Tuple.second
                         (List.foldl
@@ -210,6 +233,30 @@ addAbzugsVorlage person bezeichnung kosten model =
 
         Nothing ->
             { model | error = Just ("Zu viele Posten (Max. " ++ String.fromInt (maxPostenCount Abzugsposten) ++ ")") }
+
+
+updatePauschaleInAbzuege : String -> List StringFieldType -> List StringFieldType
+updatePauschaleInAbzuege haupttaetigkeit abzugsposten =
+    let
+        netto =
+            formatInputToFloat haupttaetigkeit |> Maybe.withDefault 0
+
+        neuerBetrag =
+            if netto > 0 then
+                formatEuroRounded (netto * 0.05)
+
+            else
+                ""
+    in
+    List.map
+        (\f ->
+            if String.trim f.bezeichnung == "Berufskosten (5 % Pauschale)" then
+                { f | kosten = neuerBetrag }
+
+            else
+                f
+        )
+        abzugsposten
 
 
 removePosten : Person -> PostenType -> Int -> Model -> Model

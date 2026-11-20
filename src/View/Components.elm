@@ -1,6 +1,7 @@
 module View.Components exposing
     ( cameraScanner
     , importFileSection
+    , moneyHelp
     , saveModal
     , showErgebnis
     , showTooltip
@@ -35,6 +36,7 @@ import Types
         , Tab(..)
         )
 import Utils.Format exposing (formatEuroRounded, formatInputToFloat, personToString, renderSelbstbehaltBetrag)
+import Utils.Validation exposing (validateMoney)
 
 
 
@@ -73,7 +75,7 @@ viewMonth columnClass model =
         [ label [ class "label", for "monat" ]
             [ text "Monat"
             , span [ class "asgla-required", attribute "aria-hidden" "true" ] [ text " *" ]
-            , span [ class "asgla-sr-only" ] [ text " (Pflichtfeld)" ]
+            , span [ class "is-sr-only" ] [ text " (Pflichtfeld)" ]
             ]
         , div [ class "control" ]
             [ div [ class "select is-fullwidth" ]
@@ -96,7 +98,7 @@ viewYear columnClass model =
         [ label [ class "label", for "jahr" ]
             [ text "Jahr"
             , span [ class "asgla-required", attribute "aria-hidden" "true" ] [ text " *" ]
-            , span [ class "asgla-sr-only" ] [ text " (Pflichtfeld)" ]
+            , span [ class "is-sr-only" ] [ text " (Pflichtfeld)" ]
             ]
         , div [ class "control" ]
             [ div [ class "select is-fullwidth" ]
@@ -135,6 +137,16 @@ viewCheckboxDurchschnittseinkommen model =
 skriptLink : String -> String -> Html msg
 skriptLink anker label =
     a [ href "#", attribute "data-skript" anker, class "skript-link", attribute "title" "Im Skript nachlesen" ] [ text label ]
+
+
+moneyHelp : String -> Html msg
+moneyHelp value =
+    case validateMoney value of
+        Just message ->
+            p [ class "help is-danger" ] [ text message ]
+
+        Nothing ->
+            text ""
 
 
 showTooltip : String -> Html msg
@@ -713,13 +725,21 @@ showErgebnis model =
             else
                 toFloat (ceiling ausgleichsanspruchNachAnrechnung)
 
+        deckelungOffen =
+            model.haftungsbetragQuelle
+                == Nothing
+                && (((model.haftungsbetragVaterSpiegel |> Maybe.withDefault 0) > hoechstbetragVater)
+                        || ((model.haftungsbetragMutterSpiegel |> Maybe.withDefault 0) > hoechstbetragMutter)
+                   )
+
         hinweisNoetig =
             ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt > 0
                 || ergebnis.haftungsbetragVaterVorBegrenzung > ergebnis.haftungsbetragVater
                 || ergebnis.haftungsbetragMutterVorBegrenzung > ergebnis.haftungsbetragMutter
-                || (model.haftungsbetragVaterSpiegel |> Maybe.withDefault 0) > hoechstbetragVater
-                || (model.haftungsbetragMutterSpiegel |> Maybe.withDefault 0) > hoechstbetragMutter
+                || deckelungOffen
 
+        detailsOffen =
+            hinweisNoetig || model.haftungsbetragQuelle /= Nothing
     in
     div
         [ class "mt-5", style "margin" "1rem" ]
@@ -762,7 +782,7 @@ showErgebnis model =
             ]
         , p [ class "ergebnis-disclaimer" ] [ text "Der Rechner liefert eine Einschätzung und ersetzt keine rechtliche Beratung." ]
         , details
-            (class "ergebnis-details" :: (if hinweisNoetig then [ attribute "open" "" ] else []))
+            (class "ergebnis-details" :: (if detailsOffen then [ attribute "open" "" ] else []))
             [ summary [ class "button is-primary is-outlined ergebnis-details-summary" ]
                 [ span [ class "icon" ] [ i [ class "fas fa-list-ol", attribute "aria-hidden" "true" ] [] ]
                 , span [] [ text "Rechenweg im Detail" ]
@@ -780,7 +800,10 @@ showErgebnis model =
         , div [ class "columns is-variable is-3" ]
             [ div [ class "column" ]
                 [ p [ class "mt-4" ] [ text ("Haftungsanteil Vater: " ++ formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ "%") ]
-                , if ergebnis.haftungsanteilVater == 0 then
+                , if ergebnis.haftungsanteilVater == 0 && ergebnis.haftungsanteilMutter == 0 then
+                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt." ]
+
+                  else if ergebnis.haftungsanteilVater == 0 then
                     p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens der Mutter." ]
 
                   else if ergebnis.haftungsanteilMutter == 0 then
@@ -1076,6 +1099,13 @@ viewHHinweisAnteilEltern model ergebnis elterenteil einkommen anteilVater anteil
 
             else
                 model.haftungsbetragMutterSpiegel |> Maybe.withDefault 0
+
+        statusText =
+            if model.haftungsbetragQuelle == Just Vorschlag then
+                " (angewendet)"
+
+            else
+                " (noch nicht angewendet)"
     in
     div [ class "mt-4" ]
         [ div
@@ -1085,7 +1115,7 @@ viewHHinweisAnteilEltern model ergebnis elterenteil einkommen anteilVater anteil
             [ text ("Der Haftungsbetrag von " ++ elternText ++ " (" ++ formatEuroRounded spiegelWert ++ "\u{00A0}€) ist höher als der Zahlungsbetrag, der im ")
             , skriptLink "haftungsanteile" "Residenzmodell"
             , text (" (Kind lebt überwiegend bei einem Elternteil) zu leisten wäre. Eine Begrenzung des Haftungsanteils auf diesen Zahlungsbetrag kommt daher in Betracht. (Haftungsanteil = der Teil der Kosten des Kindes, den ein Elternteil nach seinem Einkommen trägt)")
-            , p [ class "mt-2" ] [ text ("Möglicher Anteil von " ++ elternText ++ " bei Begrenzung: " ++ formatEuroRounded (Maybe.withDefault 0 hoechstbetrag) ++ "\u{00A0}€ (noch nicht angewendet)") ]
+            , p [ class "mt-2" ] [ text ("Möglicher Anteil von " ++ elternText ++ " bei Begrenzung: " ++ formatEuroRounded (Maybe.withDefault 0 hoechstbetrag) ++ "\u{00A0}€" ++ statusText) ]
             ]
         , button [ class "button is-small mt-2", type_ "button", onClick (ApplyHaftungsbetraege vaterWert mutterWert Vorschlag) ] [ text "Vorgeschlagenen Haftungsanteil übernehmen" ]
         , button [ class "button is-small mt-2", type_ "button", onClick (ToggleView ToggleVorschlagHft) ] [ text "Stattdessen Haftungsanteile für Eltern individuell festsetzen" ]

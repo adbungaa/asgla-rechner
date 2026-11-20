@@ -123,11 +123,14 @@ calculateAusgleichsanspruch model =
             calculateAnteil verteilbarerBetragMutter verteilbarerBetragGesamt
 
         gesamtEinkommen =
-            if anteilVater == 0 then
-                0 + bereinigtesEinkommenMutter
+            if anteilVater == 0 && anteilMutter == 0 then
+                0
+
+            else if anteilVater == 0 then
+                bereinigtesEinkommenMutter
 
             else if anteilMutter == 0 then
-                bereinigtesEinkommenVater + 0
+                bereinigtesEinkommenVater
 
             else
                 bereinigtesEinkommenVater

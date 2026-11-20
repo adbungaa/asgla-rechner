@@ -238,7 +238,6 @@ type AktionImportFile
 
 type AktionCameraScanner
     = OpenCameraContainer
-    | StartCameraScanner
     | StopCameraScanner
     | CameraScannerStarted Bool
 

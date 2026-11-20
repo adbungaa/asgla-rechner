@@ -5679,7 +5679,7 @@ var $author$project$Main$init = function (_v0) {
 			haftungsbetragVaterInput: '',
 			haftungsbetragVaterSpiegel: $elm$core$Maybe$Nothing,
 			haftungsbetragVaterUebernommen: $elm$core$Maybe$Nothing,
-			jahr: '2023',
+			jahr: '2026',
 			kind: {
 				alter: 0,
 				alterInput: '',
@@ -5877,7 +5877,22 @@ var $author$project$Elternteil$addAbzugsVorlage = F4(
 				$elm$core$String$trim(field.kosten)) && $elm$core$String$isEmpty(
 				$elm$core$String$trim(field.bezeichnung));
 		};
-		var maybeNewList = A2($elm$core$List$any, isEmpty, modelPerson.abzugsposten) ? $elm$core$Maybe$Just(
+		var hasSameBezeichnung = function (field) {
+			return _Utils_eq(
+				$elm$core$String$trim(field.bezeichnung),
+				$elm$core$String$trim(bezeichnung));
+		};
+		var maybeNewList = A2($elm$core$List$any, hasSameBezeichnung, modelPerson.abzugsposten) ? $elm$core$Maybe$Just(
+			A2(
+				$elm$core$List$map,
+				function (f) {
+					return hasSameBezeichnung(f) ? _Utils_update(
+						f,
+						{
+							kosten: $elm$core$String$isEmpty(kosten) ? f.kosten : kosten
+						}) : f;
+				},
+				modelPerson.abzugsposten)) : (A2($elm$core$List$any, isEmpty, modelPerson.abzugsposten) ? $elm$core$Maybe$Just(
 			A3(
 				$elm$core$List$foldl,
 				F2(
@@ -5903,7 +5918,7 @@ var $author$project$Elternteil$addAbzugsVorlage = F4(
 			_Utils_ap(
 				modelPerson.abzugsposten,
 				_List_fromArray(
-					[vorlage]))) : $elm$core$Maybe$Nothing);
+					[vorlage]))) : $elm$core$Maybe$Nothing));
 		if (maybeNewList.$ === 'Just') {
 			var newList = maybeNewList.a;
 			var updated = _Utils_update(
@@ -7167,7 +7182,7 @@ var $author$project$Calculation$calculateAusgleichsanspruch = function (model) {
 	var verteilbarerBetragGesamt = verteilbarerBetragVater + verteilbarerBetragMutter;
 	var anteilVater = A2($author$project$Calculation$calculateAnteil, verteilbarerBetragVater, verteilbarerBetragGesamt);
 	var anteilMutter = A2($author$project$Calculation$calculateAnteil, verteilbarerBetragMutter, verteilbarerBetragGesamt);
-	var gesamtEinkommen = (!anteilVater) ? (0 + bereinigtesEinkommenMutter) : ((!anteilMutter) ? (bereinigtesEinkommenVater + 0) : (bereinigtesEinkommenVater + bereinigtesEinkommenMutter));
+	var gesamtEinkommen = ((!anteilVater) && (!anteilMutter)) ? 0 : ((!anteilVater) ? bereinigtesEinkommenMutter : ((!anteilMutter) ? bereinigtesEinkommenVater : (bereinigtesEinkommenVater + bereinigtesEinkommenMutter)));
 	var regelbedarf = model.customRegelbedarf ? $author$project$Utils$Format$formatInputToFloat(model.kind.regelbedarf) : A3($author$project$Constants$getRegelbedarf, model.jahr, gesamtEinkommen, model.kind.alter);
 	if (regelbedarf.$ === 'Nothing') {
 		return {abzufuehrendesKindergeld: 0, anspruchsberechtigt: $author$project$Types$Vater, anteilMutterGesamtbedarf: 0, anteilMutterOhneZusatzbedarf: 0, anteilVaterGesamtbedarf: 0, anteilVaterOhneZusatzbedarf: 0, ausgleichsanspruch: $elm$core$Maybe$Nothing, auszugleichenderBetrag: 0, baranteilMutter: 0, baranteilVater: 0, bereinigtesEinkommenMutter: bereinigtesEinkommenMutter, bereinigtesEinkommenVater: bereinigtesEinkommenVater, betreuungsanteil: 0, differenzAnteil: 0, einkommenMutter: einkommenMutter, einkommenVater: einkommenVater, gesamtAbzugMutter: 0, gesamtAbzugVater: 0, gesamtEinkommen: gesamtEinkommen, gesamtKindbedarf_mitGetrageneZusatzbedarf: 0, gesamtKindbedarf_ohneGetrageneZusatzbedarf: 0, haftungsanteilMutter: 0, haftungsanteilVater: 0, haftungsbetragMutter: 0, haftungsbetragMutterVorBegrenzung: 0, haftungsbetragVater: 0, haftungsbetragVaterVorBegrenzung: 0, nichtanspruchsberechtigt: $author$project$Types$Mutter, regelbedarf: $elm$core$Maybe$Nothing, verteilbarerBetragGesamt: 0, verteilbarerBetragMutter: 111, verteilbarerBetragVater: 111, weitereEinkuenfteMutter: weitereEinkuenfteMutter, weitereEinkuenfteVater: weitereEinkuenfteVater};
@@ -7251,7 +7266,7 @@ var $elm$core$List$isEmpty = function (xs) {
 		return false;
 	}
 };
-var $author$project$Main$calculateDurchschnittseinkommen = function (einkommen) {
+var $author$project$Elternteil$calculateDurchschnittseinkommen = function (einkommen) {
 	var werte = A2(
 		$elm$core$List$filterMap,
 		A2(
@@ -16017,6 +16032,15 @@ var $author$project$Utils$Validation$inputAgeOrBirthdayToAge = F3(
 					$author$project$Utils$Validation$parseBirthday(trimmedValue)));
 		}
 	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$openPdfBlob = _Platform_outgoingPort('openPdfBlob', $elm$json$Json$Encode$string);
@@ -16078,19 +16102,6 @@ var $author$project$Kind$removeBedarf = F3(
 			model,
 			{error: $elm$core$Maybe$Nothing, kind: updatedData});
 	});
-var $author$project$Elternteil$removeAt = F2(
-	function (index, list) {
-		return A2(
-			$elm$core$List$map,
-			$elm$core$Tuple$second,
-			A2(
-				$elm$core$List$filter,
-				function (_v0) {
-					var i = _v0.a;
-					return !_Utils_eq(i, index);
-				},
-				A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, list)));
-	});
 var $author$project$Elternteil$removePosten = F4(
 	function (person, postenType, index, model) {
 		var modelPerson = function () {
@@ -16110,7 +16121,7 @@ var $author$project$Elternteil$removePosten = F4(
 					return modelPerson.einkommenZumDurchschnittsberechnung;
 			}
 		}();
-		var newList = A2($author$project$Elternteil$removeAt, index, postenListe);
+		var newList = A2($author$project$Kind$removeAt, index, postenListe);
 		var updatedData = function () {
 			switch (postenType.$) {
 				case 'Abzugsposten':
@@ -16213,11 +16224,32 @@ var $author$project$Kind$updateBedarf = F4(
 			model,
 			{kind: updatedData});
 	});
+var $author$project$Elternteil$updatePauschaleInAbzuege = F2(
+	function (haupttaetigkeit, abzugsposten) {
+		var netto = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$author$project$Utils$Format$formatInputToFloat(haupttaetigkeit));
+		var neuerBetrag = (netto > 0) ? $author$project$Utils$Format$formatEuroRounded(netto * 0.05) : '';
+		return A2(
+			$elm$core$List$map,
+			function (f) {
+				return ($elm$core$String$trim(f.bezeichnung) === 'Berufskosten (5 % Pauschale)') ? _Utils_update(
+					f,
+					{kosten: neuerBetrag}) : f;
+			},
+			abzugsposten);
+	});
 var $author$project$Main$updateElternDaten = F5(
 	function (model, haupttaetigkeit, weitereEinkuenfte, abzugsposten, selbstbehalt) {
 		return _Utils_update(
 			model,
-			{abzugsposten: abzugsposten, haupttaetigkeit: haupttaetigkeit, selbstbehalt: selbstbehalt, weitereEinkuenfte: weitereEinkuenfte});
+			{
+				abzugsposten: A2($author$project$Elternteil$updatePauschaleInAbzuege, haupttaetigkeit, abzugsposten),
+				haupttaetigkeit: haupttaetigkeit,
+				selbstbehalt: selbstbehalt,
+				weitereEinkuenfte: weitereEinkuenfte
+			});
 	});
 var $author$project$Main$updateKindDaten = F6(
 	function (alter, alterInput, mehrbedarf, sonderbedarf, regelbedarf, kind) {
@@ -16432,10 +16464,36 @@ var $author$project$Main$update = F2(
 							$elm$core$Platform$Cmd$none);
 					default:
 						var val = a.a;
+						var vater = model.vater;
+						var neuesJahr = A2(
+							$elm$core$List$member,
+							val.year,
+							_List_fromArray(
+								['2023', '2024', '2025', '2026'])) ? val.year : '2026';
+						var neuerMonat = A2(
+							$elm$core$List$member,
+							val.month,
+							_List_fromArray(
+								['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'])) ? val.month : model.monat;
+						var mutter = model.mutter;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{jahr: val.year, monat: val.month}),
+								{
+									jahr: neuesJahr,
+									kind: A3($author$project$Main$recalculateKindAlter, neuerMonat, neuesJahr, model.kind),
+									monat: neuerMonat,
+									mutter: _Utils_update(
+										mutter,
+										{
+											selbstbehalt: A2($author$project$Elternteil$updateSelbstbehalt, mutter.selbstbehalt, neuesJahr)
+										}),
+									vater: _Utils_update(
+										vater,
+										{
+											selbstbehalt: A2($author$project$Elternteil$updateSelbstbehalt, vater.selbstbehalt, neuesJahr)
+										})
+								}),
 							$elm$core$Platform$Cmd$none);
 				}
 			case 'UpdateKindDaten':
@@ -16575,7 +16633,7 @@ var $author$project$Main$update = F2(
 						case 'ApplyDurchschnittseinkommen':
 							var _v10 = _v5.a;
 							var _v11 = _v5.b;
-							var _v12 = $author$project$Main$calculateDurchschnittseinkommen(model.vater.einkommenZumDurchschnittsberechnung);
+							var _v12 = $author$project$Elternteil$calculateDurchschnittseinkommen(model.vater.einkommenZumDurchschnittsberechnung);
 							if (_v12.$ === 'Just') {
 								var durchschnitt = _v12.a;
 								var updatedVater = A5(
@@ -16652,7 +16710,7 @@ var $author$project$Main$update = F2(
 						case 'ApplyDurchschnittseinkommen':
 							var _v13 = _v5.a;
 							var _v14 = _v5.b;
-							var _v15 = $author$project$Main$calculateDurchschnittseinkommen(model.mutter.einkommenZumDurchschnittsberechnung);
+							var _v15 = $author$project$Elternteil$calculateDurchschnittseinkommen(model.mutter.einkommenZumDurchschnittsberechnung);
 							if (_v15.$ === 'Just') {
 								var durchschnitt = _v15.a;
 								var updatedMutter = A5(
@@ -16762,6 +16820,7 @@ var $author$project$Main$update = F2(
 									model,
 									{
 										customRegelbedarf: decodedData.customRegelbedarf,
+										durchschnittseinkommen: false,
 										error: $elm$core$Maybe$Nothing,
 										freitext: decodedData.freitext,
 										jahr: decodedData.jahr,
@@ -16810,10 +16869,6 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{error: $elm$core$Maybe$Nothing, qrIsProcessing: true, showCameraScanner: true}),
-							$author$project$Main$startCameraScanner(_Utils_Tuple0));
-					case 'StartCameraScanner':
-						return _Utils_Tuple2(
-							model,
 							$author$project$Main$startCameraScanner(_Utils_Tuple0));
 					case 'StopCameraScanner':
 						return _Utils_Tuple2(
@@ -16930,10 +16985,26 @@ var $author$project$Main$update = F2(
 								{customRegelbedarf: !model.customRegelbedarf, showErgebnis: false}),
 							$elm$core$Platform$Cmd$none);
 					case 'ToggleDurchschnittseinkommen':
+						var vater = model.vater;
+						var neuesDurchschnitt = !model.durchschnittseinkommen;
+						var mutter = model.mutter;
+						var leereWeitereEinkuenfte = _List_fromArray(
+							[
+								{bezeichnung: ' ', kosten: ''}
+							]);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{durchschnittseinkommen: !model.durchschnittseinkommen}),
+								{
+									durchschnittseinkommen: neuesDurchschnitt,
+									mutter: neuesDurchschnitt ? _Utils_update(
+										mutter,
+										{weitereEinkuenfte: leereWeitereEinkuenfte}) : mutter,
+									showErgebnis: false,
+									vater: neuesDurchschnitt ? _Utils_update(
+										vater,
+										{weitereEinkuenfte: leereWeitereEinkuenfte}) : vater
+								}),
 							$elm$core$Platform$Cmd$none);
 					default:
 						return _Utils_Tuple2(
@@ -18255,6 +18326,9 @@ var $author$project$View$Components$viewVorschlagHaftungsanteil = F4(
 	});
 var $author$project$View$Components$viewHHinweisAnteilEltern = F6(
 	function (model, ergebnis, elterenteil, einkommen, anteilVater, anteilMutter) {
+		var statusText = _Utils_eq(
+			model.haftungsbetragQuelle,
+			$elm$core$Maybe$Just($author$project$Types$Vorschlag)) ? ' (angewendet)' : ' (noch nicht angewendet)';
 		var spiegelWert = _Utils_eq(elterenteil, $author$project$Types$Vater) ? A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel) : A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel);
 		var hoechstbetrag = A3($author$project$Constants$getHoechstbetrag, model.jahr, einkommen, model.kind.alter);
 		var mutterWert = _Utils_eq(elterenteil, $author$project$Types$Mutter) ? A2($elm$core$Maybe$withDefault, 0, hoechstbetrag) : anteilMutter;
@@ -18297,7 +18371,7 @@ var $author$project$View$Components$viewHHinweisAnteilEltern = F6(
 								[
 									$elm$html$Html$text(
 									'Möglicher Anteil von ' + (elternText + (' bei Begrenzung: ' + ($author$project$Utils$Format$formatEuroRounded(
-										A2($elm$core$Maybe$withDefault, 0, hoechstbetrag)) + '\u00A0€ (noch nicht angewendet)'))))
+										A2($elm$core$Maybe$withDefault, 0, hoechstbetrag)) + ('\u00A0€' + statusText)))))
 								]))
 						])),
 					A2(
@@ -18790,11 +18864,6 @@ var $author$project$View$Components$showErgebnis = function (model) {
 		$elm$core$Maybe$withDefault,
 		hoechstbetragFallback,
 		A3($author$project$Constants$getHoechstbetrag, model.jahr, ergebnis.bereinigtesEinkommenVater, model.kind.alter));
-	var hinweisNoetig = ((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) || ((_Utils_cmp(ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater) > 0) || ((_Utils_cmp(ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter) > 0) || ((_Utils_cmp(
-		A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
-		hoechstbetragVater) > 0) || (_Utils_cmp(
-		A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
-		hoechstbetragMutter) > 0))));
 	var renderPersonSection = F2(
 		function (title, person) {
 			var weitereEinkuenfte = function () {
@@ -19006,6 +19075,13 @@ var $author$project$View$Components$showErgebnis = function (model) {
 					]));
 		});
 	var differenzNachAnrechnung = $elm$core$Basics$abs(ergebnis.anteilVaterGesamtbedarf - ergebnis.anteilMutterGesamtbedarf);
+	var deckelungOffen = _Utils_eq(model.haftungsbetragQuelle, $elm$core$Maybe$Nothing) && ((_Utils_cmp(
+		A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
+		hoechstbetragVater) > 0) || (_Utils_cmp(
+		A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
+		hoechstbetragMutter) > 0));
+	var hinweisNoetig = ((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) || ((_Utils_cmp(ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater) > 0) || ((_Utils_cmp(ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter) > 0) || deckelungOffen));
+	var detailsOffen = hinweisNoetig || (!_Utils_eq(model.haftungsbetragQuelle, $elm$core$Maybe$Nothing));
 	var auszugleichenderBetragNachAnrechnung = differenzNachAnrechnung / 2;
 	var anzurechnendeKindEinkuenfte = (model.kind.alter < 18) ? (kindEinkuenfteSum / 2) : kindEinkuenfteSum;
 	var anspruchsberechtigtNachAnrechnung = (_Utils_cmp(ergebnis.anteilVaterGesamtbedarf, ergebnis.anteilMutterGesamtbedarf) > 0) ? $author$project$Types$Mutter : $author$project$Types$Vater;
@@ -19228,7 +19304,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 				A2(
 					$elm$core$List$cons,
 					$elm$html$Html$Attributes$class('ergebnis-details'),
-					hinweisNoetig ? _List_fromArray(
+					detailsOffen ? _List_fromArray(
 						[
 							A2($elm$html$Html$Attributes$attribute, 'open', '')
 						]) : _List_Nil),
@@ -19380,7 +19456,18 @@ var $author$project$View$Components$showErgebnis = function (model) {
 														$elm$html$Html$text(
 														'Haftungsanteil Vater: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '%'))
 													])),
-												(!ergebnis.haftungsanteilVater) ? A2(
+												((!ergebnis.haftungsanteilVater) && (!ergebnis.haftungsanteilMutter)) ? A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den '),
+														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
+														$elm$html$Html$text(' des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt.')
+													])) : ((!ergebnis.haftungsanteilVater) ? A2(
 												$elm$html$Html$p,
 												_List_fromArray(
 													[
@@ -19402,7 +19489,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 														$elm$html$Html$text('Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der '),
 														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
 														$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens des Vaters.')
-													])) : $elm$html$Html$text(''))
+													])) : $elm$html$Html$text('')))
 											])),
 										A2(
 										$elm$html$Html$div,
@@ -20384,15 +20471,6 @@ var $author$project$Types$UpdateFreitext = function (a) {
 };
 var $author$project$Types$ViewErgebnis = {$: 'ViewErgebnis'};
 var $elm$html$Html$form = _VirtualDom_node('form');
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
 var $author$project$View$Layout$hasStufensprungAlterAmJahresende = function (model) {
 	return A2(
 		$elm$core$Maybe$withDefault,
@@ -20834,7 +20912,7 @@ var $author$project$View$Components$viewMonth = F2(
 							$elm$html$Html$span,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('asgla-sr-only')
+									$elm$html$Html$Attributes$class('is-sr-only')
 								]),
 							_List_fromArray(
 								[
@@ -21090,7 +21168,8 @@ var $author$project$View$Eltern$viewAbzugsVorlagen = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Schnell hinzufügen:')
+							$elm$html$Html$text('Schnell hinzufügen: '),
+							$author$project$View$Components$showTooltip('Fahrtkosten gehören zu den berufsbedingten Kosten. In der Regel setzen Sie entweder die 5\u00A0%-Pauschale oder die tatsächlichen Fahrtkosten an. Fahrtkosten: 0,42\u00A0€ je gefahrenem Kilometer, bei langen Strecken (ab ca. 30\u00A0km einfach) meist 0,28\u00A0€. Den Betrag tragen Sie selbst ein.')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -21189,16 +21268,6 @@ var $author$project$View$Eltern$viewAbzugsVorlagen = F2(
 											$elm$html$Html$text('Fahrtkosten')
 										]))
 								]))
-						])),
-					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('asgla-help')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Fahrtkosten gehören zu den berufsbedingten Kosten. In der Regel setzen Sie entweder die 5\u00A0%-Pauschale oder die tatsächlichen Fahrtkosten an. Fahrtkosten: 0,42\u00A0€ je gefahrenem Kilometer, bei langen Strecken (ab ca. 30\u00A0km einfach) meist 0,28\u00A0€. Den Betrag tragen Sie selbst ein.')
 						]))
 				]));
 	});
@@ -21216,7 +21285,7 @@ var $author$project$Types$UpdatePosten = F3(
 		return {$: 'UpdatePosten', a: a, b: b, c: c};
 	});
 var $author$project$Types$WeitereEinkuenfte = {$: 'WeitereEinkuenfte'};
-var $author$project$View$Eltern$moneyHelp = function (value) {
+var $author$project$View$Components$moneyHelp = function (value) {
 	var _v0 = $author$project$Utils$Validation$validateMoney(value);
 	if (_v0.$ === 'Just') {
 		var message = _v0.a;
@@ -21589,7 +21658,7 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$author$project$View$Eltern$moneyHelp(eingabe.kosten),
+							$author$project$View$Components$moneyHelp(eingabe.kosten),
 							(_Utils_eq(postenType, $author$project$Types$WeitereEinkuenfte) && ($elm$core$String$isEmpty(
 							$elm$core$String$trim(eingabe.bezeichnung)) && (!$elm$core$String$isEmpty(
 							$elm$core$String$trim(eingabe.kosten))))) ? A2(
@@ -21626,17 +21695,7 @@ var $author$project$View$Eltern$viewDurchschnittseinkommen = F2(
 					$author$project$Utils$Validation$validateMoney,
 					$elm$core$Basics$neq($elm$core$Maybe$Nothing))),
 			modelPerson.einkommenZumDurchschnittsberechnung);
-		var einkommenWerte = A2(
-			$elm$core$List$filterMap,
-			A2(
-				$elm$core$Basics$composeR,
-				function ($) {
-					return $.kosten;
-				},
-				$author$project$Utils$Format$formatInputToFloat),
-			modelPerson.einkommenZumDurchschnittsberechnung);
-		var durchschnitt = $elm$core$List$isEmpty(einkommenWerte) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-			$elm$core$List$sum(einkommenWerte) / $elm$core$List$length(einkommenWerte));
+		var durchschnitt = $author$project$Elternteil$calculateDurchschnittseinkommen(modelPerson.einkommenZumDurchschnittsberechnung);
 		return model.durchschnittseinkommen ? A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -21793,7 +21852,7 @@ var $author$project$View$Eltern$viewEinkommenMonat = F3(
 								[
 									$elm$html$Html$text('Das monatliche Netto-Einkommen, also nach Abzug von Steuern und Sozialabgaben. Ungefähre Beträge reichen aus.')
 								])),
-							$author$project$View$Eltern$moneyHelp(modelPerson.haupttaetigkeit)
+							$author$project$View$Components$moneyHelp(modelPerson.haupttaetigkeit)
 						]))
 				]));
 	});
@@ -22204,7 +22263,7 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 																		})
 																	]),
 																_List_Nil),
-																$author$project$View$Eltern$moneyHelp(
+																$author$project$View$Components$moneyHelp(
 																$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt))
 															]))
 													]))
@@ -22429,24 +22488,6 @@ var $author$project$Types$UpdateBedarf = F3(
 	function (a, b, c) {
 		return {$: 'UpdateBedarf', a: a, b: b, c: c};
 	});
-var $author$project$View$Kind$moneyHelp = function (value) {
-	var _v0 = $author$project$Utils$Validation$validateMoney(value);
-	if (_v0.$ === 'Just') {
-		var message = _v0.a;
-		return A2(
-			$elm$html$Html$p,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('help is-danger')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(message)
-				]));
-	} else {
-		return $elm$html$Html$text('');
-	}
-};
 var $author$project$View$Kind$viewBedarf = F4(
 	function (bedarfsTyp, model, index, eingabe) {
 		var radioName = function () {
@@ -22828,7 +22869,7 @@ var $author$project$View$Kind$viewBedarf = F4(
 						]),
 					_List_fromArray(
 						[
-							$author$project$View$Kind$moneyHelp(eingabe.kosten)
+							$author$project$View$Components$moneyHelp(eingabe.kosten)
 						]))
 				]));
 	});
@@ -23046,7 +23087,7 @@ var $author$project$View$Kind$viewKindEinkuenfte = F3(
 						]),
 					_List_fromArray(
 						[
-							$author$project$View$Kind$moneyHelp(eingabe.kosten)
+							$author$project$View$Components$moneyHelp(eingabe.kosten)
 						]))
 				]));
 	});
@@ -23098,7 +23139,7 @@ var $author$project$View$Kind$viewKind = function (model) {
 										$elm$html$Html$span,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('asgla-sr-only')
+												$elm$html$Html$Attributes$class('is-sr-only')
 											]),
 										_List_fromArray(
 											[
@@ -23650,7 +23691,7 @@ var $author$project$View$Components$viewYear = F2(
 							$elm$html$Html$span,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('asgla-sr-only')
+									$elm$html$Html$Attributes$class('is-sr-only')
 								]),
 							_List_fromArray(
 								[

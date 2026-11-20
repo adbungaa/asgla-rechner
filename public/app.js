@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+const { PDFDocument, StandardFonts, rgb } = window.PDFLib || {};
 
 // Start Elm app
 const app = Elm.Main.init({
@@ -779,7 +779,11 @@ app.ports.generatePdf.subscribe(async (data) => {
     drawSideBySideText(`Haftungsanteil Vater: ${data.vater.haftungsanteil}%`,
         `Haftungsanteil Mutter: ${data.mutter.haftungsanteil}%`);
 
-    if (parseEuro(data.vater.haftungsanteil) === 0) {
+    if (parseEuro(data.vater.haftungsanteil) === 0 && parseEuro(data.mutter.haftungsanteil) === 0) {
+        drawFullWidthHinweis(
+            "Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den Regelbedarf des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt."
+        );
+    } else if (parseEuro(data.vater.haftungsanteil) === 0) {
         drawFullWidthHinweis(
             "Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der Regelbedarf des Kindes allein aufgrund des Einkommens der Mutter."
         );
@@ -1772,6 +1776,7 @@ async function openPdfInTab(pdfPath) {
 // Skript als Slider von rechts (Markdown aus skript.md, gerendert mit marked).
 (function () {
     var panel = null;
+    var isOpening = false;
     var lastFocus = null;
 
     function loadMarked() {
@@ -1900,6 +1905,8 @@ async function openPdfInTab(pdfPath) {
 
     async function open(pdfPath, anchor) {
         if (panel) { if (anchor) scrollToAnchor(anchor); return; }
+        if (isOpening) return;
+        isOpening = true;
         lastFocus = document.activeElement;
         try {
             var res = await fetch("skript.md");
@@ -1934,6 +1941,8 @@ async function openPdfInTab(pdfPath) {
         } catch (error) {
             panel = null;
             openPdfInTab(pdfPath);
+        } finally {
+            isOpening = false;
         }
     }
 

@@ -1,12 +1,12 @@
-# PDF aus `Skript_ASGLA.md` erstellen
+# PDF aus `public/skript.md` erstellen
 
-Für das Skript muss die Markdown-Datei `Skript_ASGLA.md` zuerst in eine PDF-Datei umgewandelt werden. Dafür kann entweder ein Online-Konverter oder die lokale Konvertierung mit Pandoc und Tectonic verwendet werden. Anschließend wird die erzeugte PDF als statische Datei über die Schaltfläche „Skript/Anleitung“ in der Anwendung geöffnet.
+Für das Skript muss die Markdown-Datei `public/skript.md` zuerst in eine PDF-Datei umgewandelt werden. Dafür kann entweder ein Online-Konverter oder die lokale Konvertierung mit Pandoc und Tectonic verwendet werden. Anschließend wird die erzeugte PDF als statische Datei über die Schaltfläche „Skript/Anleitung“ in der Anwendung als Download angeboten.
 
 Die dynamische PDF-Erzeugung des Berechnungsergebnisses in `public/app.js` wird für das Skript nicht verwendet.
 
 ## Möglichkeit 1: Online-Konverter
 
-`Skript_ASGLA.md` kann mit einem geeigneten Markdown-zu-PDF-Online-Konverter umgewandelt werden. Die heruntergeladene Datei muss anschließend in `Skript_ASGLA.pdf` umbenannt und hier abgelegt werden:
+`public/skript.md` kann mit einem geeigneten Markdown-zu-PDF-Online-Konverter umgewandelt werden. Die heruntergeladene Datei muss anschließend in `Skript_ASGLA.pdf` umbenannt und hier abgelegt werden:
 
 ```text
 public/Skript_ASGLA.pdf
@@ -41,7 +41,7 @@ Eine Editor-Erweiterung und `pdflatex` sind nicht erforderlich.
 Den folgenden Befehl im Projektverzeichnis `asgla-rechner` ausführen:
 
 ```bash
-pandoc Skript_ASGLA.md \
+pandoc public/skript.md \
   --from=gfm \
   --pdf-engine=tectonic \
   --metadata lang=de-DE \
@@ -64,7 +64,7 @@ Ergebnis überprüfen:
 ls -lh public/Skript_ASGLA.pdf
 ```
 
-Die PDF muss nach jeder Änderung an `Skript_ASGLA.md` erneut erzeugt und zusammen mit der Anwendung veröffentlicht werden.
+Die PDF muss nach jeder Änderung an `public/skript.md` erneut erzeugt und zusammen mit der Anwendung veröffentlicht werden.
 
 ## Einbindung in die Anwendung
 

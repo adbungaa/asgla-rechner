@@ -3,7 +3,7 @@ port module Main exposing (..)
 import Browser
 import Calculation exposing (calculateAusgleichsanspruch)
 import Constants exposing (getRegelbedarf)
-import Elternteil exposing (addAbzugsVorlage, addPosten, calculateGesamtEinkommen, removePosten, toggleSelbstbehaltOption, updatePosten, updateSelbstbehalt)
+import Elternteil exposing (addAbzugsVorlage, addPosten, calculateDurchschnittseinkommen, calculateGesamtEinkommen, removePosten, toggleSelbstbehaltOption, updatePauschaleInAbzuege, updatePosten, updateSelbstbehalt)
 import File
 import File.Select as Select
 import Html exposing (a, div, i, section, text)
@@ -45,7 +45,7 @@ import View.Layout exposing (viewFooter, viewForm, viewHeader)
 init : () -> ( Model, Cmd msg )
 init _ =
     ( { monat = "Januar" -- FALLBACK
-      , jahr = "2023" -- FALLBACK
+      , jahr = "2026" -- FALLBACK
       , kind =
             { alter = 0
             , alterInput = ""
@@ -164,7 +164,49 @@ update msg model =
                     ( { model | showErgebnis = False, kindergeldEmpfaenger = person }, Cmd.none )
 
                 GetMonthYear val ->
-                    ( { model | monat = val.month, jahr = val.year }
+                    let
+                        neuesJahr =
+                            if List.member val.year [ "2023", "2024", "2025", "2026" ] then
+                                val.year
+
+                            else
+                                "2026"
+
+                        neuerMonat =
+                            if
+                                List.member val.month
+                                    [ "Januar"
+                                    , "Februar"
+                                    , "März"
+                                    , "April"
+                                    , "Mai"
+                                    , "Juni"
+                                    , "Juli"
+                                    , "August"
+                                    , "September"
+                                    , "Oktober"
+                                    , "November"
+                                    , "Dezember"
+                                    ]
+                            then
+                                val.month
+
+                            else
+                                model.monat
+
+                        vater =
+                            model.vater
+
+                        mutter =
+                            model.mutter
+                    in
+                    ( { model
+                        | monat = neuerMonat
+                        , jahr = neuesJahr
+                        , vater = { vater | selbstbehalt = updateSelbstbehalt vater.selbstbehalt neuesJahr }
+                        , mutter = { mutter | selbstbehalt = updateSelbstbehalt mutter.selbstbehalt neuesJahr }
+                        , kind = recalculateKindAlter neuerMonat neuesJahr model.kind
+                      }
                     , Cmd.none
                     )
 
@@ -369,6 +411,7 @@ update msg model =
                                 , showCameraScanner = False
                                 , showErgebnis = False
                                 , customRegelbedarf = decodedData.customRegelbedarf
+                                , durchschnittseinkommen = False
                               }
                             , stopCameraScanner ()
                             )
@@ -398,9 +441,6 @@ update msg model =
                     ( { model | showCameraScanner = True, error = Nothing, qrIsProcessing = True }
                     , startCameraScanner ()
                     )
-
-                StartCameraScanner ->
-                    ( model, startCameraScanner () )
 
                 StopCameraScanner ->
                     ( { model | showCameraScanner = False, qrIsProcessing = False }
@@ -494,7 +534,37 @@ update msg model =
                     ( { model | customRegelbedarf = not model.customRegelbedarf, showErgebnis = False }, Cmd.none )
 
                 ToggleDurchschnittseinkommen ->
-                    ( { model | durchschnittseinkommen = not model.durchschnittseinkommen }, Cmd.none )
+                    let
+                        neuesDurchschnitt =
+                            not model.durchschnittseinkommen
+
+                        leereWeitereEinkuenfte =
+                            [ { kosten = "", bezeichnung = " " } ]
+
+                        vater =
+                            model.vater
+
+                        mutter =
+                            model.mutter
+                    in
+                    ( { model
+                        | durchschnittseinkommen = neuesDurchschnitt
+                        , showErgebnis = False
+                        , vater =
+                            if neuesDurchschnitt then
+                                { vater | weitereEinkuenfte = leereWeitereEinkuenfte }
+
+                            else
+                                vater
+                        , mutter =
+                            if neuesDurchschnitt then
+                                { mutter | weitereEinkuenfte = leereWeitereEinkuenfte }
+
+                            else
+                                mutter
+                      }
+                    , Cmd.none
+                    )
 
                 ToggleVorschlagHft ->
                     ( { model | vorschlagHft = not model.vorschlagHft }, Cmd.none )
@@ -538,7 +608,7 @@ updateElternDaten model haupttaetigkeit weitereEinkuenfte abzugsposten selbstbeh
     { model
         | haupttaetigkeit = haupttaetigkeit
         , weitereEinkuenfte = weitereEinkuenfte
-        , abzugsposten = abzugsposten
+        , abzugsposten = updatePauschaleInAbzuege haupttaetigkeit abzugsposten
         , selbstbehalt = selbstbehalt
     }
 
@@ -561,20 +631,6 @@ recalculateKindAlter monat jahr kind =
             inputAgeOrBirthdayToAge monat jahr kind.alterInput
                 |> Maybe.withDefault kind.alter
     }
-
-
-calculateDurchschnittseinkommen : List StringFieldType -> Maybe Float
-calculateDurchschnittseinkommen einkommen =
-    let
-        werte =
-            einkommen
-                |> List.filterMap (.kosten >> formatInputToFloat)
-    in
-    if List.isEmpty werte then
-        Nothing
-
-    else
-        Just (List.sum werte / toFloat (List.length werte))
 
 
 monthYearDecoder : Decode.Decoder MonthYear

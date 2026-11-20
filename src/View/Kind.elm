@@ -18,7 +18,7 @@ import Types
         )
 import Utils.Format exposing (personToString, stringToPerson)
 import Utils.Validation exposing (validateAgeOrBirthday, validateMoney, validateRequiredMoney)
-import View.Components exposing (showTooltip, skriptLink, viewEntryActionButtons)
+import View.Components exposing (moneyHelp, showTooltip, skriptLink, viewEntryActionButtons)
 
 
 
@@ -43,7 +43,7 @@ viewKind model =
                 [ label [ class "label" ]
                     [ text "Alter oder Geburtsdatum des Kindes"
                     , span [ class "asgla-required", attribute "aria-hidden" "true" ] [ text " *" ]
-                    , span [ class "asgla-sr-only" ] [ text " (Pflichtfeld)" ]
+                    , span [ class "is-sr-only" ] [ text " (Pflichtfeld)" ]
                     ]
                 , p [ class "asgla-help asgla-help-top" ]
                     [ text "Entweder das Alter des Kindes in Jahren zum Zeitpunkt der Berechnung oder das Geburtsdatum im Format TT.MM.JJJJ." ]
@@ -153,16 +153,6 @@ viewKind model =
           else
             text ""
         ]
-
-
-moneyHelp : String -> Html Msg
-moneyHelp value =
-    case validateMoney value of
-        Just message ->
-            p [ class "help is-danger" ] [ text message ]
-
-        Nothing ->
-            text ""
 
 
 requiredMoneyHelp : String -> Html Msg

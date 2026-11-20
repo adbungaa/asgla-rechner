@@ -120,7 +120,7 @@ Zu beachten ist allerdings, dass der Bedarf für Unterkunft und Heizung im Regel
 >
 > Davon 20 % als Wohnkostenanteil sind 134 EUR.
 >
-> Die restlichen Verbrauchsposten haben eine Gesamthöhe von 534 EUR. Diese sind anhand der sich aus § 6 RBEG ergebenden Quotelung zu verteilen.
+> Die restlichen Verbrauchsposten haben eine Gesamthöhe von 536 EUR. Diese sind anhand der sich aus § 6 RBEG ergebenden Quotelung zu verteilen.
 
 Ob noch ein Regelbedarf oder bereits ein Zusatzbedarf vorliegt, kann im Abgleich mit § [34](https://rewis.io/gesetze/sgb-12/p/sgb-12%2D34) SGB XII (Bildung und Teilhabe, kurz: BuT) ermittelt werden (vgl. BGH v. 11.01.2017 – [XII ZB 565/15](https://www.dejure.org/dienste/vernetzung/rechtsprechung?Text=XII%20ZB%20565%2F15) Rn. 39).
 
@@ -194,12 +194,12 @@ Das Kindergeld wird zur Verrechnung zunächst in zwei gleiche Hälften geteilt. 
 >
 > | Position | Betrag |
 > |----------|--------|
-> | Betreungsanteil Mutter | 65,50 EUR |
-> | Betreungsanteil Vater | 65,50 EUR |
+> | Betreuungsanteil Mutter | 62,50 EUR |
+> | Betreuungsanteil Vater | 62,50 EUR |
 > | Baranteil Mutter (70%) | 87,50 EUR |
 > | Baranteil Vater (30%) | 37,50 EUR |
 >
-> Die Mutter hat also insgesamt 103 EUR vom Kindergeld an den Vater auszukehren.
+> Die Mutter hat also insgesamt 100 EUR vom Kindergeld an den Vater auszukehren.
 
 Dieser Kindergeld-Ausgleich ist mit dem Wechselmodell-Ausgleichsanspruch zu verrechnen. Dies geschieht, indem durch den Abzug des hälftigen Kindergeldes vom Bedarf der Baranteil bereits abgegolten wurde. Verbleibend ist allein die Verrechnung des Betreuungsanteils. Diese erfolgt durch die Hinzurechnung des hälftigen Kindergeldes beim Kindergeldempfänger und die sich anschließende Auskehr des dem anderen gebührenden Betreuungsanteils.
 

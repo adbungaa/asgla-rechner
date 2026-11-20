@@ -1,6 +1,7 @@
 module View.Eltern exposing (viewEltern)
 
 import Constants exposing (getSelbstbehalt)
+import Elternteil exposing (calculateDurchschnittseinkommen)
 import Html exposing (Html, button, div, h4, input, label, option, p, select, span, text)
 import Html.Attributes exposing (attribute, checked, class, classList, disabled, id, name, placeholder, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -18,7 +19,7 @@ import Types
         )
 import Utils.Format exposing (formatEuroRounded, formatInputToFloat, renderSelbstbehaltBetrag, selbstbehaltToString)
 import Utils.Validation exposing (validateMoney)
-import View.Components exposing (showTooltip, skriptLink, viewEntryActionButtons)
+import View.Components exposing (moneyHelp, showTooltip, skriptLink, viewEntryActionButtons)
 
 
 
@@ -219,16 +220,8 @@ viewDurchschnittseinkommen model p =
                 Mutter ->
                     model.mutter
 
-        einkommenWerte =
-            modelPerson.einkommenZumDurchschnittsberechnung
-                |> List.filterMap (.kosten >> formatInputToFloat)
-
         durchschnitt =
-            if List.isEmpty einkommenWerte then
-                Nothing
-
-            else
-                Just (List.sum einkommenWerte / toFloat (List.length einkommenWerte))
+            calculateDurchschnittseinkommen modelPerson.einkommenZumDurchschnittsberechnung
 
         hasInvalidEinkommen =
             modelPerson.einkommenZumDurchschnittsberechnung
@@ -262,16 +255,6 @@ viewDurchschnittseinkommen model p =
 
     else
         text ""
-
-
-moneyHelp : String -> Html Msg
-moneyHelp value =
-    case validateMoney value of
-        Just message ->
-            p [ class "help is-danger" ] [ text message ]
-
-        Nothing ->
-            text ""
 
 
 
