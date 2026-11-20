@@ -740,6 +740,21 @@ showErgebnis model =
 
         detailsOffen =
             hinweisNoetig || model.haftungsbetragQuelle /= Nothing
+
+        viewSchrittKopf : String -> String -> Html msg
+        viewSchrittKopf nummer titel =
+            div [ class "schritt-kopf" ]
+                [ span [ class "schritt-nr" ] [ text nummer ]
+                , h3 [ class "title is-5 mb-0" ] [ text titel ]
+                ]
+
+        viewFazitZeile : String -> String -> Html msg
+        viewFazitZeile bezeichnung wert =
+            div [ class "schritt-fazit-zeile" ]
+                [ i [ class "fas fa-arrow-right schritt-fazit-icon", attribute "aria-hidden" "true" ] []
+                , span [] [ text bezeichnung ]
+                , span [ class "schritt-fazit-wert" ] [ text wert ]
+                ]
     in
     div
         [ class "mt-5", style "margin" "1rem" ]
@@ -790,163 +805,165 @@ showErgebnis model =
                     [ i [ class "fas fa-chevron-down", attribute "aria-hidden" "true" ] [] ]
                 ]
             , div [ class "ergebnis-details-inhalt" ]
-                [ Html.h2 [ class "title is-4 mb-0" ] [ text "Rechenweg" ]
-                , div [ class "columns is-variable is-3" ]
-                    [ div [ class "column" ] [ renderPersonSection "Vater" Vater ]
-                    , div [ class "column" ] [ renderPersonSection "Mutter" Mutter ]
+                [ Html.h2 [ class "title is-4 mb-4" ] [ text "Rechenweg" ]
+                , div [ class "schritt-abschnitt" ]
+                    [ viewSchrittKopf "1" "Einkommen & Haftungsanteile der Eltern"
+                    , div [ class "columns is-variable is-3" ]
+                        [ div [ class "column" ] [ renderPersonSection "Vater" Vater ]
+                        , div [ class "column" ] [ renderPersonSection "Mutter" Mutter ]
+                        ]
+                    , div [ class "schritt-fazit" ]
+                        [ viewFazitZeile "Relevantes Gesamteinkommen für den Regelbedarf" (formatEuroRounded ergebnis.gesamtEinkommen ++ "\u{00A0}€")
+                        , viewFazitZeile "Verteilbarer Betrag Gesamt" (formatEuroRounded ergebnis.verteilbarerBetragGesamt ++ "\u{00A0}€")
+                        , viewFazitZeile "Haftungsanteil Vater / Mutter" (formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ "\u{00A0}% / " ++ formatEuroRounded (ergebnis.haftungsanteilMutter * 100) ++ "\u{00A0}%")
+                        ]
+                    , if ergebnis.haftungsanteilVater == 0 && ergebnis.haftungsanteilMutter == 0 then
+                        p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt." ]
+
+                      else if ergebnis.haftungsanteilVater == 0 then
+                        p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens der Mutter." ]
+
+                      else if ergebnis.haftungsanteilMutter == 0 then
+                        p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens des Vaters." ]
+
+                      else
+                        text ""
                     ]
-        , p [ class "mt-4" ] [ text ("Relevantes Gesamteinkommen für den Regelbedarf: " ++ formatEuroRounded ergebnis.gesamtEinkommen ++ "\u{00A0}€") ]
-        , p [ class "mt-4" ] [ text ("Verteilbarer Betrag Gesamt: " ++ formatEuroRounded ergebnis.verteilbarerBetragGesamt ++ "\u{00A0}€") ]
-        , div [ class "columns is-variable is-3" ]
-            [ div [ class "column" ]
-                [ p [ class "mt-4" ] [ text ("Haftungsanteil Vater: " ++ formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ "%") ]
-                , if ergebnis.haftungsanteilVater == 0 && ergebnis.haftungsanteilMutter == 0 then
-                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt." ]
+                , div [ class "schritt-abschnitt" ]
+                    [ viewSchrittKopf "2" ("Bedarf des Kindes (Alter: " ++ String.fromInt model.kind.alter ++ " Jahre)")
+                    , table [ class "table is-striped is-bordered is-hoverable is-fullwidth" ]
+                        [ thead []
+                            [ header "Bezeichnung" "Betrag"
+                            ]
+                        , tbody []
+                            ([ row
+                                ("Regelbedarf"
+                                    ++ (if model.customRegelbedarf then
+                                            "**"
 
-                  else if ergebnis.haftungsanteilVater == 0 then
-                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens der Mutter." ]
+                                        else
+                                            ""
+                                       )
+                                )
+                                (formatEuroRounded (Maybe.withDefault 0 ergebnis.regelbedarf) ++ "\u{00A0}€")
+                             , row "Zusätzliche Kosten des Kindes" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf) + List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ "\u{00A0}€")
+                             , row "davon Mehrbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf)) ++ "\u{00A0}€")
+                             ]
+                                -- mehrbedarf list rows
+                                ++ List.map
+                                    (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ " \u{00A0}\u{00A0} (" ++ (item.bezahltVon |> Maybe.map (\bezahler -> "bezahlt von " ++ personToString bezahler) |> Maybe.withDefault "noch nicht bezahlt") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ "\u{00A0}€"))
+                                    (List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00") model.kind.mehrbedarf)
+                                ++ [ row "davon Sonderbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ "\u{00A0}€") ]
+                                -- sonderbedarf list rows
+                                ++ List.map
+                                    (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ "\u{00A0}\u{00A0} (" ++ (item.bezahltVon |> Maybe.map (\bezahler -> "bezahlt von " ++ personToString bezahler) |> Maybe.withDefault "noch nicht bezahlt") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ "\u{00A0}€"))
+                                    (List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00") model.kind.sonderbedarf)
+                                ++ (if not (List.isEmpty kindEinkuenftePositionen) then
+                                        [ rowWithLines kindEinkuenfteZeilen (formatEuroRounded anzurechnendeKindEinkuenfte ++ "\u{00A0}€") ]
 
-                  else if ergebnis.haftungsanteilMutter == 0 then
-                    p [ class "mt-4 has-text-danger" ] [ text "Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der ", skriptLink "regelbedarf-grundbedarf" "Regelbedarf", text " des Kindes allein aufgrund des Einkommens des Vaters." ]
-
-                  else
-                    text ""
-                ]
-            , div [ class "column" ]
-                [ p [ class "mt-4" ] [ text ("Haftungsanteil Mutter: " ++ formatEuroRounded (ergebnis.haftungsanteilMutter * 100) ++ "%") ]
-                ]
-            ]
-        , hr [] []
-        , h4 [ class "title is-5 mt-5" ] [ text ("Bedarf des Kindes (Alter: " ++ String.fromInt model.kind.alter ++ " Jahre)") ]
-        , table [ class "table is-striped is-bordered is-hoverable is-fullwidth" ]
-            [ thead []
-                [ header "Bezeichnung" "Betrag"
-                ]
-            , tbody []
-                ([ row
-                    ("Regelbedarf"
-                        ++ (if model.customRegelbedarf then
-                                "**"
-
-                            else
-                                ""
-                           )
-                    )
-                    (formatEuroRounded (Maybe.withDefault 0 ergebnis.regelbedarf) ++ "\u{00A0}€")
-                 , row "Zusätzliche Kosten des Kindes" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf) + List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ "\u{00A0}€")
-                 , row "davon Mehrbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.mehrbedarf)) ++ "\u{00A0}€")
-                 ]
-                    -- mehrbedarf list rows
-                    ++ List.map
-                        (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ " \u{00A0}\u{00A0} (" ++ (item.bezahltVon |> Maybe.map (\bezahler -> "bezahlt von " ++ personToString bezahler) |> Maybe.withDefault "noch nicht bezahlt") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ "\u{00A0}€"))
-                        (List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00") model.kind.mehrbedarf)
-                    ++ [ row "davon Sonderbedarf" (formatEuroRounded (List.sum (List.map (\item -> formatInputToFloat item.kosten |> Maybe.withDefault 0) model.kind.sonderbedarf)) ++ "\u{00A0}€") ]
-                    -- sonderbedarf list rows
-                    ++ List.map
-                        (\item -> row ("\u{00A0}\u{00A0}" ++ item.bezeichnung ++ "\u{00A0}\u{00A0} (" ++ (item.bezahltVon |> Maybe.map (\bezahler -> "bezahlt von " ++ personToString bezahler) |> Maybe.withDefault "noch nicht bezahlt") ++ ")") (formatEuroRounded (formatInputToFloat item.kosten |> Maybe.withDefault 0) ++ "\u{00A0}€"))
-                        (List.filter (\item -> not (String.isEmpty item.kosten) && item.kosten /= "0,00") model.kind.sonderbedarf)
-                    ++ (if not (List.isEmpty kindEinkuenftePositionen) then
-                            [ rowWithLines kindEinkuenfteZeilen (formatEuroRounded anzurechnendeKindEinkuenfte ++ "\u{00A0}€") ]
-
-                        else
-                            []
-                       )
-                    ++ [ row "Abzug hälftiges Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr) / 2) ++ "\u{00A0}€")
-                       , row "Gesamtbedarf" (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ "\u{00A0}€")
-                       ]
-                )
-            ]
-        , hr [] []
-
-        -- , h4 [ class "title is-5 mt-5" ] [ text "Anteile ohne getragene Zusatzbedarfe" ]
-        , div [ class "columns is-variable is-3 mt-4" ]
-            [ div [ class "column" ]
-                [ p [] [ text ("Anteil Vater am Gesamtbedarf: " ++ formatEuroRounded ergebnis.haftungsbetragVater ++ "\u{00A0}€") ]
-                , viewBegrenzungHinweis
-                    "Vaters"
-                    ergebnis.haftungsbetragVaterVorBegrenzung
-                    ergebnis.haftungsbetragVater
-                    ergebnis.verteilbarerBetragVater
-                , if (model.haftungsbetragVaterSpiegel |> Maybe.withDefault 0) > hoechstbetragVater then
-                    viewHHinweisAnteilEltern model ergebnis Vater ergebnis.bereinigtesEinkommenVater ergebnis.haftungsbetragVater ergebnis.haftungsbetragMutter
-
-                  else
-                    text ""
-                ]
-            , div [ class "column" ]
-                [ p [] [ text ("Anteil Mutter am Gesamtbedarf: " ++ formatEuroRounded ergebnis.haftungsbetragMutter ++ "\u{00A0}€") ]
-                , viewBegrenzungHinweis
-                    "Mutters"
-                    ergebnis.haftungsbetragMutterVorBegrenzung
-                    ergebnis.haftungsbetragMutter
-                    ergebnis.verteilbarerBetragMutter
-                , if (model.haftungsbetragMutterSpiegel |> Maybe.withDefault 0) > hoechstbetragMutter then
-                    viewHHinweisAnteilEltern model ergebnis Mutter ergebnis.bereinigtesEinkommenMutter ergebnis.haftungsbetragVater ergebnis.haftungsbetragMutter
-
-                  else
-                    text ""
-                ]
-            ]
-        , if ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt > 0 then
-            div []
-                [ p [ style "color" "#ff0000", class "has-text-centered" ] [ text ("Ungedeckter Kindsbedarf: " ++ formatEuroRounded (ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) ++ "\u{00A0}€") ]
-                , div [ class "notification mt-4" ]
-                    [ p []
-                        [ text "Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag."
-                        , case model.vater.selbstbehalt of
-                            Angemessen _ ->
-                                span []
-                                    [ text " Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen "
-                                    , skriptLink "sockelbetrag" "Selbstbehalts"
-                                    , text " den notwendigen Selbstbehalt anzusetzen."
-                                    ]
-
-                            _ ->
-                                text " Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen."
+                                    else
+                                        []
+                                   )
+                                ++ [ row "Abzug hälftiges Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr) / 2) ++ "\u{00A0}€")
+                                   , row "Gesamtbedarf" (formatEuroRounded ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf ++ "\u{00A0}€")
+                                   ]
+                            )
                         ]
                     ]
-                ]
+                , div [ class "schritt-abschnitt" ]
+                    [ viewSchrittKopf "3" "Kostenanteile & Ausgleich vor Kindergeldverrechnung"
+                    , div [ class "schritt-fazit mt-0 mb-4" ]
+                        [ viewFazitZeile "Anteil Vater am Gesamtbedarf" (formatEuroRounded ergebnis.haftungsbetragVater ++ "\u{00A0}€")
+                        , viewFazitZeile "Anteil Mutter am Gesamtbedarf" (formatEuroRounded ergebnis.haftungsbetragMutter ++ "\u{00A0}€")
+                        ]
+                    , div [ class "columns is-variable is-3" ]
+                        [ div [ class "column" ]
+                            [ viewBegrenzungHinweis
+                                "Vaters"
+                                ergebnis.haftungsbetragVaterVorBegrenzung
+                                ergebnis.haftungsbetragVater
+                                ergebnis.verteilbarerBetragVater
+                            , if (model.haftungsbetragVaterSpiegel |> Maybe.withDefault 0) > hoechstbetragVater then
+                                viewHHinweisAnteilEltern model ergebnis Vater ergebnis.bereinigtesEinkommenVater ergebnis.haftungsbetragVater ergebnis.haftungsbetragMutter
 
-          else
-            text ""
-        , viewZusatzbedarfLeistungen model ergebnis
-        , p [ class "mt-4" ] [ text ("Differenz: " ++ formatEuroRounded differenzNachAnrechnung ++ "\u{00A0}€") ]
-        , p [ class "mt-4" ] [ text ("Auszugleichender Betrag (1/2) von " ++ personToString nichtAnspruchsberechtigtNachAnrechnung ++ " zu leisten an " ++ personToString anspruchsberechtigtNachAnrechnung ++ ": " ++ formatEuroRounded auszugleichenderBetragNachAnrechnung ++ "\u{00A0}€") ]
-        , h4 [ class "title is-5 mt-5" ] [ text "Kindergeldverrechnung " ]
-        , table [ class "table is-striped is-bordered is-hoverable is-fullwidth" ]
-            [ thead []
-                [ header "Bezeichnung" "Betrag"
-                ]
-            , tbody []
-                [ row "Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr)) ++ "\u{00A0}€")
-                , row "Kindergeldempfänger" (personToString model.kindergeldEmpfaenger)
-                , row "Betreuungsanteil Mutter" (formatEuroRounded ergebnis.betreuungsanteil ++ "\u{00A0}€")
-                , row "Baranteil Mutter" (formatEuroRounded ergebnis.baranteilMutter ++ "\u{00A0}€")
-                , row "Betreuungsanteil Vater" (formatEuroRounded ergebnis.betreuungsanteil ++ "\u{00A0}€")
-                , row "Baranteil Vater" (formatEuroRounded ergebnis.baranteilVater ++ "\u{00A0}€")
-                ]
-            ]
-        , p [ class "mt-4" ] [ text "Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des ", skriptLink "kindergeldverrechnung" "Betreuungsanteils", text (" in Höhe von " ++ formatEuroRounded kindergeldBetreuungsanteil ++ "\u{00A0}€ von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger ++ ": ") ]
-        , table [ class "table is-striped is-bordered is-hoverable is-fullwidth mt-4" ]
-            [ thead []
-                [ header "Zwischenschritt" "Betrag"
-                ]
-            , tbody []
-                [ row "Auszugleichender Betrag (1/2)" (formatEuroRounded auszugleichenderBetragNachAnrechnung ++ "\u{00A0}€")
-                , row ("Betreuungsanteil Kindergeld von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger) (ausgleichsanspruchRechenzeichen ++ " " ++ formatEuroRounded kindergeldBetreuungsanteil ++ "\u{00A0}€")
-                , row "Rechnung Ausgleichsanspruch" ausgleichsanspruchZwischenschritt
-                ]
-            ]
-        , p [ class "mt-4" ] [ text "Der Ausgleichsanspruch ist auf volle Euro aufzurunden." ]
-        , hr [] []
-        , div
-            [ class "box content has-text-weight-bold mt-4 has-text-centered"
-            , style "border" "1px solid #ccc"
-            , style "border-radius" "8px"
-            , style "padding" "1rem"
-            ]
-            [ text ("Daher insgesamt von " ++ personToString zahler ++ " an " ++ personToString empfaenger ++ " zu leistende Ausgleichszahlung: " ++ formatEuroRounded zahlbetrag ++ "\u{00A0}€")
-            ]
+                              else
+                                text ""
+                            ]
+                        , div [ class "column" ]
+                            [ viewBegrenzungHinweis
+                                "Mutters"
+                                ergebnis.haftungsbetragMutterVorBegrenzung
+                                ergebnis.haftungsbetragMutter
+                                ergebnis.verteilbarerBetragMutter
+                            , if (model.haftungsbetragMutterSpiegel |> Maybe.withDefault 0) > hoechstbetragMutter then
+                                viewHHinweisAnteilEltern model ergebnis Mutter ergebnis.bereinigtesEinkommenMutter ergebnis.haftungsbetragVater ergebnis.haftungsbetragMutter
+
+                              else
+                                text ""
+                            ]
+                        ]
+                    , if ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt > 0 then
+                        div []
+                            [ p [ style "color" "#ff0000", class "has-text-centered" ] [ text ("Ungedeckter Kindsbedarf: " ++ formatEuroRounded (ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) ++ "\u{00A0}€") ]
+                            , div [ class "notification mt-4" ]
+                                [ p []
+                                    [ text "Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag."
+                                    , case model.vater.selbstbehalt of
+                                        Angemessen _ ->
+                                            span []
+                                                [ text " Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen "
+                                                , skriptLink "sockelbetrag" "Selbstbehalts"
+                                                , text " den notwendigen Selbstbehalt anzusetzen."
+                                                ]
+
+                                        _ ->
+                                            text " Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen."
+                                    ]
+                                ]
+                            ]
+
+                      else
+                        text ""
+                    , viewZusatzbedarfLeistungen model ergebnis
+                    , div [ class "schritt-fazit" ]
+                        [ viewFazitZeile "Differenz" (formatEuroRounded differenzNachAnrechnung ++ "\u{00A0}€")
+                        , viewFazitZeile ("Auszugleichender Betrag (1/2) von " ++ personToString nichtAnspruchsberechtigtNachAnrechnung ++ " zu leisten an " ++ personToString anspruchsberechtigtNachAnrechnung) (formatEuroRounded auszugleichenderBetragNachAnrechnung ++ "\u{00A0}€")
+                        ]
+                    ]
+                , div [ class "schritt-abschnitt" ]
+                    [ viewSchrittKopf "4" "Kindergeldverrechnung"
+                    , table [ class "table is-striped is-bordered is-hoverable is-fullwidth" ]
+                        [ thead []
+                            [ header "Bezeichnung" "Betrag"
+                            ]
+                        , tbody []
+                            [ row "Kindergeld" (formatEuroRounded (toFloat (getKindergeld model.jahr)) ++ "\u{00A0}€")
+                            , row "Kindergeldempfänger" (personToString model.kindergeldEmpfaenger)
+                            , row "Betreuungsanteil Mutter" (formatEuroRounded ergebnis.betreuungsanteil ++ "\u{00A0}€")
+                            , row "Baranteil Mutter" (formatEuroRounded ergebnis.baranteilMutter ++ "\u{00A0}€")
+                            , row "Betreuungsanteil Vater" (formatEuroRounded ergebnis.betreuungsanteil ++ "\u{00A0}€")
+                            , row "Baranteil Vater" (formatEuroRounded ergebnis.baranteilVater ++ "\u{00A0}€")
+                            ]
+                        ]
+                    , p [ class "mt-4" ] [ text "Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des ", skriptLink "kindergeldverrechnung" "Betreuungsanteils", text (" in Höhe von " ++ formatEuroRounded kindergeldBetreuungsanteil ++ "\u{00A0}€ von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger ++ ": ") ]
+                    , table [ class "table is-striped is-bordered is-hoverable is-fullwidth mt-4" ]
+                        [ thead []
+                            [ header "Zwischenschritt" "Betrag"
+                            ]
+                        , tbody []
+                            [ row "Auszugleichender Betrag (1/2)" (formatEuroRounded auszugleichenderBetragNachAnrechnung ++ "\u{00A0}€")
+                            , row ("Betreuungsanteil Kindergeld von " ++ personToString model.kindergeldEmpfaenger ++ " an " ++ personToString nichtKindergeldEmpfänger) (ausgleichsanspruchRechenzeichen ++ " " ++ formatEuroRounded kindergeldBetreuungsanteil ++ "\u{00A0}€")
+                            , row "Rechnung Ausgleichsanspruch" ausgleichsanspruchZwischenschritt
+                            ]
+                        ]
+                    , p [ class "mt-4 has-text-grey" ] [ text "Der Ausgleichsanspruch ist auf volle Euro aufzurunden." ]
+                    , div [ class "gesamtergebnis-box" ]
+                        [ span [ class "gesamtergebnis-box__label" ]
+                            [ text ("Daher insgesamt von " ++ personToString zahler ++ " an " ++ personToString empfaenger ++ " zu leistende Ausgleichszahlung") ]
+                        , span [ class "gesamtergebnis-box__betrag" ]
+                            [ text (formatEuroRounded zahlbetrag ++ "\u{00A0}€") ]
+                        ]
+                    ]
                 , details [ class "ergebnis-glossar" ]
                     [ summary [] [ text "Begriffe kurz erklärt" ]
                     , Html.dl []

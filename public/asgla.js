@@ -18020,7 +18020,6 @@ var $author$project$Constants$getHoechstbetrag = F3(
 	});
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $elm$core$List$intersperse = F2(
 	function (sep, xs) {
 		if (!xs.b) {
@@ -18718,6 +18717,75 @@ var $author$project$View$Components$zusatzKachel = A2(
 			$elm$html$Html$text('Anteil an den Kosten des Kindes')
 		]));
 var $author$project$View$Components$showErgebnis = function (model) {
+	var viewSchrittKopf = F2(
+		function (nummer, titel) {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('schritt-kopf')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('schritt-nr')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(nummer)
+							])),
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('title is-5 mb-0')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(titel)
+							]))
+					]));
+		});
+	var viewFazitZeile = F2(
+		function (bezeichnung, wert) {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('schritt-fazit-zeile')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$i,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('fas fa-arrow-right schritt-fazit-icon'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(bezeichnung)
+							])),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('schritt-fazit-wert')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(wert)
+							]))
+					]));
+		});
 	var rowWithLines = F2(
 		function (lines, value) {
 			return A2(
@@ -19372,7 +19440,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 								$elm$html$Html$h2,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('title is-4 mb-0')
+										$elm$html$Html$Attributes$class('title is-4 mb-4')
 									]),
 								_List_fromArray(
 									[
@@ -19382,245 +19450,137 @@ var $author$project$View$Components$showErgebnis = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('columns is-variable is-3')
+										$elm$html$Html$Attributes$class('schritt-abschnitt')
 									]),
 								_List_fromArray(
 									[
+										A2(viewSchrittKopf, '1', 'Einkommen & Haftungsanteile der Eltern'),
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('column')
+												$elm$html$Html$Attributes$class('columns is-variable is-3')
 											]),
 										_List_fromArray(
 											[
-												A2(renderPersonSection, 'Vater', $author$project$Types$Vater)
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('column')
+													]),
+												_List_fromArray(
+													[
+														A2(renderPersonSection, 'Vater', $author$project$Types$Vater)
+													])),
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('column')
+													]),
+												_List_fromArray(
+													[
+														A2(renderPersonSection, 'Mutter', $author$project$Types$Mutter)
+													]))
 											])),
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('column')
+												$elm$html$Html$Attributes$class('schritt-fazit')
 											]),
 										_List_fromArray(
 											[
-												A2(renderPersonSection, 'Mutter', $author$project$Types$Mutter)
-											]))
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'Relevantes Gesamteinkommen für den Regelbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtEinkommen) + '\u00A0€'))
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'Verteilbarer Betrag Gesamt: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.verteilbarerBetragGesamt) + '\u00A0€'))
+												A2(
+												viewFazitZeile,
+												'Relevantes Gesamteinkommen für den Regelbedarf',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtEinkommen) + '\u00A0€'),
+												A2(
+												viewFazitZeile,
+												'Verteilbarer Betrag Gesamt',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.verteilbarerBetragGesamt) + '\u00A0€'),
+												A2(
+												viewFazitZeile,
+												'Haftungsanteil Vater / Mutter',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + ('\u00A0% / ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '\u00A0%')))
+											])),
+										((!ergebnis.haftungsanteilVater) && (!ergebnis.haftungsanteilMutter)) ? A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den '),
+												A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
+												$elm$html$Html$text(' des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt.')
+											])) : ((!ergebnis.haftungsanteilVater) ? A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der '),
+												A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
+												$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens der Mutter.')
+											])) : ((!ergebnis.haftungsanteilMutter) ? A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mt-4 has-text-danger')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der '),
+												A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
+												$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens des Vaters.')
+											])) : $elm$html$Html$text('')))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('columns is-variable is-3')
+										$elm$html$Html$Attributes$class('schritt-abschnitt')
 									]),
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$div,
+										viewSchrittKopf,
+										'2',
+										'Bedarf des Kindes (Alter: ' + ($elm$core$String$fromInt(model.kind.alter) + ' Jahre)')),
+										A2(
+										$elm$html$Html$table,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('column')
+												$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
 											]),
 										_List_fromArray(
 											[
 												A2(
-												$elm$html$Html$p,
+												$elm$html$Html$thead,
+												_List_Nil,
 												_List_fromArray(
 													[
-														$elm$html$Html$Attributes$class('mt-4')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(
-														'Haftungsanteil Vater: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '%'))
+														A2(header, 'Bezeichnung', 'Betrag')
 													])),
-												((!ergebnis.haftungsanteilVater) && (!ergebnis.haftungsanteilMutter)) ? A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('mt-4 has-text-danger')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Da der Haftungsanteil beider Eltern bei 0 Prozent liegt, wird für den '),
-														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
-														$elm$html$Html$text(' des Kindes der Mindestbedarf der Düsseldorfer Tabelle angesetzt.')
-													])) : ((!ergebnis.haftungsanteilVater) ? A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('mt-4 has-text-danger')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Da der Haftungsanteil des Vaters bei 0 Prozent liegt, berechnet sich der '),
-														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
-														$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens der Mutter.')
-													])) : ((!ergebnis.haftungsanteilMutter) ? A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('mt-4 has-text-danger')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Da der Haftungsanteil der Mutter bei 0 Prozent liegt, berechnet sich der '),
-														A2($author$project$View$Components$skriptLink, 'regelbedarf-grundbedarf', 'Regelbedarf'),
-														$elm$html$Html$text(' des Kindes allein aufgrund des Einkommens des Vaters.')
-													])) : $elm$html$Html$text('')))
-											])),
-										A2(
-										$elm$html$Html$div,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('column')
-											]),
-										_List_fromArray(
-											[
 												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('mt-4')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(
-														'Haftungsanteil Mutter: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '%'))
-													]))
-											]))
-									])),
-								A2($elm$html$Html$hr, _List_Nil, _List_Nil),
-								A2(
-								$elm$html$Html$h4,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('title is-5 mt-5')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'Bedarf des Kindes (Alter: ' + ($elm$core$String$fromInt(model.kind.alter) + ' Jahre)'))
-									])),
-								A2(
-								$elm$html$Html$table,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$thead,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(header, 'Bezeichnung', 'Betrag')
-											])),
-										A2(
-										$elm$html$Html$tbody,
-										_List_Nil,
-										_Utils_ap(
-											_List_fromArray(
-												[
-													A2(
-													row,
-													'Regelbedarf' + (model.customRegelbedarf ? '**' : ''),
-													$author$project$Utils$Format$formatEuroRounded(
-														A2($elm$core$Maybe$withDefault, 0, ergebnis.regelbedarf)) + '\u00A0€'),
-													A2(
-													row,
-													'Zusätzliche Kosten des Kindes',
-													$author$project$Utils$Format$formatEuroRounded(
-														$elm$core$List$sum(
-															A2(
-																$elm$core$List$map,
-																function (item) {
-																	return A2(
-																		$elm$core$Maybe$withDefault,
-																		0,
-																		$author$project$Utils$Format$formatInputToFloat(item.kosten));
-																},
-																model.kind.mehrbedarf)) + $elm$core$List$sum(
-															A2(
-																$elm$core$List$map,
-																function (item) {
-																	return A2(
-																		$elm$core$Maybe$withDefault,
-																		0,
-																		$author$project$Utils$Format$formatInputToFloat(item.kosten));
-																},
-																model.kind.sonderbedarf))) + '\u00A0€'),
-													A2(
-													row,
-													'davon Mehrbedarf',
-													$author$project$Utils$Format$formatEuroRounded(
-														$elm$core$List$sum(
-															A2(
-																$elm$core$List$map,
-																function (item) {
-																	return A2(
-																		$elm$core$Maybe$withDefault,
-																		0,
-																		$author$project$Utils$Format$formatInputToFloat(item.kosten));
-																},
-																model.kind.mehrbedarf))) + '\u00A0€')
-												]),
-											_Utils_ap(
-												A2(
-													$elm$core$List$map,
-													function (item) {
-														return A2(
-															row,
-															'\u00A0\u00A0' + (item.bezeichnung + (' \u00A0\u00A0 (' + (A2(
-																$elm$core$Maybe$withDefault,
-																'noch nicht bezahlt',
-																A2(
-																	$elm$core$Maybe$map,
-																	function (bezahler) {
-																		return 'bezahlt von ' + $author$project$Utils$Format$personToString(bezahler);
-																	},
-																	item.bezahltVon)) + ')'))),
-															$author$project$Utils$Format$formatEuroRounded(
-																A2(
-																	$elm$core$Maybe$withDefault,
-																	0,
-																	$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€');
-													},
-													A2(
-														$elm$core$List$filter,
-														function (item) {
-															return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
-														},
-														model.kind.mehrbedarf)),
+												$elm$html$Html$tbody,
+												_List_Nil,
 												_Utils_ap(
 													_List_fromArray(
 														[
 															A2(
 															row,
-															'davon Sonderbedarf',
+															'Regelbedarf' + (model.customRegelbedarf ? '**' : ''),
+															$author$project$Utils$Format$formatEuroRounded(
+																A2($elm$core$Maybe$withDefault, 0, ergebnis.regelbedarf)) + '\u00A0€'),
+															A2(
+															row,
+															'Zusätzliche Kosten des Kindes',
 															$author$project$Utils$Format$formatEuroRounded(
 																$elm$core$List$sum(
 																	A2(
@@ -19631,7 +19591,30 @@ var $author$project$View$Components$showErgebnis = function (model) {
 																				0,
 																				$author$project$Utils$Format$formatInputToFloat(item.kosten));
 																		},
-																		model.kind.sonderbedarf))) + '\u00A0€')
+																		model.kind.mehrbedarf)) + $elm$core$List$sum(
+																	A2(
+																		$elm$core$List$map,
+																		function (item) {
+																			return A2(
+																				$elm$core$Maybe$withDefault,
+																				0,
+																				$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																		},
+																		model.kind.sonderbedarf))) + '\u00A0€'),
+															A2(
+															row,
+															'davon Mehrbedarf',
+															$author$project$Utils$Format$formatEuroRounded(
+																$elm$core$List$sum(
+																	A2(
+																		$elm$core$List$map,
+																		function (item) {
+																			return A2(
+																				$elm$core$Maybe$withDefault,
+																				0,
+																				$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																		},
+																		model.kind.mehrbedarf))) + '\u00A0€')
 														]),
 													_Utils_ap(
 														A2(
@@ -19639,7 +19622,7 @@ var $author$project$View$Components$showErgebnis = function (model) {
 															function (item) {
 																return A2(
 																	row,
-																	'\u00A0\u00A0' + (item.bezeichnung + ('\u00A0\u00A0 (' + (A2(
+																	'\u00A0\u00A0' + (item.bezeichnung + (' \u00A0\u00A0 (' + (A2(
 																		$elm$core$Maybe$withDefault,
 																		'noch nicht bezahlt',
 																		A2(
@@ -19659,278 +19642,345 @@ var $author$project$View$Components$showErgebnis = function (model) {
 																function (item) {
 																	return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
 																},
-																model.kind.sonderbedarf)),
+																model.kind.mehrbedarf)),
 														_Utils_ap(
-															(!$elm$core$List$isEmpty(kindEinkuenftePositionen)) ? _List_fromArray(
-																[
-																	A2(
-																	rowWithLines,
-																	kindEinkuenfteZeilen,
-																	$author$project$Utils$Format$formatEuroRounded(anzurechnendeKindEinkuenfte) + '\u00A0€')
-																]) : _List_Nil,
 															_List_fromArray(
 																[
 																	A2(
 																	row,
-																	'Abzug hälftiges Kindergeld',
+																	'davon Sonderbedarf',
 																	$author$project$Utils$Format$formatEuroRounded(
-																		$author$project$Constants$getKindergeld(model.jahr) / 2) + '\u00A0€'),
+																		$elm$core$List$sum(
+																			A2(
+																				$elm$core$List$map,
+																				function (item) {
+																					return A2(
+																						$elm$core$Maybe$withDefault,
+																						0,
+																						$author$project$Utils$Format$formatInputToFloat(item.kosten));
+																				},
+																				model.kind.sonderbedarf))) + '\u00A0€')
+																]),
+															_Utils_ap(
+																A2(
+																	$elm$core$List$map,
+																	function (item) {
+																		return A2(
+																			row,
+																			'\u00A0\u00A0' + (item.bezeichnung + ('\u00A0\u00A0 (' + (A2(
+																				$elm$core$Maybe$withDefault,
+																				'noch nicht bezahlt',
+																				A2(
+																					$elm$core$Maybe$map,
+																					function (bezahler) {
+																						return 'bezahlt von ' + $author$project$Utils$Format$personToString(bezahler);
+																					},
+																					item.bezahltVon)) + ')'))),
+																			$author$project$Utils$Format$formatEuroRounded(
+																				A2(
+																					$elm$core$Maybe$withDefault,
+																					0,
+																					$author$project$Utils$Format$formatInputToFloat(item.kosten))) + '\u00A0€');
+																	},
 																	A2(
-																	row,
-																	'Gesamtbedarf',
-																	$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + '\u00A0€')
-																])))))))
+																		$elm$core$List$filter,
+																		function (item) {
+																			return (!$elm$core$String$isEmpty(item.kosten)) && (item.kosten !== '0,00');
+																		},
+																		model.kind.sonderbedarf)),
+																_Utils_ap(
+																	(!$elm$core$List$isEmpty(kindEinkuenftePositionen)) ? _List_fromArray(
+																		[
+																			A2(
+																			rowWithLines,
+																			kindEinkuenfteZeilen,
+																			$author$project$Utils$Format$formatEuroRounded(anzurechnendeKindEinkuenfte) + '\u00A0€')
+																		]) : _List_Nil,
+																	_List_fromArray(
+																		[
+																			A2(
+																			row,
+																			'Abzug hälftiges Kindergeld',
+																			$author$project$Utils$Format$formatEuroRounded(
+																				$author$project$Constants$getKindergeld(model.jahr) / 2) + '\u00A0€'),
+																			A2(
+																			row,
+																			'Gesamtbedarf',
+																			$author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf) + '\u00A0€')
+																		])))))))
+											]))
 									])),
-								A2($elm$html$Html$hr, _List_Nil, _List_Nil),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('columns is-variable is-3 mt-4')
+										$elm$html$Html$Attributes$class('schritt-abschnitt')
 									]),
 								_List_fromArray(
 									[
+										A2(viewSchrittKopf, '3', 'Kostenanteile & Ausgleich vor Kindergeldverrechnung'),
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('column')
+												$elm$html$Html$Attributes$class('schritt-fazit mt-0 mb-4')
 											]),
 										_List_fromArray(
 											[
 												A2(
-												$elm$html$Html$p,
-												_List_Nil,
-												_List_fromArray(
-													[
-														$elm$html$Html$text(
-														'Anteil Vater am Gesamtbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragVater) + '\u00A0€'))
-													])),
-												A4($author$project$View$Components$viewBegrenzungHinweis, 'Vaters', ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater, ergebnis.verteilbarerBetragVater),
-												(_Utils_cmp(
-												A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
-												hoechstbetragVater) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Vater, ergebnis.bereinigtesEinkommenVater, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
+												viewFazitZeile,
+												'Anteil Vater am Gesamtbedarf',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragVater) + '\u00A0€'),
+												A2(
+												viewFazitZeile,
+												'Anteil Mutter am Gesamtbedarf',
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragMutter) + '\u00A0€')
 											])),
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('column')
+												$elm$html$Html$Attributes$class('columns is-variable is-3')
 											]),
 										_List_fromArray(
 											[
 												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('column')
+													]),
+												_List_fromArray(
+													[
+														A4($author$project$View$Components$viewBegrenzungHinweis, 'Vaters', ergebnis.haftungsbetragVaterVorBegrenzung, ergebnis.haftungsbetragVater, ergebnis.verteilbarerBetragVater),
+														(_Utils_cmp(
+														A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragVaterSpiegel),
+														hoechstbetragVater) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Vater, ergebnis.bereinigtesEinkommenVater, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
+													])),
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('column')
+													]),
+												_List_fromArray(
+													[
+														A4($author$project$View$Components$viewBegrenzungHinweis, 'Mutters', ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter, ergebnis.verteilbarerBetragMutter),
+														(_Utils_cmp(
+														A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
+														hoechstbetragMutter) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Mutter, ergebnis.bereinigtesEinkommenMutter, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
+													]))
+											])),
+										((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) ? A2(
+										$elm$html$Html$div,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
 												$elm$html$Html$p,
-												_List_Nil,
+												_List_fromArray(
+													[
+														A2($elm$html$Html$Attributes$style, 'color', '#ff0000'),
+														$elm$html$Html$Attributes$class('has-text-centered')
+													]),
 												_List_fromArray(
 													[
 														$elm$html$Html$text(
-														'Anteil Mutter am Gesamtbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsbetragMutter) + '\u00A0€'))
+														'Ungedeckter Kindsbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) + '\u00A0€'))
 													])),
-												A4($author$project$View$Components$viewBegrenzungHinweis, 'Mutters', ergebnis.haftungsbetragMutterVorBegrenzung, ergebnis.haftungsbetragMutter, ergebnis.verteilbarerBetragMutter),
-												(_Utils_cmp(
-												A2($elm$core$Maybe$withDefault, 0, model.haftungsbetragMutterSpiegel),
-												hoechstbetragMutter) > 0) ? A6($author$project$View$Components$viewHHinweisAnteilEltern, model, ergebnis, $author$project$Types$Mutter, ergebnis.bereinigtesEinkommenMutter, ergebnis.haftungsbetragVater, ergebnis.haftungsbetragMutter) : $elm$html$Html$text('')
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('notification mt-4')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$p,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag.'),
+																function () {
+																var _v0 = model.vater.selbstbehalt;
+																if (_v0.$ === 'Angemessen') {
+																	return A2(
+																		$elm$html$Html$span,
+																		_List_Nil,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text(' Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen '),
+																				A2($author$project$View$Components$skriptLink, 'sockelbetrag', 'Selbstbehalts'),
+																				$elm$html$Html$text(' den notwendigen Selbstbehalt anzusetzen.')
+																			]));
+																} else {
+																	return $elm$html$Html$text(' Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen.');
+																}
+															}()
+															]))
+													]))
+											])) : $elm$html$Html$text(''),
+										A2($author$project$View$Components$viewZusatzbedarfLeistungen, model, ergebnis),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('schritt-fazit')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												viewFazitZeile,
+												'Differenz',
+												$author$project$Utils$Format$formatEuroRounded(differenzNachAnrechnung) + '\u00A0€'),
+												A2(
+												viewFazitZeile,
+												'Auszugleichender Betrag (1/2) von ' + ($author$project$Utils$Format$personToString(nichtAnspruchsberechtigtNachAnrechnung) + (' zu leisten an ' + $author$project$Utils$Format$personToString(anspruchsberechtigtNachAnrechnung))),
+												$author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + '\u00A0€')
 											]))
 									])),
-								((ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) > 0) ? A2(
+								A2(
 								$elm$html$Html$div,
-								_List_Nil,
 								_List_fromArray(
 									[
+										$elm$html$Html$Attributes$class('schritt-abschnitt')
+									]),
+								_List_fromArray(
+									[
+										A2(viewSchrittKopf, '4', 'Kindergeldverrechnung'),
+										A2(
+										$elm$html$Html$table,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$thead,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2(header, 'Bezeichnung', 'Betrag')
+													])),
+												A2(
+												$elm$html$Html$tbody,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2(
+														row,
+														'Kindergeld',
+														$author$project$Utils$Format$formatEuroRounded(
+															$author$project$Constants$getKindergeld(model.jahr)) + '\u00A0€'),
+														A2(
+														row,
+														'Kindergeldempfänger',
+														$author$project$Utils$Format$personToString(model.kindergeldEmpfaenger)),
+														A2(
+														row,
+														'Betreuungsanteil Mutter',
+														$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + '\u00A0€'),
+														A2(
+														row,
+														'Baranteil Mutter',
+														$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilMutter) + '\u00A0€'),
+														A2(
+														row,
+														'Betreuungsanteil Vater',
+														$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + '\u00A0€'),
+														A2(
+														row,
+														'Baranteil Vater',
+														$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilVater) + '\u00A0€')
+													]))
+											])),
 										A2(
 										$elm$html$Html$p,
 										_List_fromArray(
 											[
-												A2($elm$html$Html$Attributes$style, 'color', '#ff0000'),
-												$elm$html$Html$Attributes$class('has-text-centered')
+												$elm$html$Html$Attributes$class('mt-4')
 											]),
 										_List_fromArray(
 											[
+												$elm$html$Html$text('Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des '),
+												A2($author$project$View$Components$skriptLink, 'kindergeldverrechnung', 'Betreuungsanteils'),
 												$elm$html$Html$text(
-												'Ungedeckter Kindsbedarf: ' + ($author$project$Utils$Format$formatEuroRounded(ergebnis.gesamtKindbedarf_mitGetrageneZusatzbedarf - ergebnis.verteilbarerBetragGesamt) + '\u00A0€'))
+												' in Höhe von ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + ('\u00A0€ von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + ($author$project$Utils$Format$personToString(nichtKindergeldEmpfänger) + ': '))))))
+											])),
+										A2(
+										$elm$html$Html$table,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth mt-4')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$thead,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2(header, 'Zwischenschritt', 'Betrag')
+													])),
+												A2(
+												$elm$html$Html$tbody,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2(
+														row,
+														'Auszugleichender Betrag (1/2)',
+														$author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + '\u00A0€'),
+														A2(
+														row,
+														'Betreuungsanteil Kindergeld von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + $author$project$Utils$Format$personToString(nichtKindergeldEmpfänger))),
+														ausgleichsanspruchRechenzeichen + (' ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + '\u00A0€'))),
+														A2(row, 'Rechnung Ausgleichsanspruch', ausgleichsanspruchZwischenschritt)
+													]))
+											])),
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mt-4 has-text-grey')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Der Ausgleichsanspruch ist auf volle Euro aufzurunden.')
 											])),
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('notification mt-4')
+												$elm$html$Html$Attributes$class('gesamtergebnis-box')
 											]),
 										_List_fromArray(
 											[
 												A2(
-												$elm$html$Html$p,
-												_List_Nil,
+												$elm$html$Html$span,
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Hinweis: Der Bedarf des Kindes ist höher als der verteilbare Betrag.'),
-														function () {
-														var _v0 = model.vater.selbstbehalt;
-														if (_v0.$ === 'Angemessen') {
-															return A2(
-																$elm$html$Html$span,
-																_List_Nil,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$text(' Es sollte gegebenenfalls in Erwägung gezogen werden, statt des angemessenen '),
-																		A2($author$project$View$Components$skriptLink, 'sockelbetrag', 'Selbstbehalts'),
-																		$elm$html$Html$text(' den notwendigen Selbstbehalt anzusetzen.')
-																	]));
-														} else {
-															return $elm$html$Html$text(' Da der Bedarf des Kindes nicht durch die Eltern gedeckt werden kann, sollte geprüft werden, ob Ergänzen weitere finanzielle Unterstützungsmöglichkeiten in Anspruch genommen werden können, z. B. durch die Inanspruchnahme sozialrechtlicher Leistungen.');
-														}
-													}()
+														$elm$html$Html$Attributes$class('gesamtergebnis-box__label')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														'Daher insgesamt von ' + ($author$project$Utils$Format$personToString(zahler) + (' an ' + ($author$project$Utils$Format$personToString(empfaenger) + ' zu leistende Ausgleichszahlung'))))
+													])),
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('gesamtergebnis-box__betrag')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														$author$project$Utils$Format$formatEuroRounded(zahlbetrag) + '\u00A0€')
 													]))
 											]))
-									])) : $elm$html$Html$text(''),
-								A2($author$project$View$Components$viewZusatzbedarfLeistungen, model, ergebnis),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'Differenz: ' + ($author$project$Utils$Format$formatEuroRounded(differenzNachAnrechnung) + '\u00A0€'))
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'Auszugleichender Betrag (1/2) von ' + ($author$project$Utils$Format$personToString(nichtAnspruchsberechtigtNachAnrechnung) + (' zu leisten an ' + ($author$project$Utils$Format$personToString(anspruchsberechtigtNachAnrechnung) + (': ' + ($author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + '\u00A0€'))))))
-									])),
-								A2(
-								$elm$html$Html$h4,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('title is-5 mt-5')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Kindergeldverrechnung ')
-									])),
-								A2(
-								$elm$html$Html$table,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$thead,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(header, 'Bezeichnung', 'Betrag')
-											])),
-										A2(
-										$elm$html$Html$tbody,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(
-												row,
-												'Kindergeld',
-												$author$project$Utils$Format$formatEuroRounded(
-													$author$project$Constants$getKindergeld(model.jahr)) + '\u00A0€'),
-												A2(
-												row,
-												'Kindergeldempfänger',
-												$author$project$Utils$Format$personToString(model.kindergeldEmpfaenger)),
-												A2(
-												row,
-												'Betreuungsanteil Mutter',
-												$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + '\u00A0€'),
-												A2(
-												row,
-												'Baranteil Mutter',
-												$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilMutter) + '\u00A0€'),
-												A2(
-												row,
-												'Betreuungsanteil Vater',
-												$author$project$Utils$Format$formatEuroRounded(ergebnis.betreuungsanteil) + '\u00A0€'),
-												A2(
-												row,
-												'Baranteil Vater',
-												$author$project$Utils$Format$formatEuroRounded(ergebnis.baranteilVater) + '\u00A0€')
-											]))
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Durch den Abzug des hälftigen Kindergeldes vom Bedarf wurde der Baranteil bereits abgegolten. Verbleibend ist allein die Verrechnung des '),
-										A2($author$project$View$Components$skriptLink, 'kindergeldverrechnung', 'Betreuungsanteils'),
-										$elm$html$Html$text(
-										' in Höhe von ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + ('\u00A0€ von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + ($author$project$Utils$Format$personToString(nichtKindergeldEmpfänger) + ': '))))))
-									])),
-								A2(
-								$elm$html$Html$table,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('table is-striped is-bordered is-hoverable is-fullwidth mt-4')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$thead,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(header, 'Zwischenschritt', 'Betrag')
-											])),
-										A2(
-										$elm$html$Html$tbody,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(
-												row,
-												'Auszugleichender Betrag (1/2)',
-												$author$project$Utils$Format$formatEuroRounded(auszugleichenderBetragNachAnrechnung) + '\u00A0€'),
-												A2(
-												row,
-												'Betreuungsanteil Kindergeld von ' + ($author$project$Utils$Format$personToString(model.kindergeldEmpfaenger) + (' an ' + $author$project$Utils$Format$personToString(nichtKindergeldEmpfänger))),
-												ausgleichsanspruchRechenzeichen + (' ' + ($author$project$Utils$Format$formatEuroRounded(kindergeldBetreuungsanteil) + '\u00A0€'))),
-												A2(row, 'Rechnung Ausgleichsanspruch', ausgleichsanspruchZwischenschritt)
-											]))
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('mt-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Der Ausgleichsanspruch ist auf volle Euro aufzurunden.')
-									])),
-								A2($elm$html$Html$hr, _List_Nil, _List_Nil),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('box content has-text-weight-bold mt-4 has-text-centered'),
-										A2($elm$html$Html$Attributes$style, 'border', '1px solid #ccc'),
-										A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-										A2($elm$html$Html$Attributes$style, 'padding', '1rem')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'Daher insgesamt von ' + ($author$project$Utils$Format$personToString(zahler) + (' an ' + ($author$project$Utils$Format$personToString(empfaenger) + (' zu leistende Ausgleichszahlung: ' + ($author$project$Utils$Format$formatEuroRounded(zahlbetrag) + '\u00A0€'))))))
 									])),
 								A2(
 								$elm$html$Html$details,

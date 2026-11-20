@@ -1743,3 +1743,101 @@ html .ergebnis-details .notification,
 html .ergebnis-details .notification.is-warning.is-light,
 html .ergebnis-details .notification.is-info,
 html .ergebnis-details .notification.is-info.is-light { background-color: var(--asgla-cream); color: var(--asgla-ink); border-left: 4px solid #f9a374; border-radius: 8px; }
+
+/* ---------- Rechenweg: Schritt-Abschnitte & dezente Ergebnissätze ---------- */
+.schritt-abschnitt {
+    padding-top: 1.25rem;
+    margin-top: 1.25rem;
+    border-top: 1px solid #e3eef1;
+}
+
+.schritt-abschnitt:first-of-type {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: none;
+}
+
+.schritt-kopf {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+}
+
+.schritt-nr {
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: 999px;
+    background-color: #eef5f7;
+    color: var(--asgla-teal-900);
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.schritt-fazit {
+    margin-top: 0.9rem;
+    padding: 0.75rem 1rem;
+    background-color: #f8fbfc;
+    border-top: 1px dashed #b9d5dc;
+    border-bottom: 1px solid #e2eff3;
+    border-radius: 6px;
+}
+
+.schritt-fazit-zeile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    padding: 0.22rem 0;
+    font-size: 0.96rem;
+}
+
+.schritt-fazit-icon {
+    color: var(--asgla-teal-600);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.schritt-fazit-wert {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--asgla-teal-900);
+    white-space: nowrap;
+}
+
+.gesamtergebnis-box {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    background-color: #fdf6ee;
+    border: 1px solid #f2cba5;
+    border-left: 4px solid #f9a374;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.gesamtergebnis-box__label {
+    font-weight: 600;
+    font-size: 1.04rem;
+    color: #24303a;
+}
+
+.gesamtergebnis-box__betrag {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--asgla-teal-900);
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .gesamtergebnis-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
