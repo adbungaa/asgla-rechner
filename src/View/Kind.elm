@@ -1,7 +1,7 @@
 module View.Kind exposing (viewKind)
 
 import Html exposing (Html, button, div, input, label, option, p, select, span, text)
-import Html.Attributes exposing (attribute, checked, class, classList, name, placeholder, selected, style, type_, value)
+import Html.Attributes exposing (attribute, checked, class, classList, for, id, name, placeholder, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
@@ -200,12 +200,20 @@ viewBedarf bedarfsTyp model index eingabe =
 
                 ErbrachteLeistungen ->
                     "erbrachteLeistungenBezahltVon" ++ String.fromInt index
+
+        costId =
+            radioName ++ "-cost"
+
+        labelId =
+            radioName ++ "-label"
     in
     div [ class "entry-row" ]
         [ div [ class "field has-addons entry-controls" ]
             ([ div [ class "control entry-cost" ]
-                [ input
-                    [ classList
+                [ label [ class "entry-field-label", for costId ] [ text "Betrag (€)" ]
+                , input
+                    [ id costId
+                    , classList
                         [ ( "input", True )
                         , ( "entry-input", True )
                         , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
@@ -218,8 +226,10 @@ viewBedarf bedarfsTyp model index eingabe =
                     []
                 ]
             , div [ class "control entry-label" ]
-                [ input
-                    [ class "input entry-input"
+                [ label [ class "entry-field-label", for labelId ] [ text "Bezeichnung" ]
+                , input
+                    [ id labelId
+                    , class "input entry-input"
                     , type_ "text"
                     , placeholder "z. B. Musikschule"
                     , value eingabe.bezeichnung
@@ -349,12 +359,20 @@ viewKindEinkuenfte model index eingabe =
 
         typeList =
             modelPerson.einkuenfte
+
+        costId =
+            "kind-einkunft-cost-" ++ String.fromInt index
+
+        labelId =
+            "kind-einkunft-label-" ++ String.fromInt index
     in
     div [ class "entry-row" ]
         [ div [ class "field has-addons entry-controls" ]
             ([ div [ class "control entry-cost" ]
-                [ input
-                    [ classList
+                [ label [ class "entry-field-label", for costId ] [ text "Betrag (€)" ]
+                , input
+                    [ id costId
+                    , classList
                         [ ( "input", True )
                         , ( "entry-input", True )
                         , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
@@ -367,8 +385,10 @@ viewKindEinkuenfte model index eingabe =
                     []
                 ]
             , div [ class "control entry-label" ]
-                [ input
-                    [ class "input entry-input"
+                [ label [ class "entry-field-label", for labelId ] [ text "Bezeichnung" ]
+                , input
+                    [ id labelId
+                    , class "input entry-input"
                     , type_ "text"
                     , placeholder "Bezeichnung"
                     , value eingabe.bezeichnung
@@ -396,18 +416,20 @@ viewIndividuelleRegelbedarf model =
             [ text "Individueller Regelbedarf für das Kind (€) "
             ]
         , div [ class "control half-width-control" ]
-            [ input
-                [ classList
-                    [ ( "input", True )
-                    , ( "is-fullwidth", True )
-                    , ( "is-danger", validateMoney model.kind.regelbedarf /= Nothing )
+            [ div [ class "euro-input" ]
+                [ input
+                    [ classList
+                        [ ( "input", True )
+                        , ( "is-fullwidth", True )
+                        , ( "is-danger", validateMoney model.kind.regelbedarf /= Nothing )
+                        ]
+                    , type_ "text"
+                    , placeholder "z. B. 900"
+                    , value model.kind.regelbedarf
+                    , onInput (\val -> UpdateKindDaten (UpdateRegelbedarf val))
                     ]
-                , type_ "text"
-                , placeholder "z. B. 900"
-                , value model.kind.regelbedarf
-                , onInput (\val -> UpdateKindDaten (UpdateRegelbedarf val))
+                    []
                 ]
-                []
             , requiredMoneyHelp model.kind.regelbedarf
             ]
         , div [ style "color" "red", style "margin-top" "0.5rem" ]

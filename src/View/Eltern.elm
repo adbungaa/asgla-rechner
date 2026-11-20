@@ -3,7 +3,7 @@ module View.Eltern exposing (viewEltern)
 import Constants exposing (getSelbstbehalt)
 import Elternteil exposing (calculateDurchschnittseinkommen)
 import Html exposing (Html, button, div, h4, input, label, option, p, select, span, text)
-import Html.Attributes exposing (attribute, checked, class, classList, disabled, id, name, placeholder, selected, style, type_, value)
+import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, id, name, placeholder, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
@@ -161,22 +161,24 @@ viewEinkommenMonat model textLabel p =
             , showTooltip "Monatliches Nettoeinkommen aus der Haupttätigkeit (z.B. Gehalt, Lohn)"
             ]
         , div [ class "control" ]
-            [ input
-                [ classList
-                    [ ( "input", True )
-                    , ( "is-danger", validateMoney modelPerson.haupttaetigkeit /= Nothing || einkommenFehlt )
+            [ div [ class "euro-input" ]
+                [ input
+                    [ classList
+                        [ ( "input", True )
+                        , ( "is-danger", validateMoney modelPerson.haupttaetigkeit /= Nothing || einkommenFehlt )
+                        ]
+                    , type_ "text"
+                    , placeholder "z. B. 2500"
+                    , value modelPerson.haupttaetigkeit
+                    , onInput
+                        (\val ->
+                            UpdateElternDaten
+                                p
+                                (UpdateHaupttaetigkeit val)
+                        )
                     ]
-                , type_ "text"
-                , placeholder "z. B. 2500"
-                , value modelPerson.haupttaetigkeit
-                , onInput
-                    (\val ->
-                        UpdateElternDaten
-                            p
-                            (UpdateHaupttaetigkeit val)
-                    )
+                    []
                 ]
-                []
             , Html.p [ class "asgla-help" ]
                 [ text "Das monatliche Netto-Einkommen, also nach Abzug von Steuern und Sozialabgaben. Ungefähre Beträge reichen aus." ]
             , moneyHelp modelPerson.haupttaetigkeit
@@ -290,12 +292,52 @@ viewElternPosten postenType model p index eingabe =
 
                 _ ->
                     5
+
+        rowKey =
+            (case p of
+                Vater ->
+                    "vater"
+
+                Mutter ->
+                    "mutter"
+            )
+                ++ "-"
+                ++ (case postenType of
+                        WeitereEinkuenfte ->
+                            "weitere"
+
+                        Abzugsposten ->
+                            "abzug"
+
+                        EinkommenzumDurchschnittsberechnung ->
+                            "durchschnitt"
+                   )
+                ++ "-"
+                ++ String.fromInt index
+
+        costId =
+            "entry-cost-" ++ rowKey
+
+        labelId =
+            case postenType of
+                WeitereEinkuenfte ->
+                    case p of
+                        Vater ->
+                            "weitereEinkuenfteVater" ++ String.fromInt index
+
+                        Mutter ->
+                            "weitereEinkuenfteMutter" ++ String.fromInt index
+
+                _ ->
+                    "entry-label-" ++ rowKey
     in
     div [ class "entry-row" ]
         [ div [ class "field has-addons entry-controls" ]
             ([ div [ class "control entry-cost" ]
-                [ input
-                    [ classList
+                [ label [ class "entry-field-label", for costId ] [ text "Betrag (€)" ]
+                , input
+                    [ id costId
+                    , classList
                         [ ( "input", True )
                         , ( "entry-input", True )
                         , ( "is-danger", validateMoney eingabe.kosten /= Nothing )
@@ -309,7 +351,20 @@ viewElternPosten postenType model p index eingabe =
                     []
                 ]
             , div [ class "control is-expanded entry-label" ]
-                [ case postenType of
+                [ label [ class "entry-field-label", for labelId ]
+                    [ text
+                        (case postenType of
+                            WeitereEinkuenfte ->
+                                "Art der Einkunft"
+
+                            Abzugsposten ->
+                                "Bezeichnung"
+
+                            EinkommenzumDurchschnittsberechnung ->
+                                "Monat / Zeitraum"
+                        )
+                    ]
+                , case postenType of
                     WeitereEinkuenfte ->
                         let
                             selectId =
@@ -344,7 +399,8 @@ viewElternPosten postenType model p index eingabe =
 
                     Abzugsposten ->
                         input
-                            [ class "input  entry-input"
+                            [ id labelId
+                            , class "input  entry-input"
                             , type_ "text"
                             , placeholder "z. B. Fahrtkosten"
                             , value eingabe.bezeichnung
@@ -354,7 +410,8 @@ viewElternPosten postenType model p index eingabe =
 
                     EinkommenzumDurchschnittsberechnung ->
                         input
-                            [ class "input  entry-input"
+                            [ id labelId
+                            , class "input  entry-input"
                             , type_ "text"
                             , placeholder "z. B. Monat 1"
                             , value eingabe.bezeichnung
@@ -554,17 +611,19 @@ viewSelbstbehalt model person =
                         ++ (if selbstbehaltTypEqual modelPerson.selbstbehalt (Benutzerdefiniert "0") then
                                 [ div [ class "field mt-3" ]
                                     [ div [ class "control" ]
-                                        [ input
-                                            [ type_ "text"
-                                            , classList
-                                                [ ( "input", True )
-                                                , ( "is-danger", validateMoney (renderSelbstbehaltBetrag modelPerson.selbstbehalt) /= Nothing )
+                                        [ div [ class "euro-input" ]
+                                            [ input
+                                                [ type_ "text"
+                                                , classList
+                                                    [ ( "input", True )
+                                                    , ( "is-danger", validateMoney (renderSelbstbehaltBetrag modelPerson.selbstbehalt) /= Nothing )
+                                                    ]
+                                                , placeholder "Betrag in €"
+                                                , value (renderSelbstbehaltBetrag modelPerson.selbstbehalt)
+                                                , onInput (\val -> UpdateElternDaten person (UpdateSelbstbehalt (Benutzerdefiniert val)))
                                                 ]
-                                            , placeholder "Betrag in €"
-                                            , value (renderSelbstbehaltBetrag modelPerson.selbstbehalt)
-                                            , onInput (\val -> UpdateElternDaten person (UpdateSelbstbehalt (Benutzerdefiniert val)))
+                                                []
                                             ]
-                                            []
                                         , moneyHelp (renderSelbstbehaltBetrag modelPerson.selbstbehalt)
                                         ]
                                     ]

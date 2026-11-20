@@ -359,16 +359,16 @@ viewTabs model =
             , attribute "role" "tablist"
             , attribute "aria-label" "Eingabebereiche"
             ]
-            [ tabButton Left "Einkünfte Vater" "fa-user" model.activeTab
-            , tabButton Middle "Einkünfte Mutter" "fa-user" model.activeTab
-            , tabButton Right "Bedarf Kind" "fa-child" model.activeTab
+            [ tabButton Left "Einkünfte " "Vater" "fa-user" model.activeTab
+            , tabButton Middle "Einkünfte " "Mutter" "fa-user" model.activeTab
+            , tabButton Right "Bedarf " "Kind" "fa-child" model.activeTab
             ]
         , tabContent model.activeTab model
         ]
 
 
-tabButton : Tab -> String -> String -> Tab -> Html Msg
-tabButton tab titel icon aktiv =
+tabButton : Tab -> String -> String -> String -> Tab -> Html Msg
+tabButton tab prefix titel icon aktiv =
     let
         istAktiv =
             tab == aktiv
@@ -387,8 +387,11 @@ tabButton tab titel icon aktiv =
             )
         , onClick (ToggleView (Select tab))
         ]
-        [ span [ class "icon" ] [ i [ class ("fas " ++ icon), attribute "aria-hidden" "true" ] [] ]
-        , span [] [ text titel ]
+        [ span [ class "icon asgla-tab-icon" ] [ i [ class ("fas " ++ icon), attribute "aria-hidden" "true" ] [] ]
+        , span [ class "asgla-tab-text" ]
+            [ span [ class "asgla-tab-prefix" ] [ text prefix ]
+            , text titel
+            ]
         ]
 
 

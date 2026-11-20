@@ -224,7 +224,8 @@ html .button.save-button:active {
     /* transition: opacity 0.3s; */
 }
 
-.tooltip-container:hover .tooltip-text {
+.tooltip-container:hover .tooltip-text,
+.tooltip-container:focus-within .tooltip-text {
     visibility: visible;
     opacity: 1;
 }
@@ -277,14 +278,48 @@ html .button.save-button:active {
     display: flex;
     flex-wrap: wrap;
     row-gap: 0.5rem;
-    align-items: stretch;
+    align-items: flex-end;
     width: 100%;
 }
 
-/* Betrag mind. 7rem, Bezeichnung/Art mind. 11rem; bei wenig Platz bricht die Bezeichnung um */
+.entry-field-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #3b4754;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+/* Betrag mind. 8.5rem (inkl. €-Suffix), Bezeichnung/Art mind. 11rem; bei wenig Platz bricht die Bezeichnung um */
 .entry-controls .entry-cost {
-    flex: 0 0 7rem;
-    min-width: 7rem;
+    flex: 0 0 8.5rem;
+    min-width: 8.5rem;
+    position: relative;
+}
+
+.euro-input {
+    position: relative;
+}
+
+.entry-controls .entry-cost::after,
+.euro-input::after {
+    content: "€";
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0;
+    height: 2.5em;
+    display: flex;
+    align-items: center;
+    color: #4a5568;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.entry-controls .entry-cost .input,
+.euro-input .input {
+    padding-right: 2.1rem;
 }
 
 .entry-controls .entry-label {
@@ -1334,6 +1369,7 @@ label.checkbox,
 label.radio {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     min-height: 44px;
     padding: 0.5rem 0;
 }
@@ -1342,6 +1378,8 @@ input[type="checkbox"],
 input[type="radio"] {
     width: 22px;
     height: 22px;
+    flex-shrink: 0;
+    margin: 0;
     accent-color: var(--asgla-teal-900);
 }
 
@@ -1436,6 +1474,60 @@ html .button.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; backgrou
     }
 }
 
+.columns.is-mobile {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Tablet Portrait & schmale 2-Spalten-Ansicht (<= 960px): saubere 2-Zeilen-Posten ohne abgeschnittene has-addons-Radien */
+@media screen and (max-width: 960px) {
+    .entry-controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .entry-controls.field.has-addons .control .input,
+    .entry-controls.field.has-addons .control .select select,
+    .entry-controls.field.has-addons .control .button.entry-add,
+    .entry-controls.field.has-addons .control .button.entry-remove {
+        border-radius: 24px !important;
+    }
+
+    .entry-row .entry-cost,
+    .entry-controls .entry-cost {
+        order: 1;
+        flex: 1 1 7.5rem;
+        min-width: 7.5rem;
+        max-width: 11rem;
+        position: relative;
+    }
+
+    .entry-controls .entry-remove-control {
+        order: 2;
+        flex: 0 0 auto;
+    }
+
+    .entry-controls .entry-remove-control .button {
+        min-width: 44px;
+    }
+
+    .entry-controls .entry-add-control {
+        order: 3;
+        flex: 0 0 auto;
+    }
+
+    .entry-controls .entry-add-control .button {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .entry-controls .entry-label {
+        order: 4;
+        flex: 0 0 100%;
+        width: 100% !important;
+    }
+}
+
 /* ---------- Mobil (<= 768 px): wie Original (komplett creme), ohne Überlauf ---------- */
 
 @media screen and (max-width: 768px) {
@@ -1484,22 +1576,63 @@ html .button.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; backgrou
         padding-right: 0;
     }
 
-    /* Reiter untereinander wie im Original */
+    /* Horizontale, oben angepinnte Reiter; aktiver Reiter breiter mit animiertem Präfix & Icon */
     .asgla-tabs {
-        flex-direction: column;
-        gap: 2px;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        flex-direction: row;
+        gap: 4px;
+        padding-top: 4px;
+        background-color: var(--asgla-cream);
     }
 
     .asgla-tab {
-        justify-content: flex-start;
-        border-radius: 8px;
-        padding: 0.5em 1rem;
+        flex: 0 1 auto;
+        justify-content: center;
+        border-radius: 8px 8px 0 0;
+        padding: 0.5rem 0.65rem;
+        gap: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 0.92rem;
+        transition: flex-grow 0.25s ease, padding 0.25s ease;
+    }
+
+    .asgla-tab.is-active {
+        flex: 1 1 auto;
+        gap: 0.4rem;
+        padding: 0.5rem 0.85rem;
+    }
+
+    .asgla-tab-icon,
+    .asgla-tab-prefix {
+        display: inline-flex;
+        align-items: center;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateX(-6px);
+        transition: max-width 0.25s ease, opacity 0.2s ease, transform 0.25s ease;
+    }
+
+    .asgla-tab.is-active .asgla-tab-icon {
+        max-width: 1.5rem;
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .asgla-tab.is-active .asgla-tab-prefix {
+        max-width: 8rem;
+        opacity: 1;
+        padding-right: 0.28em;
+        transform: translateX(0);
     }
 
     .asgla-panel {
         padding: 0.75rem;
-        border-radius: 8px;
-        margin-top: 2px;
+        border-radius: 0 0 8px 8px;
+        margin-top: 0;
     }
 
     .asgla-subcard {
@@ -1538,6 +1671,60 @@ html .button.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; backgrou
         min-width: 44px;
         min-height: 44px;
         margin: -12px -6px;
+    }
+
+    /* Tooltips auf Mobile am Viewport verankern, damit nichts abgeschnitten wird */
+    .tooltip-container .tooltip-text {
+        position: fixed;
+        left: 1rem;
+        right: 1rem;
+        bottom: 1.25rem;
+        top: auto;
+        width: auto;
+        max-width: none;
+        transform: none;
+        z-index: 1100;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    }
+
+    .half-width-control {
+        width: 100%;
+    }
+
+    .asgla-vorlage {
+        min-height: 44px;
+    }
+
+    .modal-card {
+        max-height: calc(100dvh - 1.5rem);
+        margin: 0 0.75rem;
+        width: calc(100% - 1.5rem);
+    }
+
+    .modal-card-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-card-head {
+        gap: 0.5rem;
+    }
+
+    .modal-card-title {
+        min-width: 0;
+        font-size: 1.15rem;
+    }
+
+    .modal-card-head .delete {
+        min-width: 44px;
+        min-height: 44px;
+        flex-shrink: 0;
+        margin-left: 0;
+    }
+
+    .skript-head {
+        flex-wrap: wrap;
+        padding-right: 1.15rem;
     }
 
     .asgla-form > *,
@@ -1603,33 +1790,9 @@ html .button.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; backgrou
         padding: 1rem;
     }
 
-    /* Art der Einkunft bekommt eine eigene volle Zeile */
-    .entry-controls {
-        flex-wrap: wrap;
-        row-gap: 0.5rem;
-    }
-
-    .entry-controls .entry-cost {
-        order: 1;
-    }
-
-    .entry-controls .entry-remove-control {
-        order: 2;
-    }
-
-    .entry-controls .entry-add-control {
-        order: 4;
-        flex: 0 0 100%;
-    }
-
-    .entry-controls .entry-add-control .button {
-        width: 100%;
-    }
-
-    .entry-controls .entry-label {
-        order: 3;
-        flex: 0 0 100%;
-        width: 100% !important;
+    .entry-controls .entry-cost::after,
+    .euro-input::after {
+        height: 44px;
     }
 
     .asgla-checkbox-block .checkbox.asgla-checkbox,
@@ -1973,5 +2136,11 @@ html .ergebnis-details .notification.is-info.is-light { background-color: var(--
     .chevron-wave i {
         animation: none;
         opacity: 0.85;
+    }
+
+    .asgla-tab,
+    .asgla-tab-icon,
+    .asgla-tab-prefix {
+        transition: none;
     }
 }

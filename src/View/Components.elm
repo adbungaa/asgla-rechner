@@ -785,12 +785,14 @@ showErgebnis model =
             , div [ class "split-sektion" ]
                 [ div [ class "split-legende" ]
                     [ span []
-                        [ strong [] [ text "Haftungsanteil Vater", zusatzKachel, text ": " ]
+                        [ strong [] [ text "Haftungsanteil Vater: " ]
                         , text (formatEuroRounded (ergebnis.haftungsanteilVater * 100) ++ "\u{00A0}%")
+                        , zusatzKachel
                         ]
                     , span []
-                        [ strong [] [ text "Haftungsanteil Mutter", zusatzKachel, text ": " ]
+                        [ strong [] [ text "Haftungsanteil Mutter: " ]
                         , text (formatEuroRounded (ergebnis.haftungsanteilMutter * 100) ++ "\u{00A0}%")
+                        , zusatzKachel
                         ]
                     ]
                 , div

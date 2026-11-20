@@ -19264,12 +19264,11 @@ var $author$project$View$Components$showErgebnis = function (model) {
 												_List_Nil,
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Haftungsanteil Vater'),
-														$author$project$View$Components$zusatzKachel,
-														$elm$html$Html$text(': ')
+														$elm$html$Html$text('Haftungsanteil Vater: ')
 													])),
 												$elm$html$Html$text(
-												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '\u00A0%')
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilVater * 100) + '\u00A0%'),
+												$author$project$View$Components$zusatzKachel
 											])),
 										A2(
 										$elm$html$Html$span,
@@ -19281,12 +19280,11 @@ var $author$project$View$Components$showErgebnis = function (model) {
 												_List_Nil,
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Haftungsanteil Mutter'),
-														$author$project$View$Components$zusatzKachel,
-														$elm$html$Html$text(': ')
+														$elm$html$Html$text('Haftungsanteil Mutter: ')
 													])),
 												$elm$html$Html$text(
-												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '\u00A0%')
+												$author$project$Utils$Format$formatEuroRounded(ergebnis.haftungsanteilMutter * 100) + '\u00A0%'),
+												$author$project$View$Components$zusatzKachel
 											]))
 									])),
 								A2(
@@ -21153,8 +21151,8 @@ var $author$project$View$Layout$accentKlasse = function (tab) {
 			return 'asgla-accent-kind';
 	}
 };
-var $author$project$View$Layout$tabButton = F4(
-	function (tab, titel, icon, aktiv) {
+var $author$project$View$Layout$tabButton = F5(
+	function (tab, prefix, titel, icon, aktiv) {
 		var istAktiv = _Utils_eq(tab, aktiv);
 		return A2(
 			$elm$html$Html$button,
@@ -21183,7 +21181,7 @@ var $author$project$View$Layout$tabButton = F4(
 					$elm$html$Html$span,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('icon')
+							$elm$html$Html$Attributes$class('icon asgla-tab-icon')
 						]),
 					_List_fromArray(
 						[
@@ -21198,9 +21196,22 @@ var $author$project$View$Layout$tabButton = F4(
 						])),
 					A2(
 					$elm$html$Html$span,
-					_List_Nil,
 					_List_fromArray(
 						[
+							$elm$html$Html$Attributes$class('asgla-tab-text')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('asgla-tab-prefix')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(prefix)
+								])),
 							$elm$html$Html$text(titel)
 						]))
 				]));
@@ -21463,6 +21474,22 @@ var $author$project$View$Components$viewEntryActionButtons = function (_v0) {
 };
 var $author$project$View$Eltern$viewElternPosten = F5(
 	function (postenType, model, p, index, eingabe) {
+		var rowKey = function () {
+			if (p.$ === 'Vater') {
+				return 'vater';
+			} else {
+				return 'mutter';
+			}
+		}() + ('-' + (function () {
+			switch (postenType.$) {
+				case 'WeitereEinkuenfte':
+					return 'weitere';
+				case 'Abzugsposten':
+					return 'abzug';
+				default:
+					return 'durchschnitt';
+			}
+		}() + ('-' + $elm$core$String$fromInt(index))));
 		var modelPerson = function () {
 			if (p.$ === 'Vater') {
 				return model.vater;
@@ -21487,6 +21514,18 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 				return 5;
 			}
 		}();
+		var labelId = function () {
+			if (postenType.$ === 'WeitereEinkuenfte') {
+				if (p.$ === 'Vater') {
+					return 'weitereEinkuenfteVater' + $elm$core$String$fromInt(index);
+				} else {
+					return 'weitereEinkuenfteMutter' + $elm$core$String$fromInt(index);
+				}
+			} else {
+				return 'entry-label-' + rowKey;
+			}
+		}();
+		var costId = 'entry-cost-' + rowKey;
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -21513,9 +21552,21 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 								_List_fromArray(
 									[
 										A2(
+										$elm$html$Html$label,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('entry-field-label'),
+												$elm$html$Html$Attributes$for(costId)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Betrag (€)')
+											])),
+										A2(
 										$elm$html$Html$input,
 										_List_fromArray(
 											[
+												$elm$html$Html$Attributes$id(costId),
 												$elm$html$Html$Attributes$classList(
 												_List_fromArray(
 													[
@@ -21556,6 +21607,27 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 									]),
 								_List_fromArray(
 									[
+										A2(
+										$elm$html$Html$label,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('entry-field-label'),
+												$elm$html$Html$Attributes$for(labelId)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												function () {
+													switch (postenType.$) {
+														case 'WeitereEinkuenfte':
+															return 'Art der Einkunft';
+														case 'Abzugsposten':
+															return 'Bezeichnung';
+														default:
+															return 'Monat / Zeitraum';
+													}
+												}())
+											])),
 										function () {
 										switch (postenType.$) {
 											case 'WeitereEinkuenfte':
@@ -21695,6 +21767,7 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 													$elm$html$Html$input,
 													_List_fromArray(
 														[
+															$elm$html$Html$Attributes$id(labelId),
 															$elm$html$Html$Attributes$class('input  entry-input'),
 															$elm$html$Html$Attributes$type_('text'),
 															$elm$html$Html$Attributes$placeholder('z. B. Fahrtkosten'),
@@ -21718,6 +21791,7 @@ var $author$project$View$Eltern$viewElternPosten = F5(
 													$elm$html$Html$input,
 													_List_fromArray(
 														[
+															$elm$html$Html$Attributes$id(labelId),
 															$elm$html$Html$Attributes$class('input  entry-input'),
 															$elm$html$Html$Attributes$type_('text'),
 															$elm$html$Html$Attributes$placeholder('z. B. Monat 1'),
@@ -21920,31 +21994,40 @@ var $author$project$View$Eltern$viewEinkommenMonat = F3(
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$input,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$classList(
+									$elm$html$Html$Attributes$class('euro-input')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$input,
 									_List_fromArray(
 										[
-											_Utils_Tuple2('input', true),
-											_Utils_Tuple2(
-											'is-danger',
-											(!_Utils_eq(
-												$author$project$Utils$Validation$validateMoney(modelPerson.haupttaetigkeit),
-												$elm$core$Maybe$Nothing)) || einkommenFehlt)
-										])),
-									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('z. B. 2500'),
-									$elm$html$Html$Attributes$value(modelPerson.haupttaetigkeit),
-									$elm$html$Html$Events$onInput(
-									function (val) {
-										return A2(
-											$author$project$Types$UpdateElternDaten,
-											p,
-											$author$project$Types$UpdateHaupttaetigkeit(val));
-									})
-								]),
-							_List_Nil),
+											$elm$html$Html$Attributes$classList(
+											_List_fromArray(
+												[
+													_Utils_Tuple2('input', true),
+													_Utils_Tuple2(
+													'is-danger',
+													(!_Utils_eq(
+														$author$project$Utils$Validation$validateMoney(modelPerson.haupttaetigkeit),
+														$elm$core$Maybe$Nothing)) || einkommenFehlt)
+												])),
+											$elm$html$Html$Attributes$type_('text'),
+											$elm$html$Html$Attributes$placeholder('z. B. 2500'),
+											$elm$html$Html$Attributes$value(modelPerson.haupttaetigkeit),
+											$elm$html$Html$Events$onInput(
+											function (val) {
+												return A2(
+													$author$project$Types$UpdateElternDaten,
+													p,
+													$author$project$Types$UpdateHaupttaetigkeit(val));
+											})
+										]),
+									_List_Nil)
+								])),
 							A2(
 							$elm$html$Html$p,
 							_List_fromArray(
@@ -22338,34 +22421,43 @@ var $author$project$View$Eltern$viewSelbstbehalt = F2(
 														_List_fromArray(
 															[
 																A2(
-																$elm$html$Html$input,
+																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$type_('text'),
-																		$elm$html$Html$Attributes$classList(
+																		$elm$html$Html$Attributes$class('euro-input')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$input,
 																		_List_fromArray(
 																			[
-																				_Utils_Tuple2('input', true),
-																				_Utils_Tuple2(
-																				'is-danger',
-																				!_Utils_eq(
-																					$author$project$Utils$Validation$validateMoney(
-																						$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt)),
-																					$elm$core$Maybe$Nothing))
-																			])),
-																		$elm$html$Html$Attributes$placeholder('Betrag in €'),
-																		$elm$html$Html$Attributes$value(
-																		$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt)),
-																		$elm$html$Html$Events$onInput(
-																		function (val) {
-																			return A2(
-																				$author$project$Types$UpdateElternDaten,
-																				person,
-																				$author$project$Types$UpdateSelbstbehalt(
-																					$author$project$Types$Benutzerdefiniert(val)));
-																		})
-																	]),
-																_List_Nil),
+																				$elm$html$Html$Attributes$type_('text'),
+																				$elm$html$Html$Attributes$classList(
+																				_List_fromArray(
+																					[
+																						_Utils_Tuple2('input', true),
+																						_Utils_Tuple2(
+																						'is-danger',
+																						!_Utils_eq(
+																							$author$project$Utils$Validation$validateMoney(
+																								$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt)),
+																							$elm$core$Maybe$Nothing))
+																					])),
+																				$elm$html$Html$Attributes$placeholder('Betrag in €'),
+																				$elm$html$Html$Attributes$value(
+																				$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt)),
+																				$elm$html$Html$Events$onInput(
+																				function (val) {
+																					return A2(
+																						$author$project$Types$UpdateElternDaten,
+																						person,
+																						$author$project$Types$UpdateSelbstbehalt(
+																							$author$project$Types$Benutzerdefiniert(val)));
+																				})
+																			]),
+																		_List_Nil)
+																	])),
 																$author$project$View$Components$moneyHelp(
 																$author$project$Utils$Format$renderSelbstbehaltBetrag(modelPerson.selbstbehalt))
 															]))
@@ -22614,6 +22706,8 @@ var $author$project$View$Kind$viewBedarf = F4(
 					return modelPerson.erbrachteLeistungen;
 			}
 		}();
+		var labelId = radioName + '-label';
+		var costId = radioName + '-cost';
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -22640,9 +22734,21 @@ var $author$project$View$Kind$viewBedarf = F4(
 								_List_fromArray(
 									[
 										A2(
+										$elm$html$Html$label,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('entry-field-label'),
+												$elm$html$Html$Attributes$for(costId)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Betrag (€)')
+											])),
+										A2(
 										$elm$html$Html$input,
 										_List_fromArray(
 											[
+												$elm$html$Html$Attributes$id(costId),
 												$elm$html$Html$Attributes$classList(
 												_List_fromArray(
 													[
@@ -22681,9 +22787,21 @@ var $author$project$View$Kind$viewBedarf = F4(
 								_List_fromArray(
 									[
 										A2(
+										$elm$html$Html$label,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('entry-field-label'),
+												$elm$html$Html$Attributes$for(labelId)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Bezeichnung')
+											])),
+										A2(
 										$elm$html$Html$input,
 										_List_fromArray(
 											[
+												$elm$html$Html$Attributes$id(labelId),
 												$elm$html$Html$Attributes$class('input entry-input'),
 												$elm$html$Html$Attributes$type_('text'),
 												$elm$html$Html$Attributes$placeholder('z. B. Musikschule'),
@@ -23039,30 +23157,39 @@ var $author$project$View$Kind$viewIndividuelleRegelbedarf = function (model) {
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$input,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$classList(
+								$elm$html$Html$Attributes$class('euro-input')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
 								_List_fromArray(
 									[
-										_Utils_Tuple2('input', true),
-										_Utils_Tuple2('is-fullwidth', true),
-										_Utils_Tuple2(
-										'is-danger',
-										!_Utils_eq(
-											$author$project$Utils$Validation$validateMoney(model.kind.regelbedarf),
-											$elm$core$Maybe$Nothing))
-									])),
-								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$placeholder('z. B. 900'),
-								$elm$html$Html$Attributes$value(model.kind.regelbedarf),
-								$elm$html$Html$Events$onInput(
-								function (val) {
-									return $author$project$Types$UpdateKindDaten(
-										$author$project$Types$UpdateRegelbedarf(val));
-								})
-							]),
-						_List_Nil),
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('input', true),
+												_Utils_Tuple2('is-fullwidth', true),
+												_Utils_Tuple2(
+												'is-danger',
+												!_Utils_eq(
+													$author$project$Utils$Validation$validateMoney(model.kind.regelbedarf),
+													$elm$core$Maybe$Nothing))
+											])),
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$placeholder('z. B. 900'),
+										$elm$html$Html$Attributes$value(model.kind.regelbedarf),
+										$elm$html$Html$Events$onInput(
+										function (val) {
+											return $author$project$Types$UpdateKindDaten(
+												$author$project$Types$UpdateRegelbedarf(val));
+										})
+									]),
+								_List_Nil)
+							])),
 						$author$project$View$Kind$requiredMoneyHelp(model.kind.regelbedarf)
 					])),
 				A2(
@@ -23090,6 +23217,8 @@ var $author$project$View$Kind$viewKindEinkuenfte = F3(
 	function (model, index, eingabe) {
 		var modelPerson = model.kind;
 		var typeList = modelPerson.einkuenfte;
+		var labelId = 'kind-einkunft-label-' + $elm$core$String$fromInt(index);
+		var costId = 'kind-einkunft-cost-' + $elm$core$String$fromInt(index);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -23116,9 +23245,21 @@ var $author$project$View$Kind$viewKindEinkuenfte = F3(
 								_List_fromArray(
 									[
 										A2(
+										$elm$html$Html$label,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('entry-field-label'),
+												$elm$html$Html$Attributes$for(costId)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Betrag (€)')
+											])),
+										A2(
 										$elm$html$Html$input,
 										_List_fromArray(
 											[
+												$elm$html$Html$Attributes$id(costId),
 												$elm$html$Html$Attributes$classList(
 												_List_fromArray(
 													[
@@ -23155,9 +23296,21 @@ var $author$project$View$Kind$viewKindEinkuenfte = F3(
 								_List_fromArray(
 									[
 										A2(
+										$elm$html$Html$label,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('entry-field-label'),
+												$elm$html$Html$Attributes$for(labelId)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Bezeichnung')
+											])),
+										A2(
 										$elm$html$Html$input,
 										_List_fromArray(
 											[
+												$elm$html$Html$Attributes$id(labelId),
 												$elm$html$Html$Attributes$class('input entry-input'),
 												$elm$html$Html$Attributes$type_('text'),
 												$elm$html$Html$Attributes$placeholder('Bezeichnung'),
@@ -23723,9 +23876,9 @@ var $author$project$View$Layout$viewTabs = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A4($author$project$View$Layout$tabButton, $author$project$Types$Left, 'Einkünfte Vater', 'fa-user', model.activeTab),
-						A4($author$project$View$Layout$tabButton, $author$project$Types$Middle, 'Einkünfte Mutter', 'fa-user', model.activeTab),
-						A4($author$project$View$Layout$tabButton, $author$project$Types$Right, 'Bedarf Kind', 'fa-child', model.activeTab)
+						A5($author$project$View$Layout$tabButton, $author$project$Types$Left, 'Einkünfte ', 'Vater', 'fa-user', model.activeTab),
+						A5($author$project$View$Layout$tabButton, $author$project$Types$Middle, 'Einkünfte ', 'Mutter', 'fa-user', model.activeTab),
+						A5($author$project$View$Layout$tabButton, $author$project$Types$Right, 'Bedarf ', 'Kind', 'fa-child', model.activeTab)
 					])),
 				A2($author$project$View$Layout$tabContent, model.activeTab, model)
 			]));
