@@ -98,7 +98,10 @@ viewAbzugsVorlagen p haupttaetigkeit =
                 "5\u{00A0}% Pauschale"
     in
     div [ class "asgla-vorlagen" ]
-        [ span [ class "asgla-vorlagen-titel" ] [ text "Schnell hinzufügen:" ]
+        [ span [ class "asgla-vorlagen-titel" ]
+            [ text "Schnell hinzufügen: "
+            , showTooltip "Fahrtkosten gehören zu den berufsbedingten Kosten. In der Regel setzen Sie entweder die 5\u{00A0}%-Pauschale oder die tatsächlichen Fahrtkosten an. Fahrtkosten: 0,42\u{00A0}€ je gefahrenem Kilometer, bei langen Strecken (ab ca. 30\u{00A0}km einfach) meist 0,28\u{00A0}€. Den Betrag tragen Sie selbst ein."
+            ]
         , div [ class "asgla-vorlagen-buttons" ]
             [ button
                 [ class "button is-small is-light asgla-vorlage"
@@ -126,8 +129,6 @@ viewAbzugsVorlagen p haupttaetigkeit =
                 , span [] [ text "Fahrtkosten" ]
                 ]
             ]
-        , Html.p [ class "asgla-help" ]
-            [ text "Fahrtkosten gehören zu den berufsbedingten Kosten. In der Regel setzen Sie entweder die 5\u{00A0}%-Pauschale oder die tatsächlichen Fahrtkosten an. Fahrtkosten: 0,42\u{00A0}€ je gefahrenem Kilometer, bei langen Strecken (ab ca. 30\u{00A0}km einfach) meist 0,28\u{00A0}€. Den Betrag tragen Sie selbst ein." ]
         ]
 
 

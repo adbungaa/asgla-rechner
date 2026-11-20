@@ -1378,8 +1378,8 @@ select:focus-visible,
 /* ---------- Abzugs-Vorlagen ---------- */
 .asgla-vorlagen { margin: 0 0 0.75rem; }
 .asgla-vorlagen-titel { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
-.asgla-vorlagen-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.35rem; }
-.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; background: #fff; white-space: nowrap; }
+.asgla-vorlagen-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.35rem; }
+html .button.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; background: #fff; white-space: nowrap; font-size: 0.8125rem; font-weight: 600; padding: 0.25rem 0.65rem; min-height: 32px; }
 .asgla-vorlage:hover:not([disabled]) { background: rgba(9, 170, 195, 0.15); }
 .asgla-vorlage:focus-visible { outline: 3px solid #f9a374; outline-offset: 2px; }
 .asgla-vorlage[disabled] { opacity: 0.55; cursor: not-allowed; }
