@@ -187,6 +187,7 @@ type AktionPosten
     = AddPosten PostenType
     | RemovePosten PostenType Int
     | UpdatePosten PostenType Int StringFieldType
+    | AddAbzugsVorlage String String
 
 
 type PostenType

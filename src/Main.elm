@@ -3,7 +3,7 @@ port module Main exposing (..)
 import Browser
 import Calculation exposing (calculateAusgleichsanspruch)
 import Constants exposing (getRegelbedarf)
-import Elternteil exposing (addPosten, calculateGesamtEinkommen, removePosten, toggleSelbstbehaltOption, updatePosten, updateSelbstbehalt)
+import Elternteil exposing (addAbzugsVorlage, addPosten, calculateGesamtEinkommen, removePosten, toggleSelbstbehaltOption, updatePosten, updateSelbstbehalt)
 import File
 import File.Select as Select
 import Html exposing (a, div, i, section, text)
@@ -313,6 +313,9 @@ update msg model =
                         UpdatePosten postenType index field ->
                             ( updatePosten Vater postenType index field model, Cmd.none )
 
+                        AddAbzugsVorlage bezeichnung kosten ->
+                            ( addAbzugsVorlage Vater bezeichnung kosten model, Cmd.none )
+
                 ( Mutter, ChangePosten a ) ->
                     case a of
                         AddPosten postenType ->
@@ -320,6 +323,9 @@ update msg model =
 
                         UpdatePosten postenType index field ->
                             ( updatePosten Mutter postenType index field model, Cmd.none )
+
+                        AddAbzugsVorlage bezeichnung kosten ->
+                            ( addAbzugsVorlage Mutter bezeichnung kosten model, Cmd.none )
 
                         RemovePosten postenType index ->
                             ( removePosten Mutter postenType index model, Cmd.none )

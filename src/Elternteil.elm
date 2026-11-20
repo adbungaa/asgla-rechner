@@ -1,5 +1,6 @@
 module Elternteil exposing
-    ( addPosten
+    ( addAbzugsVorlage
+    , addPosten
     , calculateEinkommen
     , calculateGesamtEinkommen
     , calculateWeitereEinkuenfte
@@ -148,6 +149,67 @@ addPosten person postenType model =
 
     else
         { model | error = Just ("Zu viele Posten (Max. " ++ String.fromInt (maxPostenCount postenType) ++ ")") }
+
+
+-- Trägt eine Vorlage (Bezeichnung + Betrag) in die erste leere Abzugszeile ein,
+-- sonst in eine neue Zeile (max. 5).
+
+
+addAbzugsVorlage : Person -> String -> String -> Model -> Model
+addAbzugsVorlage person bezeichnung kosten model =
+    let
+        modelPerson =
+            case person of
+                Vater ->
+                    model.vater
+
+                Mutter ->
+                    model.mutter
+
+        isEmpty field =
+            String.isEmpty (String.trim field.kosten) && String.isEmpty (String.trim field.bezeichnung)
+
+        vorlage =
+            { kosten = kosten, bezeichnung = bezeichnung }
+
+        maybeNewList =
+            if List.any isEmpty modelPerson.abzugsposten then
+                Just
+                    (Tuple.second
+                        (List.foldl
+                            (\f ( done, acc ) ->
+                                if not done && isEmpty f then
+                                    ( True, acc ++ [ vorlage ] )
+
+                                else
+                                    ( done, acc ++ [ f ] )
+                            )
+                            ( False, [] )
+                            modelPerson.abzugsposten
+                        )
+                    )
+
+            else if List.length modelPerson.abzugsposten < maxPostenCount Abzugsposten then
+                Just (modelPerson.abzugsposten ++ [ vorlage ])
+
+            else
+                Nothing
+    in
+    case maybeNewList of
+        Just newList ->
+            let
+                updated =
+                    { modelPerson | abzugsposten = newList }
+            in
+            case person of
+                Vater ->
+                    { model | vater = updated, showErgebnis = False, error = Nothing }
+
+                Mutter ->
+                    { model | mutter = updated, showErgebnis = False, error = Nothing }
+
+        Nothing ->
+            { model | error = Just ("Zu viele Posten (Max. " ++ String.fromInt (maxPostenCount Abzugsposten) ++ ")") }
 
 
 removePosten : Person -> PostenType -> Int -> Model -> Model
