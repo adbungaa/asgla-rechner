@@ -957,6 +957,22 @@ html .button.asgla-link-button:hover {
     margin-top: 0;
 }
 
+.asgla-eltern-columns > .column {
+    display: flex;
+    flex-direction: column;
+}
+
+.asgla-eltern-columns > .column > div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.asgla-eltern-columns > .column > .asgla-subcard,
+.asgla-eltern-columns > .column > div > .asgla-subcard:last-child {
+    flex: 1;
+}
+
 /* Eingabefelder: Pill-Form wie im Original */
 .input:focus,
 .textarea:focus,

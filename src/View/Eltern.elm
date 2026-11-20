@@ -39,7 +39,7 @@ viewEltern model p =
                     model.mutter
     in
     div []
-        [ div [ class "columns" ]
+        [ div [ class "columns asgla-eltern-columns" ]
             [ div [ class "column is-half" ]
                 [ case model.durchschnittseinkommen of
                     True ->
@@ -155,7 +155,7 @@ viewEinkommenMonat model textLabel p =
                         [ model.vater.haupttaetigkeit, model.mutter.haupttaetigkeit ]
                     )
     in
-    div [ class "field", style "margin-top" "1.5rem" ]
+    div [ class "field asgla-subcard" ]
         [ label [ class "label" ]
             [ text (textLabel ++ " (€) ")
             , showTooltip "Monatliches Nettoeinkommen aus der Haupttätigkeit (z.B. Gehalt, Lohn)"
