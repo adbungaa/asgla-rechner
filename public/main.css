@@ -275,18 +275,21 @@ html .button.save-button:active {
 
 .entry-controls {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
     align-items: stretch;
     width: 100%;
 }
 
+/* Betrag mind. 7rem, Bezeichnung/Art mind. 11rem; bei wenig Platz bricht die Bezeichnung um */
 .entry-controls .entry-cost {
-    flex: 0 0 8rem;
+    flex: 0 0 7rem;
+    min-width: 7rem;
 }
 
 .entry-controls .entry-label {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 11rem;
+    min-width: 11rem;
 }
 
 .entry-action {
@@ -326,7 +329,7 @@ html .button.save-button:active {
 
     .entry-row .entry-cost {
         width: auto !important;
-        flex: 0 0 34%;
+        flex: 0 0 40%;
     }
 
     .entry-row .entry-label {
@@ -484,3 +487,1243 @@ html .selbstbehalt-box.is-mutter .button.selbstbehalt-button:hover {
     border-color: #f08161;
     color: #1a1a1a;
 }
+
+
+
+/* =====================================================================
+   Original-Design (Hülle, Header, Reiter, Panels) plus neue Komponenten
+   im Original-Farbschema: #feead2 Creme, #69a6b4 Vater, #f9a374 Mutter,
+   #bbddc1 Kind, #1f5f6e Akzent, Text #404654 (Bulma-Standard), Barlow.
+   ===================================================================== */
+
+:root {
+    --asgla-teal-900: #1f5f6e;
+    --asgla-teal-600: #4f8996;
+    --asgla-ink: #404654;
+    --asgla-muted: #565c6b;
+    --asgla-border: #69a6b4;
+    --asgla-cream: #feead2;
+    --asgla-focus: #1b3a57;
+}
+
+:focus-visible {
+    outline: 3px solid var(--asgla-focus);
+    outline-offset: 2px;
+}
+
+/* Akzentfarben je Eingabebereich: Reiter und Panel (Panel = Reiterfarbe halbtransparent auf Creme) */
+.asgla-accent-vater {
+    --tab: #69a6b4;
+    --panel: rgba(9, 170, 195, 0.5);
+    --person-accent: #69a6b4;
+}
+
+.asgla-accent-mutter {
+    --tab: #f9a374;
+    --panel: rgba(249, 163, 116, 0.5);
+    --person-accent: #f9a374;
+}
+
+.asgla-accent-kind {
+    --tab: #bbddc1;
+    --panel: rgba(187, 221, 193, 0.5);
+    --person-accent: #bbddc1;
+}
+
+/* ---------- Seite und Hülle ---------- */
+
+.asgla-page {
+    position: relative;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #ffffff;
+    background-image: url('assets/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.asgla-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.asgla-container {
+    position: relative;
+    z-index: 2;
+}
+
+.asgla-shell {
+    background-color: var(--asgla-cream);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 18px;
+}
+
+.asgla-header {
+    margin: 0;
+}
+
+.asgla-header .title {
+    color: #2b303b;
+}
+
+/* Schrittleiste "So geht's" in der Kopfkarte */
+.asgla-so-gehts {
+    background-color: var(--asgla-cream);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.asgla-so-gehts-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--asgla-teal-900);
+    margin: 0 0 0.6rem;
+}
+
+.asgla-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.asgla-step-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    color: var(--asgla-teal-900);
+}
+
+.asgla-step-chip + .asgla-step-chip::before {
+    content: "→";
+    font-weight: 700;
+    margin: 0 0.35rem;
+}
+
+.asgla-step-chip-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--asgla-teal-900);
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.asgla-step-chip-nr:empty {
+    display: none;
+}
+
+/* ---------- Über uns ---------- */
+
+.asgla-ueberuns {
+    margin-top: -1rem;
+}
+
+.asgla-ueberuns-header {
+    box-shadow: none;
+}
+
+.asgla-ueberuns-toggle {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 700;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* ---------- Import (zugeklappt) ---------- */
+
+.asgla-import {
+    margin: 0 1.5rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.asgla-import-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+html .button.asgla-link-button {
+    background-color: #bbddc1;
+    border-color: #bbddc1;
+    color: #363636;
+    text-decoration: underline;
+}
+
+html .button.asgla-link-button:hover {
+    background-color: #a6d0ae;
+    border-color: #a6d0ae;
+}
+
+.asgla-import-details {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Summary sieht aus wie der Original-Importbutton (is-primary) */
+.asgla-import-summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 0.3em 1em;
+    border: 4px solid #69a6b4;
+    border-radius: 24px;
+    background-color: #69a6b4;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+
+.asgla-import-summary::-webkit-details-marker {
+    display: none;
+}
+
+.asgla-import-summary:hover,
+.asgla-import-details[open] > .asgla-import-summary {
+    background-color: #4f8996;
+    border-color: #4f8996;
+}
+
+.asgla-import-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+}
+
+.asgla-import-collapse > .asgla-import-body {
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: visibility 0.35s;
+}
+
+.asgla-import:has(.asgla-import-details[open]) .asgla-import-collapse {
+    grid-template-rows: 1fr;
+}
+
+.asgla-import:has(.asgla-import-details[open]) .asgla-import-collapse > .asgla-import-body {
+    visibility: visible;
+    padding-bottom: 1.5rem;
+}
+
+/* Ohne :has() (ältere Browser) bleibt der Inhalt sichtbar */
+@supports not selector(:has(*)) {
+    .asgla-import-collapse {
+        grid-template-rows: 1fr;
+    }
+
+    .asgla-import-collapse > .asgla-import-body {
+        visibility: visible;
+    }
+}
+
+.asgla-import-intro {
+    margin-bottom: 0.75rem;
+}
+
+.asgla-import-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.asgla-import textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.asgla-msg {
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+/* ---------- Formular: Schritte ---------- */
+
+.asgla-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.asgla-hinweis {
+    color: var(--asgla-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.asgla-step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.asgla-step-header-small {
+    margin-bottom: 1rem;
+}
+
+.asgla-step-number {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--asgla-teal-900);
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.asgla-step-number-small {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+}
+
+.asgla-step-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 0.2rem;
+    color: #2b303b;
+}
+
+.asgla-step-help {
+    margin: 0;
+    color: var(--asgla-muted);
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+/* Hilfetext unter Feldern */
+.asgla-help {
+    margin-top: 0.35rem;
+    color: var(--asgla-muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.asgla-help-top {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.asgla-optional {
+    margin-left: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--asgla-muted);
+}
+
+.asgla-required {
+    color: #b42318;
+    font-weight: 700;
+}
+
+.asgla-tabs-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.asgla-tabs-hint > i {
+    color: var(--asgla-teal-900);
+    margin-top: 0.2rem;
+}
+
+/* Reiter wie im Original: farbige Flächen, aktiver Reiter fett mit dunklem Unterstrich */
+.asgla-tabs {
+    display: flex;
+}
+
+.asgla-tab {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5em 1em;
+    border: none;
+    border-bottom: 4px solid transparent;
+    border-radius: 8px 8px 0 0;
+    background-color: var(--tab);
+    color: #1a1a1a;
+    font: inherit;
+    cursor: pointer;
+}
+
+.asgla-tab .icon {
+    margin: 0;
+}
+
+.asgla-tab:not(.is-active):hover {
+    border-bottom-color: rgba(26, 26, 26, 0.45);
+}
+
+.asgla-tab.is-active {
+    font-weight: 700;
+    border-bottom-color: #1a1a1a;
+}
+
+.asgla-panel {
+    background-color: var(--panel);
+    border-radius: 0 0 8px 8px;
+    padding: 1.5rem;
+    color: #1a1a1a;
+}
+
+.asgla-panel-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2b303b;
+    margin: 0 0 1rem;
+}
+
+/* Unterabschnitte (Abzüge, weitere Einkünfte) */
+.asgla-subsection {
+    padding-top: 0.5rem;
+}
+
+.asgla-subsection-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.asgla-checkbox-block {
+    margin-top: 0.75rem;
+}
+
+.asgla-checkbox {
+    font-weight: 600;
+}
+
+.asgla-freitext {
+    margin-top: 0.5rem;
+}
+
+/* Unterkarten (Weitere Einkünfte, Abzüge, Kind): weiß auf dem Türkis-Panel */
+.asgla-subcard {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+}
+
+.asgla-subcard .asgla-subsection-title {
+    margin-top: 0;
+}
+
+/* Eingabefelder: Pill-Form wie im Original */
+.input:focus,
+.textarea:focus,
+.select select:focus {
+    border-color: var(--asgla-teal-900);
+    box-shadow: 0 0 0 3px rgba(31, 95, 110, 0.2);
+}
+
+.asgla-form .label {
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.asgla-form .field {
+    margin-bottom: 1rem;
+}
+
+.asgla-form .entry-row {
+    margin-bottom: 0.75rem !important;
+}
+
+.asgla-json-textarea {
+    font-family: ui-monospace, Consolas, monospace;
+}
+
+.asgla-art-hinweis {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #b45309;
+}
+
+/* ---------- Aktionen ---------- */
+
+.asgla-disclaimer {
+    font-size: 0.85rem;
+    color: var(--asgla-muted);
+    margin: 0;
+}
+
+.asgla-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.asgla-result {
+    margin-top: 1.5rem;
+}
+
+/* ---------- Ergebnis: "Wer zahlt an wen?" ---------- */
+
+.ergebnis-karte {
+    border: 1px solid var(--asgla-border);
+    border-top: 4px solid var(--asgla-teal-900);
+    border-radius: 16px;
+    padding: 1.5rem;
+    background-color: #ffffff;
+}
+
+.ergebnis-titel {
+    color: var(--asgla-teal-900);
+    margin-bottom: 1.25rem;
+}
+
+.ergebnis-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ergebnis-person {
+    border: 2px solid var(--person-accent);
+    border-radius: 16px;
+    background-color: var(--panel);
+    padding: 1rem;
+    text-align: center;
+}
+
+.ergebnis-person--mutter {
+    --person-accent: #f9a374;
+    --panel: rgba(249, 163, 116, 0.5);
+}
+
+.ergebnis-person:not(.ergebnis-person--mutter) {
+    --person-accent: #69a6b4;
+    --panel: rgba(9, 170, 195, 0.5);
+}
+
+.ergebnis-person-rolle {
+    color: var(--asgla-muted);
+    margin-bottom: 0.25rem;
+}
+
+.ergebnis-person-icon {
+    display: block;
+    color: #1a1a1a;
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.ergebnis-person-name {
+    color: #1a1a1a;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.ergebnis-mitte {
+    text-align: center;
+}
+
+.ergebnis-pfeil {
+    display: block;
+    color: var(--asgla-teal-900);
+    font-size: 2rem;
+}
+
+.ergebnis-betrag {
+    color: var(--asgla-teal-900);
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0.25rem 0 0;
+    white-space: nowrap;
+}
+
+.ergebnis-betrag-label {
+    color: var(--asgla-muted);
+    margin: 0;
+}
+
+.ergebnis-satz {
+    font-size: 1.125rem;
+    text-align: center;
+    margin-top: 1.25rem;
+}
+
+.ergebnis-hinweis {
+    margin-top: 1rem;
+}
+
+.ergebnis-kacheln {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.ergebnis-kachel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 16px;
+    background-color: var(--asgla-cream);
+    padding: 0.75rem 1rem;
+}
+
+.ergebnis-kachel-icon {
+    color: var(--asgla-teal-900);
+    font-size: 1.25rem;
+    width: 2rem;
+    text-align: center;
+}
+
+.ergebnis-kachel-label {
+    color: var(--asgla-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.ergebnis-kachel-wert {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.ergebnis-aktion {
+    margin-top: 1.25rem;
+    text-align: right;
+}
+
+.ergebnis-details {
+    margin-top: 1.25rem;
+}
+
+.ergebnis-details > summary {
+    display: inline-flex;
+    cursor: pointer;
+    list-style: none;
+}
+
+.ergebnis-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ergebnis-details > summary.ergebnis-details-summary {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+    white-space: normal;
+}
+
+.ergebnis-details-inhalt {
+    margin-top: 1.25rem;
+}
+
+.ergebnis-chevron {
+    transition: transform 0.2s ease;
+}
+
+.ergebnis-details[open] > summary .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.ergebnis-karte,
+.form-error {
+    scroll-margin-top: 1rem;
+}
+
+.ergebnis-details table td.has-text-right,
+.ergebnis-details table th.has-text-right,
+.ergebnis-karte td.has-text-right,
+.ergebnis-details td.has-text-right {
+    white-space: nowrap;
+}
+
+.ergebnis-disclaimer {
+    font-size: 0.85rem;
+    color: var(--asgla-muted);
+    margin-top: 0.75rem;
+}
+
+/* Glossar als Akkordeon */
+details.ergebnis-glossar {
+    margin-top: 1.25rem;
+    border: 1px solid var(--asgla-border);
+    border-radius: 12px;
+    background-color: #ffffff;
+    padding: 0 1rem;
+}
+
+details.ergebnis-glossar > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+    min-height: 44px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    color: var(--asgla-teal-900);
+    border-radius: 4px;
+    list-style: none;
+}
+
+details.ergebnis-glossar > summary::-webkit-details-marker {
+    display: none;
+}
+
+details.ergebnis-glossar > summary::after {
+    content: "";
+    flex: 0 0 auto;
+    width: 0.5em;
+    height: 0.5em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    margin-right: 0.35em;
+    transition: transform 0.2s ease;
+}
+
+details.ergebnis-glossar[open] > summary {
+    border-bottom: 1px solid var(--asgla-border);
+}
+
+details.ergebnis-glossar[open] > summary::after {
+    transform: rotate(-135deg);
+}
+
+details.ergebnis-glossar > summary:hover {
+    background-color: rgba(254, 234, 210, 0.6);
+}
+
+details.ergebnis-glossar > :not(summary) {
+    padding-bottom: 0.75rem;
+}
+
+.ergebnis-glossar dt {
+    font-weight: 600;
+    margin-top: 0.6rem;
+}
+
+.ergebnis-glossar dd {
+    margin-left: 0;
+    margin-bottom: 0.2rem;
+}
+
+/* Fehlerbox */
+.notification.form-error {
+    background-color: #fdecea;
+    color: #8a1c1c;
+    border-left: 4px solid #c62828;
+    border-radius: 6px;
+}
+
+.notification.form-error .title {
+    color: #8a1c1c;
+}
+
+/* ---------- Tooltips nur bei Bedarf, Antippflächen ---------- */
+
+.tooltip-container .tooltip-text {
+    display: none;
+}
+
+.tooltip-container:hover .tooltip-text,
+.tooltip-container:focus .tooltip-text,
+.tooltip-container:focus-within .tooltip-text {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-container {
+    min-width: 28px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: -4px -2px;
+    vertical-align: middle;
+}
+
+html .button,
+.ergebnis-details > summary,
+.footer-link {
+    min-height: 44px;
+}
+
+/* Bulma setzt Buttons auf feste Höhe und nowrap */
+html .button {
+    height: auto;
+    white-space: normal;
+}
+
+.footer-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+label.checkbox,
+label.radio {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 0;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--asgla-teal-900);
+}
+
+.asgla-checkbox-kind input[type="checkbox"] {
+    transform: none;
+    margin: 0 0.5rem 0 0 !important;
+}
+
+select:focus-visible,
+.select select:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible,
+.button:focus-visible {
+    outline: 3px solid #1b3a57 !important;
+    outline-offset: 2px;
+}
+
+.entry-controls .entry-label select {
+    min-width: 11rem;
+    max-width: 100%;
+    text-overflow: ellipsis;
+}
+
+/* Zeilen-Buttons (+/-) exakt so hoch wie die Eingabefelder */
+.entry-row .entry-action,
+.entry-row .entry-input,
+.entry-row .select select {
+    height: 2.5em;
+    box-sizing: border-box;
+}
+
+.entry-row .control.entry-add-control,
+.entry-row .control.entry-remove-control {
+    display: flex;
+}
+
+/* Kind-Tab: "Bereits bezahlt von" bündig auf einer Linie */
+.asgla-bezahlt .field {
+    margin-bottom: 0;
+}
+
+.asgla-bezahlt .buttons {
+    margin-bottom: 0;
+}
+
+.asgla-bezahlt > div {
+    align-items: center;
+}
+
+/* ---------- Abzugs-Vorlagen ---------- */
+.asgla-vorlagen { margin: 0 0 0.75rem; }
+.asgla-vorlagen-titel { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
+.asgla-vorlagen-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.35rem; }
+.asgla-vorlage { border: 2px solid #1f5f6e; color: #1f5f6e; background: #fff; white-space: nowrap; }
+.asgla-vorlage:hover:not([disabled]) { background: rgba(9, 170, 195, 0.15); }
+.asgla-vorlage:focus-visible { outline: 3px solid #f9a374; outline-offset: 2px; }
+.asgla-vorlage[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+/* ---------- Skript-Slider ---------- */
+.skript-overlay { position: fixed; inset: 0; z-index: 1000; }
+.skript-backdrop { position: absolute; inset: 0; background: rgba(15, 57, 67, 0.55); opacity: 0; transition: opacity 0.25s ease; }
+.skript-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(480px, 100%); background: #fff; color: #404654; display: flex; flex-direction: column; box-shadow: -8px 0 24px rgba(0,0,0,0.25); transform: translateX(100%); transition: transform 0.25s ease; font-family: Barlow, sans-serif; }
+.skript-overlay.is-open .skript-backdrop { opacity: 1; }
+.skript-overlay.is-open .skript-panel { transform: translateX(0); }
+.skript-head { display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1rem; background: #1f5f6e; color: #fff; }
+.skript-head h2 { flex: 1; margin: 0; font-size: 1.15rem; color: #fff; }
+.skript-pdf { color: #fff; text-decoration: underline; font-size: 0.9rem; }
+.skript-close { background: transparent; border: 0; color: #fff; font-size: 2rem; line-height: 1; cursor: pointer; min-width: 44px; min-height: 44px; }
+.skript-close:focus-visible, .skript-pdf:focus-visible, .skript-toc a:focus-visible, .skript-toc summary:focus-visible { outline: 3px solid #f9a374; outline-offset: 2px; }
+.skript-toc { background: #feead2; border-bottom: 1px solid #69a6b4; padding: 0.5rem 1rem; }
+.skript-toc summary { cursor: pointer; font-weight: 600; padding: 0.4rem 0; }
+.skript-toc ul { list-style: none; margin: 0.25rem 0 0.5rem; padding: 0; max-height: 40vh; overflow: auto; }
+.skript-toc li { margin: 0; }
+.skript-toc a { display: block; padding: 0.3rem 0; color: #1f5f6e; }
+.skript-toc .skript-toc-sub a { padding-left: 1rem; font-size: 0.92rem; }
+.skript-body { flex: 1; overflow-y: auto; padding: 1rem 1.25rem 2rem; line-height: 1.55; overflow-wrap: anywhere; }
+.skript-body h1 { font-size: 1.4rem; }
+.skript-body h2 { font-size: 1.25rem; margin-top: 1.6rem; color: #1f5f6e; }
+.skript-body h3 { font-size: 1.08rem; margin-top: 1.2rem; }
+.skript-body table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.skript-body th, .skript-body td { border: 1px solid #bbddc1; padding: 0.3rem 0.5rem; text-align: left; }
+.skript-body blockquote { border-left: 4px solid #69a6b4; background: #feead2; margin: 0.8rem 0; padding: 0.5rem 0.9rem; }
+.skript-body ul, .skript-body ol { margin: 0.4rem 0 0.4rem 1.3rem; list-style: revert; }
+
+@media (prefers-reduced-motion: reduce) {
+    .asgla-import-collapse,
+    .asgla-import-collapse > .asgla-import-body,
+    details.ergebnis-glossar > summary::after,
+    .skript-backdrop,
+    .skript-panel {
+        transition: none;
+    }
+}
+
+/* ---------- Mobil (<= 768 px): wie Original (komplett creme), ohne Überlauf ---------- */
+
+@media screen and (max-width: 768px) {
+    .asgla-page {
+        padding: 0.5rem;
+        background-image: none;
+        background-color: var(--asgla-cream);
+        min-height: 0;
+    }
+
+    .asgla-page::before {
+        display: none;
+    }
+
+    .asgla-shell {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        border-radius: 12px;
+        box-shadow: none;
+    }
+
+    .asgla-import {
+        margin: 0 0.5rem;
+    }
+
+    .asgla-import-top {
+        justify-content: flex-start;
+    }
+
+    .asgla-import-buttons .button {
+        flex: 1 1 100%;
+    }
+
+    .columns.is-mobile {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .asgla-form .columns {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .asgla-form .columns > .column {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Reiter untereinander wie im Original */
+    .asgla-tabs {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .asgla-tab {
+        justify-content: flex-start;
+        border-radius: 8px;
+        padding: 0.5em 1rem;
+    }
+
+    .asgla-panel {
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-top: 2px;
+    }
+
+    .asgla-subcard {
+        padding: 1rem 0.75rem;
+    }
+
+    .asgla-steps {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .asgla-step-chip + .asgla-step-chip::before {
+        content: none;
+    }
+
+    .asgla-so-gehts {
+        padding: 0.9rem 1rem;
+    }
+
+    .column.is-half {
+        width: 100%;
+    }
+
+    .input,
+    .select,
+    .select select {
+        min-height: 44px;
+    }
+
+    html .button.entry-action {
+        height: 44px;
+    }
+
+    .tooltip-container {
+        min-width: 44px;
+        min-height: 44px;
+        margin: -12px -6px;
+    }
+
+    .asgla-form > *,
+    .asgla-step > div,
+    .ergebnis-karte > *,
+    .ergebnis-details > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .ergebnis-karte,
+    .ergebnis-details-inhalt,
+    .asgla-step {
+        overflow-wrap: anywhere;
+    }
+
+    .ergebnis-karte table,
+    .ergebnis-details table {
+        display: table;
+        width: 100%;
+        table-layout: auto;
+    }
+
+    .ergebnis-karte td,
+    .ergebnis-karte th,
+    .ergebnis-details td,
+    .ergebnis-details th {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .ergebnis-flow,
+    .ergebnis-kacheln {
+        grid-template-columns: 1fr;
+    }
+
+    .ergebnis-pfeil {
+        transform: rotate(90deg);
+        margin: 0.25rem auto;
+    }
+
+    .ergebnis-betrag {
+        font-size: 2.5rem;
+    }
+
+    .ergebnis-aktion,
+    .ergebnis-aktion .button,
+    .ergebnis-details > summary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ergebnis-aktion {
+        text-align: center;
+    }
+
+    .asgla-result {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .ergebnis-karte {
+        padding: 1rem;
+    }
+
+    /* Art der Einkunft bekommt eine eigene volle Zeile */
+    .entry-controls {
+        flex-wrap: wrap;
+        row-gap: 0.5rem;
+    }
+
+    .entry-controls .entry-cost {
+        order: 1;
+    }
+
+    .entry-controls .entry-remove-control {
+        order: 2;
+    }
+
+    .entry-controls .entry-add-control {
+        order: 4;
+        flex: 0 0 100%;
+    }
+
+    .entry-controls .entry-add-control .button {
+        width: 100%;
+    }
+
+    .entry-controls .entry-label {
+        order: 3;
+        flex: 0 0 100%;
+        width: 100% !important;
+    }
+
+    .asgla-checkbox-block .checkbox.asgla-checkbox,
+    .asgla-checkbox-kind {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0.5rem 0.25rem;
+        cursor: pointer;
+    }
+}
+
+@media screen and (min-width: 769px) {
+    .asgla-subcard {
+        padding: 1rem 1.25rem;
+    }
+}
+
+/* ---------- Skript-Slider: Hover/Active, Links, Größe ändern ---------- */
+.skript-panel { min-width: 320px; max-width: 95vw; }
+.skript-panel.is-resizing { transition: none; user-select: none; }
+.skript-resize { position: absolute; left: -6px; top: 0; bottom: 0; width: 14px; cursor: ew-resize; z-index: 2; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.skript-resize::after { content: ""; width: 4px; height: 56px; border-radius: 4px; background: #69a6b4; opacity: 0.7; transition: opacity 0.15s, height 0.15s; }
+.skript-resize:hover::after, .skript-resize:focus-visible::after, .skript-panel.is-resizing .skript-resize::after { opacity: 1; height: 96px; background: #1f5f6e; }
+.skript-resize:focus-visible { outline: 3px solid #f9a374; outline-offset: -3px; }
+.skript-pdf { display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.skript-pdf:hover { text-decoration-thickness: 2px; background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+.skript-toc summary { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
+.skript-toc-aktuell { font-weight: 400; font-size: 0.85rem; color: #1f5f6e; opacity: 0.85; }
+.skript-toc details[open] .skript-toc-aktuell, .skript-toc[open] .skript-toc-aktuell { display: none; }
+.skript-toc a { border-left: 4px solid transparent; padding-left: 0.5rem; border-radius: 0 4px 4px 0; text-decoration: none; transition: background-color 0.15s, border-color 0.15s; }
+.skript-toc .skript-toc-sub a { padding-left: 1.25rem; }
+.skript-toc a:hover { background: rgba(105, 166, 180, 0.25); text-decoration: underline; }
+.skript-toc a.is-active { background: #bbddc1; border-left-color: #1f5f6e; font-weight: 700; }
+.skript-body a { color: #1f5f6e; text-decoration: none; border-bottom: 1px solid rgba(31, 95, 110, 0.35); transition: background-color 0.15s, border-color 0.15s; }
+.skript-body a:hover, .skript-body a:focus-visible { text-decoration: underline; border-bottom-color: transparent; background: rgba(105, 166, 180, 0.2); }
+.skript-flash { animation: skript-flash 1.8s ease-out; }
+@keyframes skript-flash { 0%, 40% { background: #f9a374; } 100% { background: transparent; } }
+
+/* ---------- Kurze Einblend-Animation, z. B. "Bereits bezahlt von" ---------- */
+.asgla-bezahlt { overflow: hidden; animation: asgla-einblenden 0.3s ease-out both; }
+@keyframes asgla-einblenden { from { opacity: 0; max-height: 0; transform: translateY(-6px); } to { opacity: 1; max-height: 14rem; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .asgla-bezahlt, .skript-flash { animation: none; } }
+
+/* ---------- +/- Buttons exakt so hoch wie die Felder (Desktop: 40 px; mobil bleiben 44 px) ---------- */
+@media screen and (min-width: 769px) {
+    html .entry-row .button.entry-action,
+    html .entry-row .entry-remove,
+    html .entry-row .entry-add { min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; }
+}
+
+/* ---------- Fortschrittsanzeige vor "Berechnen" ---------- */
+.asgla-fortschritt { background: #fff; border: 2px solid #bbddc1; border-radius: 12px; padding: 0.75rem 1rem; margin: 1rem 0 0.5rem; }
+.asgla-fortschritt-titel { font-weight: 700; margin: 0 0 0.4rem; color: #1f5f6e; }
+.asgla-fortschritt-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.asgla-fortschritt-liste li { display: flex; align-items: baseline; gap: 0.5rem; }
+.asgla-fortschritt-liste .is-done { color: #1f5f6e; }
+.asgla-fortschritt-liste .is-done .asgla-fortschritt-icon { color: #2f8f4e; }
+.asgla-fortschritt-liste .is-open { font-weight: 600; color: #404654; }
+.asgla-fortschritt-liste .is-open .asgla-fortschritt-icon { color: #c2530a; }
+
+/* Skript-Verweise im Fließtext */
+.skript-link {
+  color: #1f5f6e;
+  border-bottom: 1px dotted;
+  text-decoration: none;
+  cursor: pointer;
+}
+.skript-link:hover,
+.skript-link:focus-visible {
+  border-bottom-style: solid;
+  background: rgba(105, 166, 180, 0.2);
+}
+.skript-link:focus-visible {
+  outline: 3px solid #f9a374;
+  outline-offset: 2px;
+}
+
+/* ---------- Ergebnis: einheitliche Farben passend zur Seite (Creme, Teal, Orange) ---------- */
+.ergebnis-karte { border-color: var(--asgla-border); border-top-color: var(--asgla-teal-900); }
+.ergebnis-person:not(.ergebnis-person--mutter) { --person-accent: #69a6b4; --panel: #e1eef1; }
+.ergebnis-person--mutter { --person-accent: #f9a374; --panel: #fde6d6; }
+.ergebnis-kachel { background-color: #eef5f7; border: 1px solid #cfe4e9; }
+.ergebnis-aktion .button { background-color: var(--asgla-teal-900); border-color: var(--asgla-teal-900); color: #fff; }
+.ergebnis-aktion .button:hover { background-color: #164a57; border-color: #164a57; color: #fff; }
+/* alle Hinweiskästen im Ergebnis und Rechenweg: ein Stil (Creme mit orangem Rand, dunkler Text) */
+.ergebnis-karte .notification,
+.ergebnis-details .notification { background-color: var(--asgla-cream); color: var(--asgla-ink); border-left: 4px solid #f9a374; border-radius: 8px; }
+.ergebnis-karte .has-text-danger,
+.ergebnis-details .has-text-danger,
+.ergebnis-karte .has-text-warning-dark,
+.ergebnis-details .has-text-warning-dark { color: var(--asgla-ink) !important; }
+.ergebnis-details .has-background-warning-light,
+.ergebnis-details .has-background-info-light,
+.ergebnis-details .has-background-danger-light { background-color: var(--asgla-cream) !important; color: var(--asgla-ink); }
+
+/* Glossar: Hover/Fokus über die gesamte Breite des Akkordeons */
+details.ergebnis-glossar { padding: 0; overflow: hidden; }
+details.ergebnis-glossar > summary { padding: 0.75rem 1rem; border-radius: 0; }
+details.ergebnis-glossar > summary:hover,
+details.ergebnis-glossar > summary:focus-visible { background-color: rgba(105, 166, 180, 0.2); }
+details.ergebnis-glossar > :not(summary) { padding: 0 1rem 0.75rem; }
+
+html .ergebnis-aktion .button { background-color: var(--asgla-teal-900); border-color: var(--asgla-teal-900); color: #fff; }
+html .ergebnis-aktion .button:hover { background-color: #164a57; border-color: #164a57; color: #fff; }
+
+html .ergebnis-karte .notification,
+html .ergebnis-karte .notification.is-warning.is-light,
+html .ergebnis-karte .notification.is-info,
+html .ergebnis-details .notification,
+html .ergebnis-details .notification.is-warning.is-light,
+html .ergebnis-details .notification.is-info,
+html .ergebnis-details .notification.is-info.is-light { background-color: var(--asgla-cream); color: var(--asgla-ink); border-left: 4px solid #f9a374; border-radius: 8px; }
